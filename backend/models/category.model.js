@@ -1,17 +1,35 @@
 import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
-  family: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Family"
-  },
+	family: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Family",
+		required: true
+	},
 
-  name: String,
-  type: {
-    type: String,
-    enum: ["income", "expense"]
-  }
+	name: {
+		type: String,
+		required: true
+	},
+
+	categoryType: {
+		type: String,
+		enum: ["income", "expense", "investment"],
+		required: true
+	},
+
+	createdBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User"
+	}
+
 }, { timestamps: true });
+
+// Prevent duplicate categories in same family
+categorySchema.index(
+    { family: 1, name: 1, categoryType: 1 },
+    { unique: true }
+);
 
 const Category = mongoose.model("Category", categorySchema);
 export default Category;

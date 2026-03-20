@@ -1,55 +1,58 @@
 import mongoose from "mongoose";
 
 const transactionSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  },
+	user: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User",
+		required: true
+	},
 
-  family: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Family"
-  },
+	family: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Family",
+		required: true
+	},
 
-  type: {
-    type: String,
-    enum: ["income", "expense", "investment"]
-  },
+	type: {
+		type: String,
+		enum: ["income", "expense", "investment"],
+		required: true
+	},
 
-  subType: {
-    type: String,
-    enum: [
-      "earned",
-      "one-time",
-      "investment-return",
-      "regular-expense",
-      "investment-out"
-    ]
-  },
+	title: { type: String, required: true },
 
-  amount: Number,
 
-  category: {
-    type: String
-    // groceries, wifi, rent, etc
-  },
+	amount: {
+		type: Number,
+		required: true,
+		min: 0
+	},
 
-  label: {
-    type: String,
-    enum: ["need", "want", "essential", "non-essential"]
-  },
+	category: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Category",
+		required: true,
+	},
 
-  note: String,
 
-  date: {
-    type: Date,
-    default: Date.now
-  }
+	labels: [{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Label",
+		required : true, //for beetter analytics
+	}], //can add multiple labels
+
+
+	description: String,
+
+	note: String,
+
+	date: {
+		type: Date,
+		default: Date.now
+	},
+
+
 }, { timestamps: true });
-
-transactionSchema.index({ family: 1, date: -1 });
-transactionSchema.index({ user: 1 });
-transactionSchema.index({ type: 1 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);
 export default Transaction;
