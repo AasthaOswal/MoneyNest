@@ -1,6 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/auth.route.js";
+
 
 // Load environment variables
 dotenv.config();
@@ -9,6 +12,10 @@ const app = express();
 
 // Middleware to parse incoming JSON payloads
 app.use(express.json());
+app.use(cookieParser());
+
+// base route
+app.use("/api/auth", authRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {

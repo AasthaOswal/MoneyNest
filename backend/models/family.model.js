@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 const familySchema = new mongoose.Schema({
 
     familyName: {
-		type: String,
-		required: true,
+        type: String,
+        required: true,
     },
     familyAdmin: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "User"
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     },
 }, { timestamps: true });
 
