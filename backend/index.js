@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import authRoutes from "./routes/auth.route.js";
+import authRoutes from "./routes/auth.routes.js";
+import familyRoutes from "./routes/family.routes.js";
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 // base route
 app.use("/api/auth", authRoutes);
+app.use("/api/family" , familyRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {
