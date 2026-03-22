@@ -14,7 +14,7 @@ import crypto from "crypto";
 */
 // controllers/family.controller.js
 
-
+// joi validation yet to add to this
 
 // =======================
 // 🟢 CREATE FAMILY
@@ -35,8 +35,9 @@ export const createFamily = async (req, res) => {
     });
 
     res.status(201).json({
+      success : true,
       message: "Family created successfully",
-      family
+      data : family
     });
 
   } catch (err) {
@@ -92,7 +93,7 @@ export const generateInvite = async (req, res) => {
 export const joinFamilyWithToken = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { token } = req.body;
+    const { token } = req.query;
 
     const user = await User.findById(userId);
 
@@ -132,25 +133,49 @@ export const joinFamilyWithToken = async (req, res) => {
     family.inviteTokenExpires = null;
     await family.save();
 
-    return res.status(200).json({ success : true, message: "Joined family successfully", data : family._id});
+    return res.status(200).json({ success : true, message: "Joined family successfully", data : family});
 
   } catch (err) {
+    console.warn(err);
     return res.status(500).json({ success : false, message: "Error joining family" });
   }
 };
 
 
+
 // =======================
-// 🔵 GET MY FAMILY DETAILS
+// 🔵 GET MY FAMILY DETAILS WITH MEMBERS
 // =======================
 export const getMyFamily = async (req, res) => {
   try {
+    // 1️⃣ Get user with family
     const user = await User.findById(req.user._id)
       .populate("family");
 
-    return res.json({ success : true, data: user.family, });
+    if (!user.family) {
+      return res.status(404).json({
+        success: false,
+        message: "User is not part of any family"
+      });
+    }
+
+    // 2️⃣ Get all members of this family
+    const members = await User.find({ family: user.family._id })
+      .select("name email role"); // _id comes by default
+
+    // 3️⃣ Return combined response
+    return res.json({
+      success: true,
+      data: {
+        family: user.family,
+        members: members
+      }
+    });
 
   } catch (err) {
-    return res.status(500).json({ success : false, message: "Error fetching family" });
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching family"
+    });
   }
 };

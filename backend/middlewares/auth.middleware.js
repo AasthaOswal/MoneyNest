@@ -6,14 +6,23 @@ import User from "../models/user.model.js";
 // =======================
 export const authenticateToken = async (req, res, next) => {
   try {
+    // Get token from header
     const authHeader = req.headers.authorization;
+    const headerToken =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : null;
 
-    // Check if token exists
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Get token from cookie
+    const cookieToken = req.cookies?.accessToken;
+
+    // Prefer header, fallback to cookie
+    const token = headerToken || cookieToken;
+
+    if (!token) {
       return res.status(401).json({ message: "Not authorized, no token" });
     }
 
-    const token = authHeader.split(" ")[1];
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -29,8 +38,10 @@ export const authenticateToken = async (req, res, next) => {
 
     next();
   } catch (err) {
+
+    console.error("Error in authenticate middleware: ", err);
     return res.status(401).json({
-      message: "Token expired or invalid"
+      message: "Token expired or invalid. Please signup or login first."
     });
   }
 };
@@ -48,12 +59,13 @@ export const authorizeRoles = (...roles) => {
 
       if (!roles.includes(req.user.role)) {
         return res.status(403).json({
-          message: "Access denied: insufficient permissions"
+          message: "Access denied: You dont have permissions to perform this action."
         });
       }
 
       next();
     } catch (err) {
+      console.error("Error in authorize roles middleware: ", err);
       return res.status(500).json({
         message: "Authorization error"
       });

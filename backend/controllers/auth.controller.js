@@ -33,6 +33,17 @@ const sendRefreshToken = (res, token) => {
   });
 };
 
+
+// 🍪 Send access token in cookie
+const sendAccessToken = (res, token) => {
+  res.cookie("accessToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+};
+
 // 🧹 Safe user response
 const getSafeUser = (user) => {
   return {
@@ -128,6 +139,9 @@ export const login = async (req, res) => {
     await user.save();
 
     sendRefreshToken(res, refreshToken);
+
+    // for easier postman testing.
+    sendAccessToken(res, accessToken);
 
     res.status(200).json({
       user: getSafeUser(user),
