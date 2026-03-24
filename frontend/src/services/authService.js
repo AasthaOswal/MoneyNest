@@ -11,6 +11,7 @@ const signup = async (userData) => {
 
 const login = async (credentials) => {
   const response = await api.post("/auth/login", credentials);
+  console.log(response.data)
   if (response.data.accessToken) {
     localStorage.setItem("accessToken", response.data.accessToken);
     localStorage.setItem("user", JSON.stringify(response.data.user));
