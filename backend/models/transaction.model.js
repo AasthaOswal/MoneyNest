@@ -28,12 +28,12 @@ const transactionSchema = new mongoose.Schema({
 		min: 0
 	},
 
-	// check if we should support multiple categories here because what if we have just paid a food bill, then 2 categories Food and Bills should come here right?
-	category: {
+	// we should support multiple categories here because what if we have just paid a food bill, then 2 categories Food and Bills should come here right?
+	category: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Category",
 		required: true,
-	},
+	}],
 
 
 	labels: [{
@@ -51,6 +51,12 @@ const transactionSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now
 	},
+
+	// can be photo or pdf
+	transactionDoc:{
+		url : {type : String, },
+		publicId: {type : String,},
+	}
 
 
 }, { timestamps: true });
