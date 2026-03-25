@@ -6,7 +6,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import familyRoutes from "./routes/family.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
-
+import labelRoutes from './routes/label.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +28,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/family" , familyRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/labels", labelRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {

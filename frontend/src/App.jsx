@@ -12,6 +12,12 @@ import CategoriesPage from './pages/categories/CategoriesPage';
 import CreateCategory from './pages/categories/CreateCategory';
 import CategoryDetails from './pages/categories/CategoryDetails';
 
+
+//Label related pages
+import LabelsPage from './pages/labels/LabelsPage';
+import CreateLabel from './pages/labels/CreateLabel';
+import LabelDetails from './pages/labels/LabelDetails';
+
 // Layouts and Contexts
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -44,7 +50,6 @@ function App() {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/individual-dashboard" element={<div>Individual Dashboard</div>} />
                   <Route path="/transactions" element={<div>Transactions</div>} />
-                  <Route path="/labels" element={<div>Labels</div>} />
                   <Route path="/goals" element={<div>Goals</div>} />
                   <Route path="/reminders" element={<div>Reminders</div>} />
 
@@ -53,6 +58,11 @@ function App() {
                   <Route path="/categories" element={<CategoriesPage />} />
                   <Route path="/categories/create" element={<CreateCategory />} />
                   <Route path="/categories/:id" element={<CategoryDetails />} />
+
+                  {/* Labels related pages */}
+                  <Route path="/labels" element={<LabelsPage />} />
+                  <Route path="/labels/create" element={<CreateLabel />} />
+                  <Route path="/labels/:id" element={<LabelDetails />} />
                   
                 </Route>
 
