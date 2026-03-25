@@ -209,11 +209,13 @@ export const getTransactions = async (req, res) => {
       page,
       limit,
       minAmount,
-      maxAmount
+      maxAmount,
+      startDate,
+      endDate
     } = req.query;
 
     const { error, value } = getTransactionsValidation.validate(
-      { search, type, page, limit, minAmount, maxAmount },
+      { search, type, page, limit, minAmount, maxAmount, startDate, endDate },
       { abortEarly: false }
     );
 

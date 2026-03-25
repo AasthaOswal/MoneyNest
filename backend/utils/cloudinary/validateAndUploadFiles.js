@@ -42,7 +42,7 @@ export const validateAndUploadFiles = async (filesObj, fileConfigs) => {
             const { fieldName } = config;
             const file = filesObj?.[fieldName]?.[0];
             const uploadOptions = {
-                folder: "studentWebsite",
+                folder: "MoneyNest",
                 resource_type: "auto",
                 access_mode: "public",
                 ...(config.cloudinaryOptions || {}) // merge extra options if provided
