@@ -85,7 +85,7 @@ instance.interceptors.response.use(
             { withCredentials: true }
           );
 
-          const accessToken = res.data.data.accessToken;
+          const accessToken = res.data.accessToken;
 
           // ✅ Store new token
           localStorage.setItem("accessToken", accessToken);
