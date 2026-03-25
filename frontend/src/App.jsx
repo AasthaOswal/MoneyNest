@@ -18,6 +18,13 @@ import LabelsPage from './pages/labels/LabelsPage';
 import CreateLabel from './pages/labels/CreateLabel';
 import LabelDetails from './pages/labels/LabelDetails';
 
+
+// Transactions pages
+import CreateTransaction from './pages/transactions/CreateTransaction';
+import TransactionsList from './pages/transactions/TransactionsList';
+import TransactionDetails from './pages/transactions/TransactionDetails';
+import EditTransaction from './pages/transactions/EditTransaction';
+
 // Layouts and Contexts
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -49,7 +56,6 @@ function App() {
                   <Route path="/family" element={<FamilyPage />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/individual-dashboard" element={<div>Individual Dashboard</div>} />
-                  <Route path="/transactions" element={<div>Transactions</div>} />
                   <Route path="/goals" element={<div>Goals</div>} />
                   <Route path="/reminders" element={<div>Reminders</div>} />
 
@@ -63,6 +69,12 @@ function App() {
                   <Route path="/labels" element={<LabelsPage />} />
                   <Route path="/labels/create" element={<CreateLabel />} />
                   <Route path="/labels/:id" element={<LabelDetails />} />
+
+
+                  <Route path="/transactions" element={<CreateTransaction />} />
+                  <Route path="/transactions/all" element={<TransactionsList />} />
+                  <Route path="/transactions/:id" element={<TransactionDetails />} />
+                  <Route path="/transactions/edit/:id" element={<EditTransaction />} />
                   
                 </Route>
 
