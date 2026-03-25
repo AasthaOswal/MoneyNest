@@ -25,11 +25,17 @@ const Login = () => {
 
     login(data.user); // 🔥 THIS IS THE MISSING PIECE
 
-  if (data.user.role === "admin") {
-  navigate("/admin-dashboard");
-} else {
-  navigate("/dashboard");
-}
+    if (data.user.role === "admin") {
+      navigate("/admin-dashboard");
+    } else if (data.user.role === "member") {
+      if(data.user.familyId != null){
+        navigate("/dashboard");
+      }else{
+        navigate("/family/join");
+      }
+    }else {
+      navigate("/dashboard");
+    }
   } catch (err) {
     console.log(err);
     setError(err.response?.data?.message || "Invalid email or password");

@@ -4,6 +4,8 @@ import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import Dashboard from './pages/dashboard/Dashboard';
 import Landing from './pages/home/Landing';
+import FamilyPage from './pages/family/FamilyPage';
+import ManageFamily from './pages/family/ManageFamily';
 
 // Layouts and Contexts
 import PublicLayout from './layouts/PublicLayout';
@@ -33,6 +35,7 @@ function App() {
 
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>
+                  <Route path="/family" element={<FamilyPage />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/individual-dashboard" element={<div>Individual Dashboard</div>} />
                   <Route path="/transactions" element={<div>Transactions</div>} />
@@ -44,7 +47,7 @@ function App() {
 
                 {/* Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['familyAdmin']} />}>
-                  <Route path="/manage-members" element={<div>Manage Members</div>} />
+                  <Route path="/family/manage" element={<ManageFamily />}  />
                 </Route>
 
                 {/* Admin */}

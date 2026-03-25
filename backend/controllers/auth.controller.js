@@ -11,6 +11,20 @@ import {
 If someone tries to use an expired or already used refresh token, it’s a sign of a breach. In that case, you might want to clear the entire refreshToken array to force a logout on all devices. 
 */
 
+const refreshTokenCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
+
+const accessTokenCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
+  maxAge: 15 * 60 * 1000
+};
+
 // 🔐 Generate Tokens
 const generateTokens = (userId) => {
   const accessToken = jwt.sign(
@@ -30,22 +44,12 @@ const generateTokens = (userId) => {
 
 // 🍪 Send refresh token in cookie
 const sendRefreshToken = (res, token) => {
-  res.cookie("refreshToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie("refreshToken", token, refreshTokenCookieOptions);
 };
 
 // 🍪 Send access token in cookie (Postman friendly)
 const sendAccessToken = (res, token) => {
-  res.cookie("accessToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
-    maxAge: 15 * 60 * 1000
-  });
+  res.cookie("accessToken", token, accessTokenCookieOptions);
 };
 
 // 🧹 Safe user response
@@ -54,7 +58,8 @@ const getSafeUser = (user) => {
     _id: user._id,
     name: user.name,
     email: user.email,
-    role: user.role
+    role: user.role,
+    familyId: user.familyId ? user.familyId._id : null,
   };
 };
 
@@ -106,6 +111,7 @@ export const signup = async (req, res) => {
         return res.status(201).json({ success: true, user: getSafeUser(user), accessToken });
 
     } catch (err) {
+      console.error("Error in signup controller : " , err);
         return res.status(500).json({ success: false, message: "Some error occurred. Please try again later" });
     }
 };
@@ -126,7 +132,7 @@ export const login = async (req, res) => {
 
     const { email, password } = value;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("familyId", "_id");
 
     if (!user) {
       return res.status(400).json({
@@ -170,6 +176,7 @@ export const login = async (req, res) => {
     });
 
   } catch (err) {
+    console.error("Error in login controller : " , err);
     return res.status(500).json({
       success: false,
       message: "Some error occurred. Please try again later."
@@ -243,6 +250,7 @@ export const refreshAccessToken = async (req, res) => {
     });
 
   } catch (err) {
+    console.error("Error in refresh token controller : " , err);
     return res.status(403).json({
       success: false,
       message: "Invalid or expired token"
@@ -274,8 +282,9 @@ export const logout = async (req, res) => {
       }
     }
 
-    res.clearCookie("refreshToken");
-    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken", refreshTokenCookieOptions);
+
+    res.clearCookie("accessToken", accessTokenCookieOptions);
 
     return res.json({
       success: true,
@@ -283,8 +292,11 @@ export const logout = async (req, res) => {
     });
 
   } catch (err) {
-    res.clearCookie("refreshToken");
-    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken", refreshTokenCookieOptions);
+
+    res.clearCookie("accessToken", accessTokenCookieOptions);
+
+    console.error("Error in logout controller : " , err);
 
     return res.json({
       success: false,

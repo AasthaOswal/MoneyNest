@@ -30,7 +30,7 @@ export const createFamily = async (req, res) => {
     });
 
     await User.findByIdAndUpdate(userId, {
-      family: family._id,
+      familyId: family._id,
       role: "familyAdmin"
     });
 
@@ -72,7 +72,7 @@ export const generateInvite = async (req, res) => {
 
     const expires = Date.now() + 15 * 60 * 1000; // 15 mins
 
-    await Family.findByIdAndUpdate(user.family, {
+    await Family.findByIdAndUpdate(user.familyId, {
       inviteToken: hashedToken,
       inviteTokenExpires: expires
     });
@@ -97,9 +97,9 @@ export const joinFamilyWithToken = async (req, res) => {
 
     const user = await User.findById(userId);
 
-    if (user.family) {
+    if (user.familyId) {
       return res.status(400).json({
-        success : true,
+        success : false,
         message: "Already part of a family."
       });
     }
@@ -124,7 +124,7 @@ export const joinFamilyWithToken = async (req, res) => {
 
     // ✅ Join user
     await User.findByIdAndUpdate(userId, {
-      family: family._id,
+      familyId: family._id,
       role: "member"
     });
 
@@ -150,9 +150,9 @@ export const getMyFamily = async (req, res) => {
   try {
     // 1️⃣ Get user with family
     const user = await User.findById(req.user._id)
-      .populate("family");
+      .populate("familyId");
 
-    if (!user.family) {
+    if (!user.familyId) {
       return res.status(404).json({
         success: false,
         message: "User is not part of any family"
@@ -160,14 +160,14 @@ export const getMyFamily = async (req, res) => {
     }
 
     // 2️⃣ Get all members of this family
-    const members = await User.find({ family: user.family._id })
+    const members = await User.find({ familyId: user.familyId._id })
       .select("name email role"); // _id comes by default
 
     // 3️⃣ Return combined response
     return res.json({
       success: true,
       data: {
-        family: user.family,
+        familyId: user.familyId,
         members: members
       }
     });

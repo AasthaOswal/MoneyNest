@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   User, 
+  UserPlus,
   ArrowRightLeft, 
   List, 
   Tag, 
@@ -35,7 +36,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Labels', path: '/labels', icon: Tag },
         { name: 'Goals', path: '/goals', icon: Target },
         { name: 'Reminders', path: '/reminders', icon: Bell },
-        ...(user?.role === 'familyAdmin' ? [{ name: 'Manage Members', path: '/manage-members', icon: Users }] : [])
+        { name: 'Family', path: '/family', icon: Users },
+        ...(user?.role === 'familyAdmin' ? [{ name: 'Manage Family', path: '/family/manage', icon: Users }] : [])
       ];
 
   return (
