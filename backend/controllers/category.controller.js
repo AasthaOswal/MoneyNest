@@ -1,5 +1,5 @@
 import Category from "../models/category.model.js";
-import { createCategorySchema } from "../validations/category.validation.js";
+import { createCategorySchema } from "../validators/category.validation.js";
 
 // =======================
 // ➕ CREATE CATEGORY
@@ -21,7 +21,7 @@ export const createCategory = async (req, res) => {
     const category = await Category.create({
       name,
       categoryType,
-      family: req.user.family,
+      family: req.user.familyId,
       createdBy: req.user._id
     });
 
@@ -31,6 +31,7 @@ export const createCategory = async (req, res) => {
     });
 
   } catch (err) {
+    console.log("Error in create category controller : ", err);
     if (err.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -47,6 +48,123 @@ export const createCategory = async (req, res) => {
 
 
 // =======================
+// ✏️ UPDATE CATEGORY
+// =======================
+export const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required"
+      });
+    }
+
+    const category = await Category.findOneAndUpdate(
+      { _id: id, family: req.user.familyId },
+      { name },
+      { new: true, runValidators: true }
+    );
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found"
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: category
+    });
+
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Category already exists in this family"
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Error updating category"
+    });
+  }
+};
+
+// =======================
+// 📋 GET ALL CATEGORIES
+// =======================
+export const getCategories = async (req, res) => {
+  try {
+    const { search, type } = req.query;
+
+    let query = {
+      family: req.user.familyId
+    };
+
+    if (type) {
+      query.categoryType = type;
+    }
+
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    const categories = await Category.find(query).sort({ createdAt: -1 });
+
+    return res.json({
+      success: true,
+      count: categories.length,
+      data: categories
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching categories"
+    });
+  }
+};
+
+
+// =======================
+// 🔍 GET CATEGORY BY ID
+// =======================
+export const getCategoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const category = await Category.findOne({
+      _id: id,
+      family: req.user.familyId
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found"
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: category
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching category"
+    });
+  }
+};
+
+
+// =======================
 // ❌ DELETE CATEGORY
 // =======================
 export const deleteCategory = async (req, res) => {
@@ -55,7 +173,7 @@ export const deleteCategory = async (req, res) => {
 
     const category = await Category.findOneAndDelete({
       _id: id,
-      family: req.user.family
+      family: req.user.familyId
     });
 
     if (!category) {
@@ -77,3 +195,4 @@ export const deleteCategory = async (req, res) => {
     });
   }
 };
+

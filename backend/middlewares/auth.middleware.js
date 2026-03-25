@@ -40,9 +40,30 @@ export const authenticateToken = async (req, res, next) => {
   } catch (err) {
 
     console.error("Error in authenticate middleware: ", err);
+      // 🔴 Access token expired
+  if (err.name === "TokenExpiredError") {
     return res.status(401).json({
-      message: "Token expired or invalid. Please signup or login first."
+      success: false,
+      code: "ACCESS_TOKEN_EXPIRED",
+      message: "Access token expired"
     });
+  }
+
+  // 🔴 Invalid token
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({
+      success: false,
+      code: "INVALID_TOKEN",
+      message: "Invalid token"
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    code: "AUTH_FAILED",
+    message: "Authentication failed"
+  });
+
   }
 };
 

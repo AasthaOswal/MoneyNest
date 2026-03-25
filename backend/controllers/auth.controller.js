@@ -220,9 +220,15 @@ export const refreshAccessToken = async (req, res) => {
     }
 
     if (!isValid) {
+
+      // possible token theft or reuse
+      user.refreshToken = []; // clear all sessions
+      await user.save();
+
       return res.status(403).json({
         success: false,
-        message: "Invalid refresh token"
+        code: "TOKEN_REUSE_DETECTED",
+        message: "Security issue detected. Logged out from all devices."
       });
     }
 
@@ -251,10 +257,30 @@ export const refreshAccessToken = async (req, res) => {
 
   } catch (err) {
     console.error("Error in refresh token controller : " , err);
+      // 🔴 Refresh token expired
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      success: false,
+      code: "REFRESH_TOKEN_EXPIRED",
+      message: "Session expired. Please login again."
+    });
+  }
+
+  // 🔴 Invalid token (tampered / wrong secret)
+  if (err.name === "JsonWebTokenError") {
     return res.status(403).json({
       success: false,
-      message: "Invalid or expired token"
+      code: "INVALID_REFRESH_TOKEN",
+      message: "Invalid refresh token"
     });
+  }
+
+  return res.status(403).json({
+    success: false,
+    code: "REFRESH_FAILED",
+    message: "Refresh failed"
+  });
+
   }
 };
 

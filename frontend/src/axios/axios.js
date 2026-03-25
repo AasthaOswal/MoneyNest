@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api"; // Adjust based on backend URL
+const API_URL = "http://localhost:5000/api";
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -10,7 +10,36 @@ const instance = axios.create({
   },
 });
 
-// Request Interceptor: Add Access Token to Header
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+// ✅ Notify all waiting requests after refresh success
+const onRefreshed = (token) => {
+  refreshSubscribers.forEach((cb) => cb(token, null));
+  refreshSubscribers = [];
+};
+
+// ❌ Notify all waiting requests if refresh fails
+const onRefreshFailed = (error) => {
+  refreshSubscribers.forEach((cb) => cb(null, error));
+  refreshSubscribers = [];
+};
+
+const addRefreshSubscriber = (cb) => {
+  refreshSubscribers.push(cb);
+};
+
+// 🔴 Logout helper (keep axios independent)
+const logoutUser = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("user");
+  delete instance.defaults.headers.common["Authorization"];
+  window.location.href = "/login";
+};
+
+// =======================
+// 🔹 REQUEST INTERCEPTOR
+// =======================
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -22,34 +51,91 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle Token Refresh on 401
+// =======================
+// 🔹 RESPONSE INTERCEPTOR
+// =======================
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.log("Inside interceptors:");
+
+    // 🌐 Network error (server down, no response)
+    if (!error.response) {
+      console.error("Network/Server error");
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
+    if (!originalRequest) return Promise.reject(error);
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    const code = error.response?.data?.code;
 
-      try {
-        const res = await axios.post(
-          `${API_URL}/auth/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
+    // =======================
+    // 🔴 ACCESS TOKEN EXPIRED
+    // =======================
+    if (error.response.status === 401 && code === "ACCESS_TOKEN_EXPIRED") {
 
-        const { accessToken } = res.data;
-        localStorage.setItem("accessToken", accessToken);
+      if (!isRefreshing) {
+        isRefreshing = true;
 
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return instance(originalRequest);
-      } catch (refreshError) {
-        // Refresh token failed, logout user
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+        try {
+          const res = await axios.post(
+            `${API_URL}/auth/refresh-token`,
+            {},
+            { withCredentials: true }
+          );
+
+          const accessToken = res.data.data.accessToken;
+
+          // ✅ Store new token
+          localStorage.setItem("accessToken", accessToken);
+          instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+          // ✅ Resolve all pending requests
+          onRefreshed(accessToken);
+
+          isRefreshing = false;
+
+        } catch (refreshError) {
+          isRefreshing = false;
+
+          // ❌ Reject all pending requests
+          onRefreshFailed(refreshError);
+
+          const refreshCode = refreshError.response?.data?.code;
+
+          if (
+            refreshCode === "REFRESH_TOKEN_EXPIRED" ||
+            refreshCode === "INVALID_REFRESH_TOKEN"
+          ) {
+            logoutUser();
+          }
+
+          if (refreshCode === "TOKEN_REUSE_DETECTED") {
+            alert("Security issue detected. Logged out from all devices.");
+            logoutUser();
+          }
+
+          return Promise.reject(refreshError);
+        }
       }
+
+      // ⏳ Queue requests while refreshing
+      return new Promise((resolve, reject) => {
+        addRefreshSubscriber((token, err) => {
+          if (err) return reject(err);
+
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(instance(originalRequest));
+        });
+      });
+    }
+
+    // =======================
+    // 🔴 INVALID ACCESS TOKEN
+    // =======================
+    if (code === "INVALID_TOKEN" || code === "AUTH_FAILED") {
+      logoutUser();
     }
 
     return Promise.reject(error);

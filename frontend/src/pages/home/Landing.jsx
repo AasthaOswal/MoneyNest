@@ -1,104 +1,172 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from '../../components/layoutParts/Navbar';
-import Footer from '../../components/layoutParts/Footer';
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  BarChart3,
+  Bell,
+  FileText,
+  Users,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
 
 const Landing = () => {
   return (
-    // Use 'bg-bg' but fallback to a standard gray if variable fails
     <div className="min-h-screen bg-bg text-text selection:bg-primary selection:text-white">
-      <Navbar />
 
-      {/* Hero Section */}
-      <header className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
-            Stop tracking in notebooks. <br />
-            {/* Standard blue-500 fallback if primary fails */}
-            <span className="text-primary">Start building wealth.</span>
+      {/* HERO */}
+      <section className="py-24 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
+            Manage family finances <br />
+            <span className="text-primary">without the chaos</span>
           </h1>
-          <p className="text-xl text-muted max-w-2xl mx-auto mb-10">
-            A real-time family finance tracker that aggregates individual incomes, 
-            expenses, and investments into a single powerful dashboard.
+
+          <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-10">
+            Track income, expenses, and goals across your entire family —
+            all in one clean, real-time dashboard.
           </p>
+
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {/* Added h-14 and leading-none to ensure button height visibility */}
-            <Link 
-              to="/signup" 
-              className="px-8 py-4 bg-primary hover:bg-primary-hover text-white rounded-xl text-lg font-bold shadow-xl transition-all flex items-center justify-center"
+            <Link
+              to="/signup"
+              className="px-8 py-4 bg-primary hover:bg-primary-hover text-white rounded-xl text-lg font-semibold flex items-center justify-center gap-2 shadow-lg transition-all"
             >
-              Create Family Account
+              Get Started <ArrowRight size={18} />
             </Link>
-            <button className="px-8 py-4 bg-surface border border-border text-text rounded-xl text-lg font-bold hover:border-primary transition-all">
-              See How It Works
+
+            <button className="px-8 py-4 bg-surface border border-border text-text rounded-xl text-lg font-semibold hover:border-primary transition-all">
+              Live Demo
             </button>
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* Story Section */}
-      <section className="py-20 bg-surface border-y border-border px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-4">The "Notebook" Story</h2>
-              <p className="text-muted leading-relaxed mb-4 italic">
-                "We saw our mom writing every single ₹30 and ₹40 transaction in a notebook for 3 years..."
-              </p>
-              <p className="text-muted leading-relaxed">
-                FamFinance was built to solve this. Individual inputs, combined visibility, 
-                and smart insights. No more manual pens and paper.
-              </p>
-            </div>
-            
-            {/* Visual Progress Bars using your 'income' variable */}
-            <div className="bg-bg p-8 rounded-2xl border border-border shadow-inner">
-              <h4 className="text-sm font-bold uppercase tracking-wider text-muted mb-6">Family Contribution Split</h4>
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-medium text-text">Mom</span> 
-                    <span className="text-income font-bold">60%</span>
-                  </div>
-                  <div className="w-full bg-border h-3 rounded-full">
-                    <div className="bg-income h-full rounded-full w-[60%] shadow-[0_0_10px_rgba(var(--income),0.5)]"></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-medium text-text">Dad</span> 
-                    <span className="text-income font-bold">30%</span>
-                  </div>
-                  <div className="w-full bg-border h-3 rounded-full">
-                    <div className="bg-income h-full rounded-full w-[30%] opacity-70"></div>
-                  </div>
-                </div>
-              </div>
+      {/* TRUST STRIP */}
+      <section className="py-10 border-y border-border bg-surface">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-10 text-muted text-sm">
+          <div className="flex items-center gap-2">
+            <Users size={16} /> Multi-user support
+          </div>
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={16} /> Secure & private
+          </div>
+          <div className="flex items-center gap-2">
+            <TrendingUp size={16} /> Real-time insights
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-16">
+            Everything your family needs
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<BarChart3 size={28} />}
+              title="Real-time Analytics"
+              desc="Understand spending patterns, track income sources, and make smarter decisions instantly."
+            />
+
+            <FeatureCard
+              icon={<Bell size={28} />}
+              title="Smart Alerts"
+              desc="Get notified when expenses go high or budgets are close to limits."
+            />
+
+            <FeatureCard
+              icon={<FileText size={28} />}
+              title="Reports & Export"
+              desc="Generate clean reports for your family discussions or financial planning."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* STORY / VISUAL */}
+      <section className="py-24 px-4 bg-surface border-y border-border">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+
+          {/* TEXT */}
+          <div>
+            <h2 className="text-3xl font-bold mb-4">
+              Built from real problems
+            </h2>
+
+            <p className="text-muted mb-4 italic">
+              "Every expense written in a notebook… every month the same struggle."
+            </p>
+
+            <p className="text-muted leading-relaxed">
+              We built this to replace manual tracking with a smart, shared system —
+              where every family member contributes, and everyone stays informed.
+            </p>
+          </div>
+
+          {/* VISUAL CARD */}
+          <div className="bg-bg border border-border rounded-2xl p-8 shadow-sm">
+            <h4 className="text-sm font-semibold text-muted mb-6 uppercase tracking-wide">
+              Monthly Overview
+            </h4>
+
+            <div className="space-y-6">
+              <ProgressBar label="Income" value="70%" color="income" />
+              <ProgressBar label="Expenses" value="45%" color="expense" />
+              <ProgressBar label="Investments" value="30%" color="investment" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features - Logic check: using FeatureCard sub-component */}
-      <section className="py-24 px-4 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-16">Designed for Real Families</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <FeatureCard icon="📊" title="Real-time Analytics" desc="Detailed visualization of needs vs wants and income sources." />
-          <FeatureCard icon="🚨" title="Smart Reminders" desc="Get alerts when you reach 50% of your monthly expense limit." />
-          <FeatureCard icon="📄" title="One-Click Export" desc="Generate PDF or Excel reports for your family meetings." />
+      {/* CTA */}
+      <section className="py-24 px-4 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold mb-6">
+            Start managing smarter today
+          </h2>
+
+          <p className="text-muted mb-10">
+            Join your family, track everything together, and take control of your finances.
+          </p>
+
+          <Link
+            to="/signup"
+            className="px-10 py-4 bg-primary hover:bg-primary-hover text-white rounded-xl text-lg font-semibold shadow-lg transition-all"
+          >
+            Create Your Family Account
+          </Link>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };
 
+/* ---------- COMPONENTS ---------- */
+
 const FeatureCard = ({ icon, title, desc }) => (
-  <div className="p-8 bg-surface border border-border rounded-2xl hover:border-primary transition-all group shadow-sm">
-    <div className="text-4xl mb-4">{icon}</div>
-    <h3 className="text-xl font-bold mb-2 text-text">{title}</h3>
-    <p className="text-muted leading-relaxed">{desc}</p>
+  <div className="p-8 bg-surface border border-border rounded-2xl hover:border-primary transition-all shadow-sm">
+    <div className="text-primary mb-4">{icon}</div>
+    <h3 className="text-xl font-semibold mb-2">{title}</h3>
+    <p className="text-muted">{desc}</p>
+  </div>
+);
+
+const ProgressBar = ({ label, value, color }) => (
+  <div>
+    <div className="flex justify-between text-sm mb-2">
+      <span className="text-text font-medium">{label}</span>
+      <span className={`text-${color} font-semibold`}>{value}</span>
+    </div>
+
+    <div className="w-full h-3 bg-border rounded-full">
+      <div
+        className={`h-full rounded-full bg-${color}`}
+        style={{ width: value }}
+      />
+    </div>
   </div>
 );
 
