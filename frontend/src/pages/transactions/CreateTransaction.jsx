@@ -1,7 +1,292 @@
+// import { useEffect, useState } from "react";
+// import TransactionService from "../../services/transaction.service";
+// import api from "../../axios/axios";
+// import { useNavigate } from "react-router-dom";
+// import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
+
+// const CreateTransaction = () => {
+//   const navigate = useNavigate();
+
+//   const [form, setForm] = useState({
+//     type: "expense",
+//     title: "",
+//     amount: "",
+//     category: [],
+//     labels: [],
+//     description: "",
+//     note: "",
+//     date: new Date().toISOString().split("T")[0],
+//   });
+
+//   const [file, setFile] = useState(null);
+//   const [categories, setCategories] = useState([]);
+//   const [labels, setLabels] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [errorMsg, setErrorMsg] = useState("");
+
+//   const fetchTypeData = async (type) => {
+//     try {
+//       const [categoryRes, labelRes] = await Promise.all([
+//         api.get(`/categories?type=${type}`),
+//         api.get("/labels"),
+//       ]);
+
+//       setCategories(categoryRes.data.data || []);
+//       setLabels(labelRes.data.data || []);
+//     } catch (err) {
+//       console.error("Failed to fetch categories/labels", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchTypeData(form.type);
+//   }, [form.type]);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleTypeChange = (type) => {
+//     setForm((prev) => ({
+//       ...prev,
+//       type,
+//       category: [],
+//       labels: [],
+//     }));
+//   };
+
+//   const handleCategoryChange = (values) => {
+//     setForm((prev) => ({ ...prev, category: values }));
+//   };
+
+//   const handleLabelChange = (values) => {
+//     setForm((prev) => ({ ...prev, labels: values }));
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setErrorMsg("");
+
+//     try {
+//       if (form.category.length === 0) {
+//         throw new Error("Please select at least one category.");
+//       }
+
+//       if (form.labels.length === 0) {
+//         throw new Error("Please select at least one label.");
+//       }
+
+//       const response = await TransactionService.createTransaction({
+//         ...form,
+//         transactionDoc: file,
+//       });
+
+//       navigate(`/transactions/${response.data.data._id}`);
+//     } catch (err) {
+//       setErrorMsg(
+//         err.response?.data?.message || err.message || "Something went wrong."
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-[calc(100vh-64px)] bg-bg px-4 py-6 md:px-8 md:py-10">
+//       <div className="mx-auto w-full max-w-4xl rounded-2xl border border-border bg-surface shadow-sm">
+//         <div className="flex flex-col gap-4 border-b border-border px-6 py-6 md:flex-row md:items-center md:justify-between">
+//           <div>
+//             <h2 className="text-2xl font-bold text-text">Create Transaction</h2>
+//             <p className="mt-1 text-sm text-muted">
+//               Record a new income, expense, or investment.
+//             </p>
+//           </div>
+
+//           <button
+//             type="button"
+//             onClick={() => navigate("/transactions/all")}
+//             className="rounded-xl border border-primary px-4 py-2 font-medium text-primary transition-colors hover:bg-primary hover:text-white"
+//           >
+//             View Transactions
+//           </button>
+//         </div>
+
+//         {errorMsg && (
+//           <div className="mx-6 mt-6 rounded-xl border border-expense bg-surface px-4 py-3 text-sm text-expense">
+//             {errorMsg}
+//           </div>
+//         )}
+
+//         <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6">
+//           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+//             {["expense", "income", "investment"].map((type) => (
+//               <label
+//                 key={type}
+//                 className={`flex cursor-pointer items-center justify-center rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
+//                   form.type === type
+//                     ? type === "expense"
+//                       ? "border-expense bg-surface text-expense"
+//                       : type === "income"
+//                       ? "border-income bg-surface text-income"
+//                       : "border-investment bg-surface text-investment"
+//                     : "border-border bg-bg text-muted hover:border-primary hover:text-text"
+//                 }`}
+//               >
+//                 <input
+//                   type="radio"
+//                   name="type"
+//                   value={type}
+//                   checked={form.type === type}
+//                   onChange={() => handleTypeChange(type)}
+//                   className="hidden"
+//                 />
+//                 <span className="capitalize">{type}</span>
+//               </label>
+//             ))}
+//           </div>
+
+//           <div className="space-y-5">
+//             <div>
+//               <label className="mb-2 block text-sm font-medium text-text">
+//                 Title <span className="text-expense">*</span>
+//               </label>
+//               <input
+//                 required
+//                 name="title"
+//                 value={form.title}
+//                 placeholder="e.g. Monthly Groceries"
+//                 onChange={handleChange}
+//                 className="w-full rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+//               />
+//             </div>
+
+//             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+//               <div>
+//                 <label className="mb-2 block text-sm font-medium text-text">
+//                   Amount <span className="text-expense">*</span>
+//                 </label>
+//                 <div className="relative">
+//                   <span className="pointer-events-none absolute left-4 top-3.5 text-muted">
+//                     ₹
+//                   </span>
+//                   <input
+//                     required
+//                     name="amount"
+//                     type="number"
+//                     min="0"
+//                     value={form.amount}
+//                     placeholder="0.00"
+//                     onChange={handleChange}
+//                     className="w-full rounded-xl border border-border bg-bg py-3 pl-8 pr-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+//                   />
+//                 </div>
+//               </div>
+
+//               <div>
+//                 <label className="mb-2 block text-sm font-medium text-text">
+//                   Date
+//                 </label>
+//                 <input
+//                   type="date"
+//                   name="date"
+//                   value={form.date}
+//                   onChange={handleChange}
+//                   className="w-full rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+//                 />
+//               </div>
+//             </div>
+
+//             <div>
+//               <label className="mb-2 block text-sm font-medium text-text">
+//                 Description
+//               </label>
+//               <textarea
+//                 name="description"
+//                 value={form.description}
+//                 placeholder="Add some descriptive text..."
+//                 rows="3"
+//                 onChange={handleChange}
+//                 className="w-full resize-none rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+//               />
+//             </div>
+
+//             <div>
+//               <label className="mb-2 block text-sm font-medium text-text">
+//                 Note
+//               </label>
+//               <textarea
+//                 name="note"
+//                 value={form.note}
+//                 placeholder="Any personal notes?"
+//                 rows="3"
+//                 onChange={handleChange}
+//                 className="w-full resize-none rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+//               />
+//             </div>
+
+//             <div>
+//               <label className="mb-2 block text-sm font-medium text-text">
+//                 Attachment
+//               </label>
+//               <input
+//                 type="file"
+//                 onChange={(e) => setFile(e.target.files?.[0] || null)}
+//                 className="w-full cursor-pointer rounded-xl border border-border bg-bg p-2 text-text shadow-sm file:mr-4 file:rounded-lg file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:font-medium file:text-text hover:file:bg-border"
+//               />
+//             </div>
+//           </div>
+
+//           <div className="space-y-5 border-t border-border pt-6">
+//             <MultiSelectSheet
+//               label="Categories"
+//               title="Select Categories"
+//               options={categories}
+//               selectedIds={form.category}
+//               onChange={handleCategoryChange}
+//               placeholder={`Select categories for ${form.type}`}
+//               emptyText={`No categories found for ${form.type}.`}
+//               accent={form.type}
+//             />
+
+            
+
+//             <MultiSelectSheet
+//               label="Labels"
+//               title="Select Labels"
+//               options={labels}
+//               selectedIds={form.labels}
+//               onChange={handleLabelChange}
+//               placeholder="Select labels"
+//               emptyText="No labels found."
+//               accent="primary"
+//             />
+//           </div>
+
+//           <div className="pt-2">
+//             <button
+//               type="submit"
+//               disabled={loading}
+//               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3 font-medium text-white shadow-md transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70 md:w-auto"
+//             >
+//               {loading ? "Saving..." : "Save Transaction"}
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CreateTransaction;
+
+
 import { useEffect, useState } from "react";
 import TransactionService from "../../services/transaction.service";
 import api from "../../axios/axios";
 import { useNavigate } from "react-router-dom";
+import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
 
 const CreateTransaction = () => {
   const navigate = useNavigate();
@@ -14,7 +299,7 @@ const CreateTransaction = () => {
     labels: [],
     description: "",
     note: "",
-    date: new Date().toISOString().split("T")[0]
+    date: new Date().toISOString().split("T")[0],
   });
 
   const [file, setFile] = useState(null);
@@ -23,52 +308,44 @@ const CreateTransaction = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Fetch labels once
-  useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const res = await api.get("/labels");
-        setLabels(res.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch labels", err);
-      }
-    };
-    fetchLabels();
-  }, []);
+  const fetchTypeData = async (type) => {
+    try {
+      const [categoryRes, labelRes] = await Promise.all([
+        api.get(`/categories?type=${type}`),
+        api.get("/labels"),
+      ]);
 
-  // Fetch categories when type changes
+      setCategories(categoryRes.data.data || []);
+      setLabels(labelRes.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch categories/labels", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await api.get(`/categories?type=${form.type}`);
-        setCategories(res.data.data || []);
-        // Reset selected categories since they might not be valid for the new type
-        setForm(prev => ({ ...prev, category: [] }));
-      } catch (err) {
-        console.error("Failed to fetch categories", err);
-      }
-    };
-    fetchCategories();
+    fetchTypeData(form.type);
   }, [form.type]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const toggleCategory = (id) => {
-    setForm(prev => {
-      const isSelected = prev.category.includes(id);
-      if (isSelected) return { ...prev, category: prev.category.filter(c => c !== id) };
-      return { ...prev, category: [...prev.category, id] };
-    });
+  const handleTypeChange = (type) => {
+    setForm((prev) => ({
+      ...prev,
+      type,
+      category: [],
+      labels: [],
+    }));
   };
 
-  const toggleLabel = (id) => {
-    setForm(prev => {
-      const isSelected = prev.labels.includes(id);
-      if (isSelected) return { ...prev, labels: prev.labels.filter(c => c !== id) };
-      return { ...prev, labels: [...prev.labels, id] };
-    });
+  const handleCategoryChange = (values) => {
+    setForm((prev) => ({ ...prev, category: values }));
+  };
+
+  const handleLabelChange = (values) => {
+    setForm((prev) => ({ ...prev, labels: values }));
   };
 
   const handleSubmit = async (e) => {
@@ -77,67 +354,76 @@ const CreateTransaction = () => {
     setErrorMsg("");
 
     try {
-      if (form.category.length === 0) throw new Error("Please select at least one category.");
-      if (form.labels.length === 0) throw new Error("Please select at least one label.");
+      if (form.category.length === 0) {
+        throw new Error("Please select at least one category.");
+      }
+
+      if (form.labels.length === 0) {
+        throw new Error("Please select at least one label.");
+      }
 
       const response = await TransactionService.createTransaction({
         ...form,
-        transactionDoc: file
+        transactionDoc: file,
       });
-      navigate(`/transactions/${response.data.data._id}`);
+
+      navigate(`/transactions/${response.data._id}`);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || err.message || "Something went wrong.");
+      setErrorMsg(
+        err.response?.data?.message || err.message || "Something went wrong."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-bg min-h-[calc(100vh-64px)] p-4 md:p-8 flex justify-center items-start">
-      <div className="w-full max-w-4xl bg-surface p-6 md:p-8 rounded-2xl shadow-sm border border-border">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 pb-4 border-b border-border">
+    <div className="min-h-[calc(100vh-64px)] bg-bg px-4 py-6 md:px-8 md:py-10">
+      <div className="mx-auto w-full max-w-4xl rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-border px-6 py-6 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-text">Create Transaction</h2>
-            <p className="text-muted text-sm mt-1">Record a new income, expense, or investment.</p>
+            <p className="mt-1 text-sm text-muted">
+              Record a new income, expense, or investment.
+            </p>
           </div>
+
           <button
             type="button"
             onClick={() => navigate("/transactions/all")}
-            className="bg-transparent border border-primary text-primary px-4 py-2 rounded-xl hover:bg-primary hover:text-white transition-colors duration-200 font-medium"
+            className="rounded-xl border border-primary px-4 py-2 font-medium text-primary transition-colors hover:bg-primary hover:text-white"
           >
             View Transactions
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 text-sm">
+          <div className="mx-6 mt-6 rounded-xl border border-expense bg-surface px-4 py-3 text-sm text-expense">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-
-          {/* Type Selection */}
-          <div className="grid grid-cols-3 gap-4">
-            {["expense", "income", "investment"].map(type => (
-              <label 
-                key={type} 
-                className={`flex justify-center items-center p-3 rounded-xl border cursor-pointer transition-all duration-200 ${
-                  form.type === type 
-                    ? type === "expense" ? "bg-red-50 border-expense text-expense font-medium" 
-                      : type === "income" ? "bg-green-50 border-income text-income font-medium"
-                      : "bg-purple-50 border-investment text-investment font-medium"
-                    : "border-border text-muted hover:bg-bg"
+        <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {["expense", "income", "investment"].map((type) => (
+              <label
+                key={type}
+                className={`flex cursor-pointer items-center justify-center rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
+                  form.type === type
+                    ? type === "expense"
+                      ? "border-expense bg-surface text-expense"
+                      : type === "income"
+                      ? "border-income bg-surface text-income"
+                      : "border-investment bg-surface text-investment"
+                    : "border-border bg-bg text-muted hover:border-primary hover:text-text"
                 }`}
               >
-                <input 
-                  type="radio" 
-                  name="type" 
-                  value={type} 
-                  checked={form.type === type} 
-                  onChange={handleChange} 
+                <input
+                  type="radio"
+                  name="type"
+                  value={type}
+                  checked={form.type === type}
+                  onChange={() => handleTypeChange(type)}
                   className="hidden"
                 />
                 <span className="capitalize">{type}</span>
@@ -145,133 +431,128 @@ const CreateTransaction = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">Title <span className="text-red-500">*</span></label>
-                <input required name="title" value={form.title} placeholder="e.g. Monthly Groceries" onChange={handleChange}
-                  className="w-full p-3 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
-              </div>
+          <div className="space-y-5">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-text">
+                Title <span className="text-expense">*</span>
+              </label>
+              <input
+                required
+                name="title"
+                value={form.title}
+                placeholder="e.g. Monthly Groceries"
+                onChange={handleChange}
+                className="w-full rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
 
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-text mb-1">Amount <span className="text-red-500">*</span></label>
+                <label className="mb-2 block text-sm font-medium text-text">
+                  Amount <span className="text-expense">*</span>
+                </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-3 text-muted">₹</span>
-                  <input required name="amount" type="number" min="0" value={form.amount} placeholder="0.00" onChange={handleChange}
-                    className="w-full pl-8 p-3 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
+                  <span className="pointer-events-none absolute left-4 top-3.5 text-muted">
+                    ₹
+                  </span>
+                  <input
+                    required
+                    name="amount"
+                    type="number"
+                    min="0"
+                    value={form.amount}
+                    placeholder="0.00"
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-border bg-bg py-3 pl-8 pr-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text mb-1">Date</label>
-                <input type="date" name="date" value={form.date} onChange={handleChange}
-                  className="w-full p-3 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
+                <label className="mb-2 block text-sm font-medium text-text">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  value={form.date}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary"
+                />
               </div>
             </div>
 
-            {/* Right Column */}
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">Description</label>
-                <textarea name="description" value={form.description} placeholder="Add some descriptive text..." rows="2"
-                  onChange={handleChange}
-                  className="w-full p-3 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none" />
-              </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-text">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={form.description}
+                placeholder="Add some descriptive text..."
+                rows="3"
+                onChange={handleChange}
+                className="w-full resize-none rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">Note</label>
-                <textarea name="note" value={form.note} placeholder="Any personal notes?" rows="2"
-                  onChange={handleChange}
-                  className="w-full p-3 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none" />
-              </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-text">
+                Note
+              </label>
+              <textarea
+                name="note"
+                value={form.note}
+                placeholder="Any personal notes?"
+                rows="3"
+                onChange={handleChange}
+                className="w-full resize-none rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">Attachment</label>
-                <input type="file" onChange={(e) => setFile(e.target.files[0])}
-                  className="w-full p-2 border border-border rounded-xl bg-bg text-text file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-surface file:text-text hover:file:bg-border transition-colors cursor-pointer" />
-              </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-text">
+                Attachment
+              </label>
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="w-full cursor-pointer rounded-xl border border-border bg-bg p-2 text-text shadow-sm file:mr-4 file:rounded-lg file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:font-medium file:text-text hover:file:bg-border"
+              />
             </div>
           </div>
 
-          <div className="space-y-6 pt-4 border-t border-border">
-            {/* Categories */}
-            <div>
-              <label className="block text-sm font-medium text-text mb-2 flex items-center gap-2">
-                Categories <span className="text-red-500">*</span>
-                <span className="text-xs text-muted font-normal block">(Select 1 or more)</span>
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {categories.length === 0 ? (
-                  <span className="text-muted text-sm italic">No categories found for {form.type}.</span>
-                ) : (
-                  categories.map(c => {
-                    const isSelected = form.category.includes(c._id);
-                    return (
-                      <button
-                        key={c._id}
-                        type="button"
-                        onClick={() => toggleCategory(c._id)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
-                          isSelected 
-                            ? "bg-primary text-white border-primary shadow-sm scale-105" 
-                            : "bg-bg text-text border-border hover:border-muted"
-                        }`}
-                      >
-                        {c.name}
-                      </button>
-                    )
-                  })
-                )}
-              </div>
-            </div>
+          <div className="space-y-5 border-t border-border pt-6">
+            <MultiSelectSheet
+              label="Categories"
+              title="Select Categories"
+              options={categories}
+              selectedIds={form.category}
+              onChange={handleCategoryChange}
+              placeholder={`Select categories for ${form.type}`}
+              emptyText={`No categories found for ${form.type}.`}
+            />
 
-            {/* Labels */}
-            <div>
-              <label className="block text-sm font-medium text-text mb-2 flex items-center gap-2">
-                Labels <span className="text-red-500">*</span>
-                <span className="text-xs text-muted font-normal block">(Select 1 or more)</span>
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {labels.length === 0 ? (
-                  <span className="text-muted text-sm italic">No labels found.</span>
-                ) : (
-                  labels.map(l => {
-                    const isSelected = form.labels.includes(l._id);
-                    return (
-                      <button
-                        key={l._id}
-                        type="button"
-                        onClick={() => toggleLabel(l._id)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
-                          isSelected 
-                            ? "bg-text text-surface border-text shadow-sm scale-105" 
-                            : "bg-bg text-text border-border hover:border-muted"
-                        }`}
-                      >
-                        {l.name}
-                      </button>
-                    )
-                  })
-                )}
-              </div>
-            </div>
+            <MultiSelectSheet
+              label="Labels"
+              title="Select Labels"
+              options={labels}
+              selectedIds={form.labels}
+              onChange={handleLabelChange}
+              placeholder="Select labels"
+              emptyText="No labels found."
+            />
           </div>
 
-          <div className="pt-6">
+          <div className="pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full md:w-auto px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover shadow-md transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3 font-medium text-white shadow-md transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70 md:w-auto"
             >
-              {loading ? (
-                 <span>Saving...</span>
-              ) : (
-                 <span>Save Transaction</span>
-              )}
+              {loading ? "Saving..." : "Save Transaction"}
             </button>
           </div>
-
         </form>
       </div>
     </div>

@@ -52,6 +52,7 @@ const createTransaction = async (transactionData) => {
 const getTransactions = async (params = {}) => {
   try {
     const response = await api.get("/transactions", { params });
+    console.log(response)
     return response.data;
 
   } catch (error) {
@@ -66,6 +67,7 @@ const getTransactions = async (params = {}) => {
 const getTransactionById = async (id) => {
   try {
     const response = await api.get(`/transactions/${id}`);
+    console.log(response)
     return response.data;
 
   } catch (error) {

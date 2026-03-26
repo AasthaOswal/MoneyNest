@@ -70,7 +70,7 @@ const TransactionsList = () => {
             <p className="text-muted text-sm mt-1">Manage and filter your transaction history.</p>
           </div>
           <button
-            onClick={() => navigate("/transactions/create")}
+            onClick={() => navigate("/transactions")}
             className="bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary-hover font-medium shadow-sm transition-colors duration-200"
           >
             + Add Transaction
@@ -174,7 +174,8 @@ const TransactionsList = () => {
                  🔍
                </div>
                <h3 className="text-lg font-semibold text-text mb-1">Search Transactions</h3>
-               <p className="text-sm text-muted">Adjust the filters above and click Show Transactions</p>
+               <p className="text-sm text-muted">Adjust the filters above and click Show Transactions. </p>
+               <p className="text-sm text-primary">For full details click on the trasnaction yoou want to see full details for</p>
              </div>
           )}
 

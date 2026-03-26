@@ -315,9 +315,8 @@ export const getTransactionById = async (req, res) => {
       });
     }
 
-    // 🔐 Ownership + family check (IMPORTANT)
+    // 🔐 Ownership - family check (IMPORTANT)
     if (
-      transaction.user.toString() !== req.user._id.toString() ||
       transaction.family.toString() !== req.user.familyId.toString()
     ) {
       return res.status(403).json({
