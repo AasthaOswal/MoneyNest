@@ -1,60 +1,106 @@
 import mongoose from "mongoose";
 
 const goalSchema = new mongoose.Schema({
-  family: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Family",
-    required: true
-  },
 
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null // null = family-level goal
-  },
+    title: {
+        type: String,
+        required: true
+    },
 
-  // 🎯 What this goal applies to
-  targetType: {
-    type: String,
-    enum: ["overall", "category", "label"],
-    default: "overall"
-  },
+    type: {
+        type: String,
+        enum: ["income", "expense", "investment", "saving"],
+        required: true
+    },
 
-  // If targetType = category
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    default: null
-  },
+    goalType: {
+        type: String,
+        enum: ["target", "limit"], 
+        // target = reach this amount (income/investment)
+        // limit = don't exceed (expense)
+        required: true
+    },
 
-  // If targetType = label
-  label: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Label",
-    default: null
-  },
+    goalMode: {
+        type: String,
+        enum: ["recurring", "custom"],
+        default: "recurring"
+    }, // later on add  custom goals like from startDate= this to EndDate = this save xyz amount of money
 
-  type: {
-    type: String,
-    enum: ["expense-limit", "income-target", "investment-target"]
-  },
+    amount: {
+        type: Number,
+        required: true
+    },
 
-  amount: {
-    type: Number,
-    required: true
-  },
+    period: {
+        type: String,
+        enum: ["daily", "weekly", "monthly", "yearly"],
+        required: function () {
+            return this.goalMode === "recurring";
+        }
+    },
 
-  period: {
-    type: String,
-    enum: ["daily", "weekly", "monthly", "yearly"]
-  },
+	startDate: {
+		type: Date,
+		required: function () {
+			return this.goalMode === "custom";
+		}
+	},
 
-  startDate: Date,
-  endDate: Date,
+	endDate: {
+		type: Date,
+		required: function () {
+			return this.goalMode === "custom";
+		}
+	},
 
-  // For alerts like 50%, 80%
-  alertThresholds: [Number] // e.g. [50, 80, 100] ---> so alert will go at 50% 80% so on
+    // WHO OWNS THIS GOAL
+    scope: {
+        type: String,
+        enum: ["family", "individual"],
+        required: true
+    },
 
+    family: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Family",
+        required: true
+    },
+
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: function () {
+            return this.scope === "individual";
+        }
+    },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
+
+    status: {
+        type: String,
+        enum: ["active", "completed", "failed"],
+        default: "active"
+    },
+
+	// if family member wants to keep  their goals private from the family then they can do so
+	visibility: {
+		type: String,
+		enum: ["private", "family"],
+		default: "private"
+	},
+
+    // if alerts triggered at 50% then add to aarray
+    //so that again tomorrow when cron job runs same alert for 50% is not sent
+    triggeredAlerts: [{
+		percentage: Number,
+		lastTriggeredAt : Date,
+	}], // [50, 70]
 }, { timestamps: true });
 
 const Goal = mongoose.model("Goal", goalSchema);
