@@ -41,7 +41,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/goals", goalRoutes);
 
 // run cron job
-startGoalTracker();
+// startGoalTracker();
 
 // Basic test route
 app.get("/", (req, res) => {
