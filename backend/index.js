@@ -21,16 +21,34 @@ import {startGoalTracker} from './services/cron/goalTracker.js'
 
 const app = express();
 
+app.set("trust proxy", 1);
+
+
 app.use(
   cors({
     origin: "http://localhost:5173", // URL of your frontend
     credentials: true,
   })
 );
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      process.env.CLIENT_URL // Support env-based URL
+    ].filter(Boolean), // Remove undefined/null if env var is missing
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Middleware to parse incoming JSON payloads
-app.use(express.json());
+app.use(express.json({ limit: "4mb" }));
+app.use(express.urlencoded({ limit: "4mb", extended: true }));
 app.use(cookieParser());
+
+
+connectDB();
 
 // base route
 app.use("/api/auth", authRoutes);
@@ -51,6 +69,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    connectDB();
     console.log(`Server is running on port ${PORT}`);
 });
