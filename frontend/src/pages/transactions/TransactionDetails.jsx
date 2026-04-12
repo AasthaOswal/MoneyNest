@@ -21,7 +21,7 @@ const TransactionDetails = () => {
 
   const handleDelete = async () => {
     await TransactionService.deleteTransaction(id);
-    navigate("/transactions/all");
+    navigate("/transactions");
   };
 
   if (!transaction)
@@ -38,7 +38,7 @@ const TransactionDetails = () => {
           </h2>
 
           <button
-            onClick={() => navigate("/transactions/all")}
+            onClick={() => navigate("/transactions")}
             className="flex items-center gap-2 px-4 py-2 rounded-lg 
                        bg-primary text-white 
                        hover:bg-primary-hover transition"

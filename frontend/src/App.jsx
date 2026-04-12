@@ -25,6 +25,12 @@ import TransactionsList from './pages/transactions/TransactionsList';
 import TransactionDetails from './pages/transactions/TransactionDetails';
 import EditTransaction from './pages/transactions/EditTransaction';
 
+// Goals pages
+import GoalsPage from './pages/goals/GoalsPage';
+import CreateGoal from './pages/goals/CreateGoal';
+import GoalDetails from './pages/goals/GoalDetails';
+import EditGoal from './pages/goals/EditGoal';
+
 // Layouts and Contexts
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -56,7 +62,6 @@ function App() {
                   <Route path="/family" element={<FamilyPage />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/individual-dashboard" element={<div>Individual Dashboard</div>} />
-                  <Route path="/goals" element={<div>Goals</div>} />
                   <Route path="/reminders" element={<div>Reminders</div>} />
 
 
@@ -70,9 +75,15 @@ function App() {
                   <Route path="/labels/create" element={<CreateLabel />} />
                   <Route path="/labels/:id" element={<LabelDetails />} />
 
+                  {/* Goals related pages */}
+                  <Route path="/goals" element={<GoalsPage />} />
+                  <Route path="/goals/create" element={<CreateGoal />} />
+                  <Route path="/goals/:id" element={<GoalDetails />} />
+                  <Route path="/goals/edit/:id" element={<EditGoal />} />
 
-                  <Route path="/transactions" element={<CreateTransaction />} />
-                  <Route path="/transactions/all" element={<TransactionsList />} />
+
+                  <Route path="/transactions" element={<TransactionsList />} />
+                  <Route path="/transactions/create" element={<CreateTransaction />} />
                   <Route path="/transactions/:id" element={<TransactionDetails />} />
                   <Route path="/transactions/edit/:id" element={<EditTransaction />} />
                   

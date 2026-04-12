@@ -70,7 +70,7 @@ const TransactionsList = () => {
             <p className="text-muted text-sm mt-1">Manage and filter your transaction history.</p>
           </div>
           <button
-            onClick={() => navigate("/transactions")}
+            onClick={() => navigate("/transactions/create")}
             className="bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary-hover font-medium shadow-sm transition-colors duration-200"
           >
             + Add Transaction

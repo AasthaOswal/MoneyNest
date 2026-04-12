@@ -390,7 +390,7 @@ const CreateTransaction = () => {
 
           <button
             type="button"
-            onClick={() => navigate("/transactions/all")}
+            onClick={() => navigate("/transactions")}
             className="rounded-xl border border-primary px-4 py-2 font-medium text-primary transition-colors hover:bg-primary hover:text-white"
           >
             View Transactions
