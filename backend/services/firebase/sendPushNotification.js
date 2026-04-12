@@ -1,17 +1,24 @@
-import admin from "firebase-admin";
 
-export const sendPushNotification = async (goal, level) => {
-    const message = {
-        notification: {
-            title: "Goal Update 🚀",
-            body: `${goal.title} reached ${level}%`
-        },
-        topic: goal.family.toString() // or user-specific token
-    };
+import admin from "../../config/firebase.js";
+import User from "../../models/user.model.js";
 
-    try {
-        await admin.messaging().send(message);
-    } catch (err) {
-        console.log("Notification error:", err.message);
+export const sendPushNotification = async (userId, title, body) => {
+    try{
+		const user = await User.findById(userId);
+
+		const tokens = user.fcmTokens.map(t => t.token);
+
+		if (!tokens.length) return;
+
+		const message = {
+			notification: { title, body },
+			tokens,
+		};
+
+		const response = await admin.messaging().sendEachForMulticast(message);
+
+		console.log("FCM Response:", response);
+    }catch(err){
+      	console.log(err);
     }
 };

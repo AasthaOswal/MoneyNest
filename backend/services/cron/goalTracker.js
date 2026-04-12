@@ -1,10 +1,9 @@
-// services/goalTracker.service.js
 
 import cron from "node-cron";
 import Goal from "../../models/goal.model.js";
 import Transaction from "../../models/transaction.model.js";
 import { getDateRange } from "../../utils/goals/getDateRange.js";
-// import { sendPushNotification } from "../../utils/firebase/pushNotification.js";
+import { sendPushNotification } from "../firebase/sendPushNotification.js";
 
 // Solve N+1 problem cause by this for loop later on
 
@@ -12,7 +11,7 @@ import { getDateRange } from "../../utils/goals/getDateRange.js";
 
 
 const GOAL_TRACKER_CRON =
-  process.env.NODE_ENV === "development" ? "* * * * *" : "*/10 * * * *";
+  process.env.NODE_ENV === "development" ? "* * * * *" : "0 */12 * * *";
 
 export const startGoalTracker = () => {
     cron.schedule(GOAL_TRACKER_CRON, async () => {
@@ -56,47 +55,55 @@ export const startGoalTracker = () => {
                 },
             ]);
 
-        console.log("Aggregation result:", result);
+            console.log("Aggregation result:", result);
 
-        const currentAmount = result[0]?.total || 0;
-        const percentage = (currentAmount / goal.amount) * 100;
+            const currentAmount = result[0]?.total || 0;
+            const percentage = (currentAmount / goal.amount) * 100;
 
-        console.log("Current Amount:", currentAmount);
-        console.log("Goal Amount:", goal.amount);
-        console.log("Percentage:", percentage);
+            console.log("Current Amount:", currentAmount);
+            console.log("Goal Amount:", goal.amount);
+            console.log("Percentage:", percentage);
 
-        const alertLevels = [50, 70, 100];
+            const alertLevels = [50, 70, 100];
 
-        for (const level of alertLevels) {
-            const alreadyTriggered = goal.triggeredAlerts.some((a) => {
-            return (
-                a.percentage === level &&
-                a.lastTriggeredAt >= start &&
-                a.lastTriggeredAt <= end
-            );
-            });
-
-            if (percentage >= level && !alreadyTriggered) {
-                // await sendPushNotification(goal, level);
-                console.log("-----------Simulating push notification-------------");
-                console.log("Goal: ", goal.title);
-                console.log("Level: ", level);
-                console.log("Percentage: ", percentage);
-                console.log("Already Triggered: ", alreadyTriggered);
-                console.log("-------------------------------------");
-
-                goal.triggeredAlerts.push({
-                    percentage: level,
-                    lastTriggeredAt: new Date(),
+            for (const level of alertLevels) {
+                const alreadyTriggered = goal.triggeredAlerts.some((a) => {
+                return (
+                    a.percentage === level &&
+                    a.lastTriggeredAt >= start &&
+                    a.lastTriggeredAt <= end
+                );
                 });
+
+                if (percentage >= level && !alreadyTriggered) {
+                    const title = `🚨 Goal Alert for : ${goal.title}`;
+                    const body = `${goal.title} reached ${level}%`;
+
+                    if (goal.scope === "family") {
+                        // TODO: send to all family members
+                        console.log("Send to family members");
+                        
+                        const users = await User.find({ family: goal.family });
+
+                        for (const user of users) {
+                            await sendPushNotification(user._id, title, body);
+                        }
+                    } else {
+                        await sendPushNotification(goal.user, title, body);
+                    }
+
+                    goal.triggeredAlerts.push({
+                        percentage: level,
+                        lastTriggeredAt: new Date(),
+                    });
+                }
             }
-        }
 
-        if (percentage >= 100 && goal.goalType === "target") {
-            goal.status = "completed";
-        }
+            if (percentage >= 100 && goal.goalType === "target") {
+                goal.status = "completed";
+            }
 
-        await goal.save();
+            await goal.save();
         }
     });
 };

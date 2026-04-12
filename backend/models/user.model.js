@@ -35,6 +35,17 @@ export const userSchema = new mongoose.Schema({
         required: false
     }],
 
+
+    // Array of fcmTokens because:
+    // 1 user → multiple devices → multiple tokens
+    fcmTokens: [
+        {
+            token: { type: String },
+            device: { type: String },
+            createdAt: { type: Date, default: Date.now }
+        }
+    ]
+
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

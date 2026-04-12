@@ -15,7 +15,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import labelRoutes from './routes/label.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
 import goalRoutes from './routes/goal.routes.js';
-
+import userRoutes from './routes/user.routes.js'
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
 
@@ -48,13 +48,14 @@ connectDB();
 // base route
 app.use("/api/auth", authRoutes);
 app.use("/api/family" , familyRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/labels", labelRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/goals", goalRoutes);
 
 // run cron job
-// startGoalTracker();
+startGoalTracker();
 
 // Basic test route
 app.get("/", (req, res) => {
