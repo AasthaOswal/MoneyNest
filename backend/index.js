@@ -33,7 +33,7 @@ app.use(
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
+      "http://localhost:5173","https://project-money-nest.vercel.app","https://money-nest-one.vercel.app",
       process.env.CLIENT_URL // Support env-based URL
     ].filter(Boolean), // Remove undefined/null if env var is missing
     credentials: true,
