@@ -1,6 +1,7 @@
 
 import cron from "node-cron";
 import Goal from "../../models/goal.model.js";
+import User from "../../models/user.model.js";
 import Transaction from "../../models/transaction.model.js";
 import { getDateRange } from "../../utils/goals/getDateRange.js";
 import { sendPushNotification } from "../firebase/sendPushNotification.js";
