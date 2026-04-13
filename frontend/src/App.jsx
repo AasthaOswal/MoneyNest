@@ -44,16 +44,22 @@ import { messaging } from "./services/firebase.service.js"; // adjust path if ne
 
 
 function App() {
-    useEffect(() => {
+
+  useEffect(() => {
+    // This listener stays active for the lifetime of the component
     const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Foreground message:", payload);
+      console.log("Foreground message received:", payload);
 
-      const title = payload.notification?.title || "New Notification";
-      const body = payload.notification?.body || "";
+      const { title, body } = payload.notification;
 
-      if (Notification.permission === "granted") {
-        new Notification(title, { body });
-      }
+      // Use the Service Worker to show the notification (High mobile compatibility)
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(title, {
+          body: body,
+          icon: "/favicon.svg",
+          badge: "/favicon.svg", // Optional: small icon for mobile status bars
+        });
+      });
     });
 
     return () => unsubscribe();

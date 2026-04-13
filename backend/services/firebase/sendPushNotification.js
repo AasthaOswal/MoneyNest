@@ -18,17 +18,29 @@ export const sendPushNotification = async (userId, title, body) => {
 
 		const response = await admin.messaging().sendEachForMulticast(message);
 
-		response.responses.forEach((res, idx) => {
+		response.responses.forEach(async (res, idx) => {
 			if (!res.success) {
 				console.log(`❌ Token ${idx} failed`);
 				console.log("Error:", res.error);
 				console.log("Error Code:", res.error?.code);
 				console.log("Error Message:", res.error?.message);
+				const errorCode = res.error?.code;
+				if (errorCode === 'messaging/registration-token-not-registered' || 
+					errorCode === 'messaging/invalid-registration-token') {
+					
+					// Remove the invalid token from the user's document
+					await User.updateOne(
+						{ _id: userId },
+						{ $pull: { fcmTokens: { token: tokens[idx] } } }
+					);
+					console.log(`🧹 Removed invalid token at index ${idx}`);
+				}
 			} else {
 				console.log(`✅ Token ${idx} success`);
 				console.log("Message ID:", res.messageId);
 			}
 		});
+
     }catch(err){
       	console.log(err);
     }

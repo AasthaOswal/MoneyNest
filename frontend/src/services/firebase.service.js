@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBT5GpZ5EhNU5f51KaQAYccePvrsIj7oVs",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "moneynest-7d03e.firebaseapp.com",
   projectId: "moneynest-7d03e",
   storageBucket: "moneynest-7d03e.firebasestorage.app",
@@ -11,6 +11,4 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-// 🔥 THIS is what "messaging" is
 export const messaging = getMessaging(app);
