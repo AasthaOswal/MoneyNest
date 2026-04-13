@@ -18,7 +18,17 @@ export const sendPushNotification = async (userId, title, body) => {
 
 		const response = await admin.messaging().sendEachForMulticast(message);
 
-		console.log("FCM Response:", response);
+		response.responses.forEach((res, idx) => {
+			if (!res.success) {
+				console.log(`❌ Token ${idx} failed`);
+				console.log("Error:", res.error);
+				console.log("Error Code:", res.error?.code);
+				console.log("Error Message:", res.error?.message);
+			} else {
+				console.log(`✅ Token ${idx} success`);
+				console.log("Message ID:", res.messageId);
+			}
+		});
     }catch(err){
       	console.log(err);
     }
