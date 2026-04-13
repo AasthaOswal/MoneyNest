@@ -24,6 +24,8 @@ export const startGoalTracker = () => {
         if (isRunning) return;
         isRunning = true;
 
+        console.log("⏰ Cron Triggered at:", new Date().toISOString());
+
         try {
             console.log("Running Goal Tracker...");
 
@@ -122,5 +124,7 @@ export const startGoalTracker = () => {
             isRunning = false;
         }
         
+    }, {
+        timezone: "Asia/Kolkata"
     });
 };
