@@ -6,6 +6,8 @@ const NotificationButton = () => {
   const [enabled, setEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const device = navigator.userAgent;
+
 //   Check if already enabled (optional basic check)
   useEffect(() => {
     if (Notification.permission === "granted") {
@@ -24,7 +26,7 @@ const NotificationButton = () => {
         return;
       }
 
-      await api.post("/user/fcm-token", { fcmToken: token });
+      await api.post("/user/fcm-token", { fcmToken: token, device });
 
       setEnabled(true);
       alert("Notifications enabled 🔔");

@@ -22,9 +22,11 @@ const login = async (credentials) => {
     // STEP 1: Get FCM token
     const token = await getFCMToken();
 
+    const device = navigator.userAgent;
+
     // STEP 2: Send it to backend
     if (token) {
-      await api.post("/user/fcm-token", { fcmToken: token });
+      await api.post("/user/fcm-token", { fcmToken: token, device });
     }
   }
   return response.data;

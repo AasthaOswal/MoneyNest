@@ -3,7 +3,7 @@ import User from '../models/user.model.js'
 
 export const saveFcmToken = async (req, res) => {
     try {
-        const { fcmToken } = req.body;
+        const { fcmToken, device } = req.body;
 
         if (!fcmToken) {
             return res.status(400).json({ message: "Token is required" });
@@ -11,10 +11,19 @@ export const saveFcmToken = async (req, res) => {
 
         const cleanToken = fcmToken.trim();
 
-        await User.findByIdAndUpdate(
-            req.user._id,
+        await User.updateOne(
+            { 
+                _id: req.user._id,
+                "fcmTokens.token": { $ne: cleanToken } // check inside array
+            },
             {
-                $addToSet: { fcmTokens: { token: cleanToken } }
+                $push: {
+                fcmTokens: {
+                    token: cleanToken,
+                    device: device || "unknown",
+                    createdAt: new Date()
+                }
+                }
             }
         );
 

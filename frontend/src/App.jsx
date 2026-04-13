@@ -38,7 +38,26 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 
+import { useEffect } from "react";
+import { onMessage } from "firebase/messaging";
+import { messaging } from "./services/firebase.service.js"; // adjust path if needed
+
+
 function App() {
+    useEffect(() => {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("Foreground message:", payload);
+
+      const title = payload.notification?.title || "New Notification";
+      const body = payload.notification?.body || "";
+
+      if (Notification.permission === "granted") {
+        new Notification(title, { body });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
   return (
     <ThemeProvider>
       <AuthProvider>
