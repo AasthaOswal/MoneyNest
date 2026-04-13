@@ -42,6 +42,7 @@ import React from 'react';
 import { Menu } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import NotificationButton from '../buttons/NotificationButton';
 
 const Header = ({ setIsOpen }) => {
   const { theme, toggleTheme } = useTheme();
@@ -78,6 +79,8 @@ const Header = ({ setIsOpen }) => {
             {user?.role}
           </span>
         </div>
+
+<NotificationButton/>
 
         {/* THEME TOGGLE */}
         <button 

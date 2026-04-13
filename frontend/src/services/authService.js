@@ -1,5 +1,5 @@
 import api from "../axios/axios";
-import { getFCMToken } from "../../utils/createFcmToken";
+import { getFCMToken } from "../utils/createFcmToken";
 
 const signup = async (userData) => {
   const response = await api.post("/auth/signup", userData);
@@ -18,13 +18,13 @@ const login = async (credentials) => {
   if (response.data.accessToken) {
     localStorage.setItem("accessToken", response.data.accessToken);
     localStorage.setItem("user", JSON.stringify(response.data.user));
-    
+
     // STEP 1: Get FCM token
     const token = await getFCMToken();
 
     // STEP 2: Send it to backend
     if (token) {
-      await api.post("/user/fcm-token", { fcmToken : token });
+      await api.post("/user/fcm-token", { fcmToken: token });
     }
   }
   return response.data;

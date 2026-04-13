@@ -1,9 +1,18 @@
+//utils/createFcmToken
+
 import { getToken } from "firebase/messaging";
-import { messaging } from "../src/services/firebase.service.js";
+import { messaging } from "../services/firebase.service.js";
 
 export const getFCMToken = async () => {
-    try{
+    try {
         const permission = await Notification.requestPermission();
+
+        console.log("Permission:", permission);
+
+        if (Notification.permission === "denied") {
+            alert("Notifications are blocked. Please enable them from browser settings (🔒 icon → Allow).");
+            return null;
+        }
 
         if (permission !== "granted") return null;
 
@@ -13,7 +22,7 @@ export const getFCMToken = async () => {
 
         console.log("TOKEN:", token);
         return token;
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return null;
     }
