@@ -1,6 +1,19 @@
 //controllers/user.controler.js
 import User from '../models/user.model.js'
 
+
+const getSafeUser = (user) => {
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    familyId: user.familyId ? user.familyId._id : null,
+  };
+};
+
+
+
 export const saveFcmToken = async (req, res) => {
     try {
         const { fcmToken, device } = req.body;
@@ -32,4 +45,18 @@ export const saveFcmToken = async (req, res) => {
         console.error(error);
         return res.status(500).json({ message: "Server error" });
     }
+};
+
+export const getMyProfile = async (req, res) => {
+  try {
+
+    // middleware adds user to req
+    return res.status(200).json({
+      success: true,
+      user: getSafeUser(req.user),
+    });
+
+  } catch (err) {
+    return res.status(500).json({ success: false });
+  }
 };

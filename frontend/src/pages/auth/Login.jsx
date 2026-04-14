@@ -15,20 +15,26 @@ const Login = () => {
     setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleGoogleLogin = () => {
+    AuthService.loginWithGoogle();
+  };
+
   const handleLogin = async (e) => {
   e.preventDefault();
   setError("");
   setLoading(true);
 
   try {
-    const data = await AuthService.login(credentials);
+    const user = await AuthService.login(credentials);
+    console.log(user)
 
-    login(data.user); // 🔥 THIS IS THE MISSING PIECE
+    // login(data.user); // 🔥 THIS IS THE MISSING 
+    await login(user)
 
-    if (data.user.role === "admin") {
+    if (user.role === "admin") {
       navigate("/admin-dashboard");
-    } else if (data.user.role === "member") {
-      if(data.user.familyId != null){
+    } else if (user.role === "member") {
+      if(user.familyId != null){
         navigate("/dashboard");
       }else{
         navigate("/family/join");
@@ -110,6 +116,18 @@ const Login = () => {
         Create Account
       </Link>
     </p>
+
+    <button
+      onClick={handleGoogleLogin}
+      className="w-full py-2 rounded-lg border border-border bg-bg hover:bg-surface transition flex items-center justify-center gap-2"
+    >
+      <img
+        src="https://www.svgrepo.com/show/475656/google-color.svg"
+        alt="Google"
+        className="w-5 h-5"
+      />
+      Continue with Google
+    </button>
 
   </div>
 </div>

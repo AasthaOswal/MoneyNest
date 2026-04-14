@@ -54,7 +54,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       <aside className={`fixed md:static inset-y-0 left-0 w-64 bg-surface border-r border-border h-full flex flex-col shadow-sm transition-transform duration-300 z-50 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-border">
           <Link to="/dashboard" className="text-2xl font-extrabold tracking-tight text-primary">
-            WealthNest
+            MoneyNest
           </Link>
           <button 
             className="md:hidden p-2 text-text hover:bg-black/5 dark:hover:bg-white/10 rounded-lg"

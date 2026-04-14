@@ -19,6 +19,9 @@ import userRoutes from './routes/user.routes.js'
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
 
+import session from "express-session";
+
+
 const app = express();
 
 app.set("trust proxy", 1);
@@ -42,6 +45,14 @@ app.use(express.json({ limit: "4mb" }));
 app.use(express.urlencoded({ limit: "4mb", extended: true }));
 app.use(cookieParser());
 
+
+app.use(
+  session({
+    secret: "your_session_secret",
+    resave: false,
+    saveUninitialized: false
+  })
+);
 
 connectDB();
 

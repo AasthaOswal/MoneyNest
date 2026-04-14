@@ -21,14 +21,15 @@ export const userSchema = new mongoose.Schema({
         enum: ["local", "google"],
         required: true
     },
-    googleSub: {
+    googleId: {
         type: String,
         unique: true,
         sparse: true
     },
     password: {
         type: String,
-        required: false
+        required: false,
+        default : null
     },
     refreshToken: [{
         type: String,

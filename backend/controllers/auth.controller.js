@@ -5,6 +5,11 @@ import {
   signupValidation,
   loginValidation
 } from "../validators/authValidation.js";
+import crypto from "crypto";
+
+const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
 //Later On, Implement this as well :-
 /*
@@ -24,6 +29,18 @@ const accessTokenCookieOptions = {
   sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
   maxAge: 15 * 60 * 1000
 };
+
+/*
+OAuth redirect = cross-site navigation
+"strict" → cookie NOT sent ❌
+Your state validation will FAIL
+*/
+const googleOAuthCookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax", 
+    maxAge: 5 * 60 * 1000 // 5 min
+}
 
 // 🔐 Generate Tokens
 const generateTokens = (userId) => {
@@ -108,7 +125,9 @@ export const signup = async (req, res) => {
         sendRefreshToken(res, refreshToken);
         sendAccessToken(res, accessToken);
 
-        return res.status(201).json({ success: true, user: getSafeUser(user), accessToken });
+        // return res.status(201).json({ success: true, user: getSafeUser(user), accessToken });
+
+        return res.status(201).json({ success: true, user: getSafeUser(user), });
 
     } catch (err) {
       console.error("Error in signup controller : " , err);
@@ -250,9 +269,13 @@ export const refreshAccessToken = async (req, res) => {
     sendRefreshToken(res, refreshToken);
     sendAccessToken(res, accessToken);
 
+    // return res.json({
+    //   success: true,
+    //   accessToken
+    // });
+
     return res.json({
       success: true,
-      accessToken
     });
 
   } catch (err) {
@@ -332,102 +355,157 @@ export const logout = async (req, res) => {
 };
 
 
-// =======================
-// 🔵 GOOGLE AUTH
-// =======================
-// export const googleAuth = async (req, res) => {
-//   try {
-//     const { credential } = req.body; // ID token from frontend
+export const googleAuth = (req, res) => {
+  const state = crypto.randomBytes(32).toString("hex");
 
-//     // 1️⃣ Verify Google token
-//     const ticket = await client.verifyIdToken({
-//       idToken: credential,
-//       audience: process.env.GOOGLE_CLIENT_ID
-//     });
-
-//     const payload = ticket.getPayload();
-
-//     const { sub, email, name } = payload;
-
-//     // 2️⃣ Check if user exists by googleSub
-//     let user = await User.findOne({ googleSub: sub });
-
-//     // ==========================
-//     // CASE B: First time Google signup
-//     // ==========================
-//     if (!user) {
-
-//       // ==========================
-//       // CASE D: Email already exists (local account)
-//       // ==========================
-//       const existingEmailUser = await User.findOne({ email });
-
-//       if (existingEmailUser) {
-//         return res.status(400).json({
-//           message:
-//             "Account already exists with this email. Please login and link Google."
-//         });
-//       }
-
-//       // Create new Google user
-//       user = await User.create({
-//         name,
-//         email,
-//         googleSub: sub,
-//         authProvider: "google"
-//       });
-//     }
-
-//     // ==========================
-//     // Existing Google user login
-//     // ==========================
-
-//     const token = generateToken(user._id);
-//     sendToken(res, token);
-
-//     res.status(200).json({ user });
-
-//   } catch (err) {
-//     res.status(500).json({ message: "Google authentication failed" });
-//   }
-// };
+  // req.session.googleState = state;
 
 
-// =======================
-// 🔗 OPTIONAL: LINK GOOGLE
-// =======================
-// export const linkGoogle = async (req, res) => {
-//   try {
-//     const { credential } = req.body;
-//     const userId = req.user._id;
+  const params = new URLSearchParams({
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+    response_type: "code",
+    scope: "openid email profile",
+    access_type: "offline",
+    prompt: "consent",
+    state
+  });
 
-//     const ticket = await client.verifyIdToken({
-//       idToken: credential,
-//       audience: process.env.GOOGLE_CLIENT_ID
-//     });
+  res.cookie("google_oauth_state", state, googleOAuthCookieOptions);
 
-//     const payload = ticket.getPayload();
-//     const { sub } = payload;
+  res.redirect(`${GOOGLE_AUTH_URL}?${params.toString()}`);
+};
 
-//     // Check if this Google account already linked
-//     const existing = await User.findOne({ googleSub: sub });
+export const googleCallback = async (req, res) => {
+  try {
+    const { code, state } = req.query;
 
-//     if (existing) {
-//       return res.status(400).json({
-//         message: "Google account already linked with another user"
-//       });
-//     }
+    // 🔐 STATE VALIDATION (CRITICAL)
+    const storedState = req.cookies.google_oauth_state;
 
-//     const user = await User.findById(userId);
+    if (!state || state !== storedState) {
+      res.clearCookie("google_oauth_state"); 
+      return res.status(401).json({
+        success: false,
+        message: "Invalid state (CSRF detected)"
+      });
+    }
 
-//     user.googleSub = sub;
-//     user.authProvider = "google"; // or "both" if you want
+    if (!code) {
+      res.clearCookie("google_oauth_state"); 
+      return res.status(400).json({
+        success: false,
+        message: "Authorization code missing"
+      });
+    }
 
-//     await user.save();
+  // cleanup
+  res.clearCookie("google_oauth_state");
 
-//     res.status(200).json({ message: "Google linked successfully" });
+    // 1️⃣ Exchange code for tokens
+    const tokenRes = await fetch(GOOGLE_TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: "authorization_code"
+      })
+    });
 
-//   } catch (err) {
-//     res.status(500).json({ message: "Some error occured. Please try again later." });
-//   }
-// };
+    const tokenData = await tokenRes.json();
+
+    if (!tokenRes.ok) {
+      console.log(tokenData);
+      res.clearCookie("google_oauth_state"); 
+      return res.status(400).json({
+        success: false,
+        message: "Token exchange failed"
+      });
+    }
+
+    // 2️⃣ Get user info
+    const userRes = await fetch(GOOGLE_USERINFO_URL, {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`
+      }
+    });
+
+    if (!userRes.ok) {
+      res.clearCookie("google_oauth_state"); 
+      return res.status(400).json({
+        success: false,
+        message: "Failed to fetch Google user"
+      });
+    }
+
+    const googleUser = await userRes.json();
+    
+
+    // 3️⃣ Extract data
+    const googleId = googleUser.sub;
+    const email = googleUser.email;
+
+
+    if (!googleUser.email) {
+      res.clearCookie("google_oauth_state"); 
+      return res.status(400).json({
+        success: false,
+        message: "Google account has no email"
+      });
+    }
+
+    let user = await User.findOne({ googleId });
+
+    // =========================
+    // 🟢 USER CREATION / LOGIN
+    // =========================
+
+    if (!user) {
+      // check email match
+      const existingEmailUser = await User.findOne({ email });
+
+      if (existingEmailUser) {
+        // link account
+        existingEmailUser.googleId = googleUser.sub;
+        existingEmailUser.authProvider = "google";
+        user = await existingEmailUser.save();
+      } else {
+        user = await User.create({
+          name: googleUser.name,
+          email,
+          googleId,
+          authProvider: "google",
+          refreshToken: []
+        });
+      }
+    }
+
+    // =========================
+    // 🔐 USE YOUR EXISTING JWT SYSTEM
+    // =========================
+    const { accessToken, refreshToken } = generateTokens(user._id);
+
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+    user.refreshToken.push(hashedRefreshToken);
+    await user.save();
+
+    sendRefreshToken(res, refreshToken);
+    sendAccessToken(res, accessToken);
+
+    return res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+
+  } catch (err) {
+    console.error("Google OAuth Error:", err);
+    res.clearCookie("google_oauth_state");
+    return res.status(500).json({
+      success: false,
+      message: "Google login failed"
+    });
+  }
+};
