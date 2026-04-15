@@ -17,10 +17,11 @@ export const userSchema = new mongoose.Schema({
     },
 
     authProvider: {
-        type: String,
-        enum: ["local", "google"],
-        required: true
+        type: [String],
+        enum: ["local", "google",], // we can add future methods here
+        default: [],
     },
+
     googleId: {
         type: String,
         unique: true,

@@ -98,11 +98,26 @@ export const signup = async (req, res) => {
 
         const existingUser = await User.findOne({ email });
 
+
         if (existingUser) {
-        return res.status(400).json({
-            success: false,
+          // Case: Google-only account -> allow password setup
+          if (!existingUser.authProvider || !existingUser.authProvider.includes("local")) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            existingUser.password = hashedPassword;
+            existingUser.authProvider.push("local");
+
+            await existingUser.save();
+
+            return res.json({
+              message: "Password set successfully. You can now login with email/password."
+            });
+          }
+
+          // Already has local account
+          return res.status(400).json({
             message: "User already exists. Please login."
-        });
+          });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -111,7 +126,7 @@ export const signup = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        authProvider: "local",
+        authProvider: ["local"],
         refreshToken: []
         });
 
@@ -160,10 +175,10 @@ export const login = async (req, res) => {
       });
     }
 
-    if (user.authProvider === "google") {
+    if (!user.authProvider.includes("local")){
       return res.status(400).json({
         success: false,
-        message: "This account uses Google login."
+        message: "This account uses google login."
       });
     }
 
@@ -472,14 +487,16 @@ export const googleCallback = async (req, res) => {
       if (existingEmailUser) {
         // link account
         existingEmailUser.googleId = googleUser.sub;
-        existingEmailUser.authProvider = "google";
+        if (!existingEmailUser.authProvider.includes("google")) {
+          existingEmailUser.authProvider.push("google");
+        }
         user = await existingEmailUser.save();
       } else {
         user = await User.create({
           name: googleUser.name,
           email,
           googleId,
-          authProvider: "google",
+          authProvider: ["google"],
           refreshToken: []
         });
       }

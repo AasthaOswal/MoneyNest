@@ -66,20 +66,32 @@ const FamilyPage = () => {
   // =========================
   // 🟡 JOIN FAMILY
   // =========================
-  const handleJoinFamily = async () => {
-    try {
-      setLoading(true);
-      const res = await api.post(`/family/join?token=${joinToken}`);
+  const extractToken = (input) => {
+  try {
+    const url = new URL(input);
+    return url.searchParams.get("token");
+  } catch {
+    return input; // already a raw token
+  }
+};
 
-      if (res.data.success) {
-        fetchFamily();
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
+const handleJoinFamily = async () => {
+  try {
+    setLoading(true);
+
+    const cleanToken = extractToken(joinToken);
+
+    const res = await api.post(`/family/join?token=${cleanToken}`);
+
+    if (res.data.success) {
+      fetchFamily();
     }
-  };
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // =========================
   // 🧠 UI
