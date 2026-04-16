@@ -16,6 +16,7 @@ const FamilyPage = () => {
     try {
       const res = await api.get("/family/me");
       if (res.data.success) {
+        console.log(res.data.data);
         setFamily(res.data.data.familyId);
         setMembers(res.data.data.members);
       }

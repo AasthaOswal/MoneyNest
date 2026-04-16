@@ -24,6 +24,16 @@ export const createFamily = async (req, res) => {
     const userId = req.user._id;
     const { familyName } = req.body;
 
+    // Check if user already in a family
+    const user = await User.findById(userId);
+
+    if (user.familyId) {
+      return res.status(400).json({
+        success: false,
+        message: "You are already part of a family. Leave it before creating a new one."
+      });
+    }
+
     const family = await Family.create({
       familyName,
       familyAdmin: userId
@@ -79,7 +89,7 @@ export const generateInvite = async (req, res) => {
 
     const inviteLink = `${process.env.CLIENT_URL}/join-family?token=${rawToken}`;
 
-    return res.status(200).json({ success : true, message: "Invite link generated", data : inviteLink, });
+    return res.status(200).json({ success : true, message: "Invite link generated. Please make sure the member has already signed up. Only then they can join your family. The link will expire in 15 minutes.", data : inviteLink, });
 
   } catch (err) {
     return res.status(500).json({ success:false, message: "Error generating invite link" });
@@ -122,13 +132,13 @@ export const joinFamilyWithToken = async (req, res) => {
       });
     }
 
-    // ✅ Join user
+    // Join user
     await User.findByIdAndUpdate(userId, {
       familyId: family._id,
       role: "member"
     });
 
-    // ✅ Invalidate token (one-time use)
+    // Invalidate token (one-time use)
     family.inviteToken = null;
     family.inviteTokenExpires = null;
     await family.save();
@@ -177,5 +187,140 @@ export const getMyFamily = async (req, res) => {
       success: false,
       message: "Error fetching family"
     });
+  }
+};
+
+export const leaveFamily = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user.familyId) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not part of any family"
+      });
+    }
+
+    if (user.role === "familyAdmin") {
+      return res.status(400).json({
+        success: false,
+        message: "Admin cannot leave. Delete family instead."
+      });
+    }
+
+    user.familyId = null;
+    user.role = "member";
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Left family successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error leaving family" });
+  }
+};
+
+export const removeMember = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user._id);
+    const { memberId } = req.params;
+
+    if (admin.role !== "familyAdmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admin can remove members"
+      });
+    }
+
+    if (admin._id.toString() === memberId) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin cannot remove themselves"
+      });
+    }
+
+    const member = await User.findById(memberId);
+
+    if (!member || member.familyId.toString() !== admin.familyId.toString()) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found in your family"
+      });
+    }
+
+    member.familyId = null;
+    member.role = "member";
+    await member.save();
+
+    res.json({
+      success: true,
+      message: "Member removed successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error removing member" });
+  }
+};
+
+export const deleteFamily = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user._id);
+
+    if (admin.role !== "familyAdmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admin can delete family"
+      });
+    }
+
+    const familyId = admin.familyId;
+
+    // Remove familyId from all users
+    await User.updateMany(
+      { familyId },
+      { $set: { familyId: null, role: "member" } }
+    );
+
+    // Delete family
+    await Family.findByIdAndDelete(familyId);
+
+    res.json({
+      success: true,
+      message: "Family deleted successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error deleting family" });
+  }
+};
+
+export const editFamily = async (req, res) => {
+  try {
+    const user = req.user;
+    const { familyName } = req.body;
+
+    if (user.role !== "familyAdmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admin can edit family"
+      });
+    }
+
+    const family = await Family.findByIdAndUpdate(
+      user.familyId,
+      { familyName },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: "Family updated successfully",
+      data: family
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error updating family" });
   }
 };

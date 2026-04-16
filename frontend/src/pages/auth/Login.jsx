@@ -37,7 +37,7 @@ const Login = () => {
       if(user.familyId != null){
         navigate("/dashboard");
       }else{
-        navigate("/family/join");
+        navigate("/family/onboarding");
       }
     }else {
       navigate("/dashboard");

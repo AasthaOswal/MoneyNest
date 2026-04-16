@@ -67,7 +67,15 @@ export const AuthProvider = ({ children }) => {
       const res = await api.get("/user/me");
       setUser(res.data.user);
     } catch (err) {
-      setUser(null);
+      console.log("First attempt failed, retrying...");
+
+      try {
+        console.log("Second attempt at getting user from /user/me endpoint");
+        const res = await api.get("/user/me"); // retry after refresh
+        setUser(res.data.user);
+      } catch (err2) {
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }

@@ -2,37 +2,55 @@ import api from "../axios/axios";
 
 /**
  * Create a new family group.
- * Expects: { name: "Family Name" } (or whatever your schema requires)
  */
 const createFamily = async (familyData) => {
-  const response = await api.post("/family/create", familyData);
-  return response.data;
+  try {
+    const response = await api.post("/family/create", familyData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating family:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
 /**
  * Generate an invitation token.
- * Only accessible by users with the 'familyAdmin' role.
  */
 const generateInvite = async () => {
-  const response = await api.post("/family/invite");
-  return response.data;
+  try {
+    const response = await api.post("/family/invite");
+    return response.data;
+  } catch (error) {
+    console.error("Error generating invite:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
 /**
  * Join an existing family using a token.
- * Expects: { token: "abc-123" }
  */
 const joinFamilyWithToken = async (tokenData) => {
-  const response = await api.post("/family/join", tokenData);
-  return response.data;
+  try {
+    const response = await api.post("/family/join", tokenData);
+    return response.data;
+  } catch (error) {
+    console.error("Error joining family:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
 /**
  * Retrieve the current user's family details and members.
  */
 const getMyFamily = async () => {
-  const response = await api.get("/family/me");
-  return response.data;
+  try {
+    const response = await api.get("/family/me");
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching family:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
 };
 
 const FamilyService = {

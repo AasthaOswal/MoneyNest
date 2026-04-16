@@ -4,8 +4,6 @@ import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import Dashboard from './pages/dashboard/Dashboard';
 import Landing from './pages/home/Landing';
-import FamilyPage from './pages/family/FamilyPage';
-import ManageFamily from './pages/family/ManageFamily';
 
 // Categories related pages
 import CategoriesPage from './pages/categories/CategoriesPage';
@@ -41,6 +39,14 @@ import { ThemeProvider } from './context/ThemeContext';
 import { useEffect } from "react";
 import { onMessage } from "firebase/messaging";
 import { messaging } from "./services/firebase.service.js"; // adjust path if needed
+
+// Family pages
+import FamilyOnboarding from "./pages/family/FamilyOnBoarding";
+import CreateFamily from "./pages/family/CreateFamily";
+import JoinFamily from "./pages/family/JoinFamily";
+import FamilyPage from './pages/family/FamilyPage';
+import ManageFamily from './pages/family/ManageFamily';
+
 
 
 function App() {
@@ -84,11 +90,17 @@ function App() {
 
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>
-                  <Route path="/family" element={<FamilyPage />} />
+      
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/individual-dashboard" element={<div>Individual Dashboard</div>} />
                   <Route path="/reminders" element={<div>Reminders</div>} />
 
+
+                  {/* Family Related Pages */}
+                  <Route path="/family" element={<FamilyPage />} />
+                  <Route path="/family/onboarding" element={<FamilyOnboarding />} />
+                  <Route path="/family/create" element={<CreateFamily />} />
+                  <Route path="/family/join" element={<JoinFamily />} />
 
                   {/* Categories related pages */}
                   <Route path="/categories" element={<CategoriesPage />} />
