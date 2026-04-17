@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Transaction from "../models/transaction.model.js";
+import Category from "../models/category.model.js";
+import Label from "../models/label.model.js";
 
 import { createTransactionSchema, updateTransactionSchema, getTransactionsValidation } from "../validators/transaction.validation.js";
 
@@ -18,6 +20,32 @@ const fileConfigs = [
     friendlyName: "Transaction Document"
   }
 ];
+
+const validateCategoryOrLabel = async ({
+  model,
+  ids,
+  familyId,
+  fieldName
+}) => {
+  if (!ids || ids.length === 0) return;
+
+  const docs = await model.find({
+    _id: { $in: ids },
+    family: familyId
+  }).select("_id");
+
+  const validIds = new Set(docs.map(doc => doc._id.toString()));
+
+  const invalidIds = ids.filter(
+    id => !validIds.has(id.toString())
+  );
+
+  if (invalidIds.length > 0) {
+    throw new Error(
+      `Invalid ${fieldName}: ${invalidIds.join(", ")} not found in your family`
+    );
+  }
+};
 
 // =======================
 // ➕ CREATE TRANSACTION
@@ -57,6 +85,21 @@ export const createTransaction = async (req, res) => {
         errors: validationErrors
       });
     }
+
+    await Promise.all([
+      validateCategoryOrLabel({
+        model: Category,
+        ids: value.category,
+        familyId: req.user.familyId,
+        fieldName: "category"
+      }),
+      validateCategoryOrLabel({
+        model: Label,
+        ids: value.labels,
+        familyId: req.user.familyId,
+        fieldName: "label"
+      })
+    ]);
 
     // Upload file (optional)
     if (req.files && Object.keys(req.files).length > 0) {
@@ -108,6 +151,7 @@ export const updateTransaction = async (req, res) => {
 
   try {
     const { transactionId } = req.params;
+    const userFamilyId = req.user.family;
 
     if (!transactionId || !mongoose.Types.ObjectId.isValid(transactionId)) {
       return res.status(400).json({
@@ -159,6 +203,21 @@ export const updateTransaction = async (req, res) => {
         errors: validationErrors
       });
     }
+
+      await Promise.all([
+        validateCategoryOrLabel({
+          model: Category,
+          ids: value.category,
+          familyId: req.user.familyId,
+          fieldName: "category"
+        }),
+        validateCategoryOrLabel({
+          model: Label,
+          ids: value.labels,
+          familyId: req.user.familyId,
+          fieldName: "label"
+        })
+      ]);
 
     let oldPublicId = null;
 
@@ -281,10 +340,25 @@ export const getTransactions = async (req, res) => {
       query.category = {
         $in: value.category.map(id => new mongoose.Types.ObjectId(id))
       };
+      await validateCategoryOrLabel({
+        model: Category,
+        ids: value.category.map(id => new mongoose.Types.ObjectId(id)),
+        familyId: req.user.familyId,
+        fieldName: "category"
+      })
+      
     }
 
     // ✅ labels (ARRAY)
     if (value.label?.length) {
+      
+      await validateCategoryOrLabel({
+        model: Label,
+        ids: value.label.map(id => new mongoose.Types.ObjectId(id)),
+        familyId: req.user.familyId,
+        fieldName: "label"
+      })
+
       query.labels = {
         $in: value.label.map(id => new mongoose.Types.ObjectId(id))
       };

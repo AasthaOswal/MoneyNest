@@ -51,20 +51,6 @@ const createTransaction = async (transactionData) => {
 /**
  * Get all transactions (with filters)
  */
-// const getTransactions = async (params = {}) => {
-//   try {
-//     const response = await api.get("/transactions", { params });
-//     console.log(response)
-//     return response.data;
-
-//   } catch (error) {
-//     console.error("Get Transactions Error:", error.response?.data || error.message);
-//     throw error;
-//   }
-// };
-
-
-
 const getTransactions = async (params = {}) => {
   try {
     const response = await api.get("/transactions", {
@@ -103,11 +89,20 @@ const updateTransaction = async (id, updateData) => {
   try {
     const formData = new FormData();
 
+
     Object.keys(updateData).forEach((key) => {
-      if (key !== "transactionDoc") {
-        formData.append(key, updateData[key]);
-      }
-    });
+  if (key !== "transactionDoc") {
+    const value = updateData[key];
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        formData.append(key, item); // ✅ FIX (same as create)
+      });
+    } else {
+      formData.append(key, value);
+    }
+  }
+});
 
     if (updateData.transactionDoc) {
       formData.append("transactionDoc", updateData.transactionDoc);

@@ -141,7 +141,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="bg-bg min-h-[calc(100vh-64px)] p-4 md:p-8 flex flex-col items-center">
+    <div className="bg-bg min-h-[calc(100vh-64px)] p-0 sm:p-4 md:p-8 flex flex-col items-center">
       <div className="w-full max-w-6xl space-y-6">
 
         {/* Top Header Section */}
