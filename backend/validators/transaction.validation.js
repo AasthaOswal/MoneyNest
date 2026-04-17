@@ -1,14 +1,21 @@
 import Joi from "joi";
+import mongoose from "mongoose";
 
 // Helper for MongoDB ObjectId validation
 const objectId = (value, helpers) => {
-  if (!value.match(/^[0-9a-fA-F]{24}$/)) {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
     return helpers.message('"{{#label}}" must be a valid ObjectId');
   }
   return value;
 };
 
-// 1. Create Transaction Schema
+const commonOptions = {
+  stripUnknown: true,
+  convert: true,
+  abortEarly: false
+};
+
+// Create Transaction Schema
 export const createTransactionSchema = Joi.object({
   type: Joi.string().valid("income", "expense", "investment").required(),
   title: Joi.string().trim().min(1).max(100).required(),
@@ -19,9 +26,9 @@ export const createTransactionSchema = Joi.object({
   description: Joi.string().allow("", null).max(500),
   note: Joi.string().allow("", null).max(500),
   date: Joi.date().default(Date.now),
-});
+}).options(commonOptions);
 
-// 2. Update Transaction Schema (All fields optional, but must be valid if provided)
+// Update Transaction Schema (All fields optional, but must be valid if provided)
 export const updateTransactionSchema = Joi.object({
   type: Joi.string().valid("income", "expense", "investment"),
   title: Joi.string().trim().min(1).max(100),
@@ -31,7 +38,9 @@ export const updateTransactionSchema = Joi.object({
   description: Joi.string().allow("", null).max(500),
   note: Joi.string().allow("", null).max(500),
   date: Joi.date(),
-}).min(1); // Ensure at least one field is being updated
+})
+.min(1)    // Ensure at least one field is being updated
+.options(commonOptions);
 
 // 3. Get Transactions Validation (For query params like filtering/pagination)
 export const getTransactionsValidation = Joi.object({
@@ -52,4 +61,4 @@ export const getTransactionsValidation = Joi.object({
   page: Joi.number().integer().min(1).default(1),
 
   limit: Joi.number().integer().min(1).max(50).default(10),
-});
+}).options(commonOptions);

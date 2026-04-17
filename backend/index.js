@@ -19,7 +19,6 @@ import userRoutes from './routes/user.routes.js'
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
 
-import session from "express-session";
 
 
 const app = express();
@@ -46,13 +45,7 @@ app.use(express.urlencoded({ limit: "4mb", extended: true }));
 app.use(cookieParser());
 
 
-app.use(
-  session({
-    secret: "your_session_secret",
-    resave: false,
-    saveUninitialized: false
-  })
-);
+
 
 connectDB();
 

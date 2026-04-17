@@ -41,7 +41,7 @@ import { onMessage } from "firebase/messaging";
 import { messaging } from "./services/firebase.service.js"; // adjust path if needed
 
 // Family pages
-import FamilyOnboarding from "./pages/family/FamilyOnBoarding";
+import FamilyOnboarding from "./pages/family/FamilyOnboarding";
 import CreateFamily from "./pages/family/CreateFamily";
 import JoinFamily from "./pages/family/JoinFamily";
 import FamilyPage from './pages/family/FamilyPage';

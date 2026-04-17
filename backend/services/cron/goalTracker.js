@@ -15,7 +15,11 @@ import { sendPushNotification } from "../firebase/sendPushNotification.js";
 
 
 // Just for testing -
-const GOAL_TRACKER_CRON = "* * * * *";
+// const GOAL_TRACKER_CRON = "* * * * *";
+
+
+
+const GOAL_TRACKER_CRON = "0 */12 * * *";
 
 export const startGoalTracker = () => {
     let isRunning = false;

@@ -3,7 +3,7 @@
 import Family from "../models/family.model.js";
 import User from "../models/user.model.js";
 import crypto from "crypto";
-
+import { createFamilySchema, joinFamilySchema, editFamilySchema } from "../validators/family.validation.js";
 
 //later on add(not now):-
 /* 
@@ -22,7 +22,18 @@ import crypto from "crypto";
 export const createFamily = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { familyName } = req.body;
+    
+
+    const { value, error } = createFamilySchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map(err => err.message)
+      });
+    }
+
+    const { familyName } = value;
 
     // Check if user already in a family
     const user = await User.findById(userId);
@@ -103,7 +114,18 @@ export const generateInvite = async (req, res) => {
 export const joinFamilyWithToken = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { token } = req.query;
+    
+
+    const { value, error } = joinFamilySchema.validate(req.query);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map(err => err.message)
+      });
+    }
+
+    const { token } = value;
 
     const user = await User.findById(userId);
 
@@ -190,79 +212,6 @@ export const getMyFamily = async (req, res) => {
   }
 };
 
-export const leaveFamily = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-
-    if (!user.familyId) {
-      return res.status(400).json({
-        success: false,
-        message: "You are not part of any family"
-      });
-    }
-
-    if (user.role === "familyAdmin") {
-      return res.status(400).json({
-        success: false,
-        message: "Admin cannot leave. Delete family instead."
-      });
-    }
-
-    user.familyId = null;
-    user.role = "member";
-    await user.save();
-
-    res.json({
-      success: true,
-      message: "Left family successfully"
-    });
-
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Error leaving family" });
-  }
-};
-
-export const removeMember = async (req, res) => {
-  try {
-    const admin = await User.findById(req.user._id);
-    const { memberId } = req.params;
-
-    if (admin.role !== "familyAdmin") {
-      return res.status(403).json({
-        success: false,
-        message: "Only admin can remove members"
-      });
-    }
-
-    if (admin._id.toString() === memberId) {
-      return res.status(400).json({
-        success: false,
-        message: "Admin cannot remove themselves"
-      });
-    }
-
-    const member = await User.findById(memberId);
-
-    if (!member || member.familyId.toString() !== admin.familyId.toString()) {
-      return res.status(404).json({
-        success: false,
-        message: "Member not found in your family"
-      });
-    }
-
-    member.familyId = null;
-    member.role = "member";
-    await member.save();
-
-    res.json({
-      success: true,
-      message: "Member removed successfully"
-    });
-
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Error removing member" });
-  }
-};
 
 export const deleteFamily = async (req, res) => {
   try {
@@ -299,7 +248,18 @@ export const deleteFamily = async (req, res) => {
 export const editFamily = async (req, res) => {
   try {
     const user = req.user;
-    const { familyName } = req.body;
+    
+
+    const { value, error } = editFamilySchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map(err => err.message)
+      });
+    }
+
+    const { familyName } = value;
 
     if (user.role !== "familyAdmin") {
       return res.status(403).json({
@@ -324,3 +284,82 @@ export const editFamily = async (req, res) => {
     res.status(500).json({ success: false, message: "Error updating family" });
   }
 };
+
+
+
+
+
+// export const leaveFamily = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user._id);
+
+//     if (!user.familyId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "You are not part of any family"
+//       });
+//     }
+
+//     if (user.role === "familyAdmin") {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Admin cannot leave. Delete family instead."
+//       });
+//     }
+
+//     user.familyId = null;
+//     user.role = "member";
+//     await user.save();
+
+//     res.json({
+//       success: true,
+//       message: "Left family successfully"
+//     });
+
+//   } catch (err) {
+//     res.status(500).json({ success: false, message: "Error leaving family" });
+//   }
+// };
+
+// export const removeMember = async (req, res) => {
+//   try {
+//     const admin = await User.findById(req.user._id);
+//     const { memberId } = req.params;
+
+//     if (admin.role !== "familyAdmin") {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Only admin can remove members"
+//       });
+//     }
+
+//     if (admin._id.toString() === memberId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Admin cannot remove themselves"
+//       });
+//     }
+
+//     const member = await User.findById(memberId);
+
+//     if (!member || member.familyId.toString() !== admin.familyId.toString()) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Member not found in your family"
+//       });
+//     }
+
+//     member.familyId = null;
+//     member.role = "member";
+//     await member.save();
+
+//     res.json({
+//       success: true,
+//       message: "Member removed successfully"
+//     });
+
+//   } catch (err) {
+//     res.status(500).json({ success: false, message: "Error removing member" });
+//   }
+// };
+

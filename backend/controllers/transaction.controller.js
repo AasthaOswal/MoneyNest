@@ -30,6 +30,17 @@ export const createTransaction = async (req, res) => {
     const userId = req.user._id;
     const familyId = req.user.familyId;
 
+
+    // Normalize category
+    if (typeof req.body.category === "string") {
+      req.body.category = [req.body.category];
+    }
+
+    // Normalize labels
+    if (typeof req.body.labels === "string") {
+      req.body.labels = [req.body.labels];
+    }
+
     const { error, value } = createTransactionSchema.validate(req.body, {
       abortEarly: false
     });
@@ -118,8 +129,18 @@ export const updateTransaction = async (req, res) => {
     if (existingTransaction.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized"
+        message: "Only the person who has created transaction can edit their own transaction"
       });
+    }
+
+    // Normalize category
+    if (req.body.category && typeof req.body.category === "string") {
+      req.body.category = [req.body.category];
+    }
+
+    // Normalize labels
+    if (req.body.labels && typeof req.body.labels === "string") {
+      req.body.labels = [req.body.labels];
     }
 
     const { error, value } = updateTransactionSchema.validate(req.body, {
@@ -366,7 +387,7 @@ export const deleteTransaction = async (req, res) => {
     if (transaction.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized"
+        message: "Only the person who has created transaction can delete their own transaction"
       });
     }
 
