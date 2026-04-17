@@ -42,23 +42,66 @@ export const updateTransactionSchema = Joi.object({
 .min(1)    // Ensure at least one field is being updated
 .options(commonOptions);
 
-// 3. Get Transactions Validation (For query params like filtering/pagination)
-export const getTransactionsValidation = Joi.object({
-  familyId: Joi.string().custom(objectId),
+// //3. Get Transactions Validation (For query params like filtering/pagination)
+// export const getTransactionsValidation = Joi.object({
+//   familyId: Joi.string().custom(objectId),
 
+//   type: Joi.string().valid("income", "expense", "investment"),
+
+//   search: Joi.string().trim().allow("", null),
+
+//   minAmount: Joi.number().min(0),
+
+//   maxAmount: Joi.number().min(0),
+
+//   startDate: Joi.date(),
+
+//   endDate: Joi.date(),
+
+//   page: Joi.number().integer().min(1).default(1),
+
+//   limit: Joi.number().integer().min(1).max(50).default(10),
+// }).options(commonOptions);
+
+export const getTransactionsValidation = Joi.object({
   type: Joi.string().valid("income", "expense", "investment"),
 
   search: Joi.string().trim().allow("", null),
 
   minAmount: Joi.number().min(0),
-
   maxAmount: Joi.number().min(0),
 
   startDate: Joi.date(),
-
   endDate: Joi.date(),
 
   page: Joi.number().integer().min(1).default(1),
-
   limit: Joi.number().integer().min(1).max(50).default(10),
-}).options(commonOptions);
+
+  // ✅ user filter
+  user: Joi.array()
+  .items(Joi.string().custom(objectId))
+  .single(),
+
+  // ✅ category array
+  category: Joi.array()
+    .items(Joi.string().custom(objectId))
+    .single(),   // 🔥 allows both ?category=id1&id2 and ?category=id1
+
+  // ✅ label array
+  label: Joi.array()
+    .items(Joi.string().custom(objectId))
+    .single(),
+
+})
+  .custom((value, helpers) => {
+    if (value.minAmount && value.maxAmount && value.minAmount > value.maxAmount) {
+      return helpers.message("minAmount cannot be greater than maxAmount");
+    }
+
+    if (value.startDate && value.endDate && value.startDate > value.endDate) {
+      return helpers.message("startDate cannot be after endDate");
+    }
+
+    return value;
+  })
+  .options(commonOptions);

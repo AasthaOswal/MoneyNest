@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TransactionService from "../../services/transaction.service";
+import LabelService from "../../services/label.service";
+import CategoryService from "../../services/category.service";
+import FamilyService from "../../services/family.service";
 import { useNavigate } from "react-router-dom";
+import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
 
 const TransactionsList = () => {
   const navigate = useNavigate();
@@ -16,8 +20,57 @@ const TransactionsList = () => {
     minAmount: "",
     maxAmount: "",
     startDate: "",
-    endDate: ""
+    endDate: "",
+    // NEW
+    category: [],
+    label: [],
+    user: []
   });
+
+  const applyQuickFilter = (type) => {
+  const now = new Date();
+  let start;
+
+  if (type === "1m") {
+    start = new Date();
+    start.setMonth(now.getMonth() - 1);
+  }
+
+  if (type === "3m") {
+    start = new Date();
+    start.setMonth(now.getMonth() - 3);
+  }
+
+  setFilters({
+    ...filters,
+    startDate: start.toISOString().split("T")[0],
+    endDate: now.toISOString().split("T")[0]
+  });
+};
+
+  const [categories, setCategories] = useState([]);
+const [labels, setLabels] = useState([]);
+const [users, setUsers] = useState([]);
+
+useEffect(() => {
+  const fetchMeta = async () => {
+    try {
+      const [catRes, labelRes, userRes] = await Promise.all([
+        CategoryService.getCategories(),
+        LabelService.getLabels(),
+        FamilyService.getMyFamily()
+      ]);
+
+      setCategories(catRes?.data?.data || []);
+      setLabels(labelRes?.data?.data || []);
+      setUsers(userRes?.data?.data?.members || []);
+    } catch (err) {
+      console.error("Failed to load filter data", err);
+    }
+  };
+
+  fetchMeta();
+}, []);
 
   const fetchTransactions = async (pageToFetch = 1) => {
     setLoading(true);
@@ -42,16 +95,19 @@ const TransactionsList = () => {
     fetchTransactions(1);
   };
 
-  const clearFilters = () => {
-    setFilters({
-      search: "",
-      type: "",
-      minAmount: "",
-      maxAmount: "",
-      startDate: "",
-      endDate: ""
-    });
-  };
+ const clearFilters = () => {
+  setFilters({
+    search: "",
+    type: "",
+    minAmount: "",
+    maxAmount: "",
+    startDate: "",
+    endDate: "",
+    category: [],
+    label: [],
+    user: []
+  });
+};
 
   const getTypeColor = (type) => {
     if (type === "income") return "text-income bg-green-50 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
@@ -147,6 +203,47 @@ const TransactionsList = () => {
                 className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
               />
             </div>
+
+            <MultiSelectSheet
+  label="Category"
+  title="Select Categories"
+  options={categories}
+  selectedIds={filters.category}
+  onChange={(ids) => setFilters({ ...filters, category: ids })}
+  placeholder="Select categories"
+/>
+<MultiSelectSheet
+  label="Label"
+  title="Select Labels"
+  options={labels}
+  selectedIds={filters.label}
+  onChange={(ids) => setFilters({ ...filters, label: ids })}
+  placeholder="Select labels"
+/>
+<MultiSelectSheet
+  label="User"
+  title="Select Users"
+  options={users}
+  selectedIds={filters.user}
+  onChange={(ids) => setFilters({ ...filters, user: ids })}
+  placeholder="Select users"
+/>
+
+<div className="flex gap-2">
+  <button
+    onClick={() => applyQuickFilter("1m")}
+    className="px-3 py-1 bg-bg border rounded-lg text-sm"
+  >
+    Past Month
+  </button>
+
+  <button
+    onClick={() => applyQuickFilter("3m")}
+    className="px-3 py-1 bg-bg border rounded-lg text-sm"
+  >
+    Past 3 Months
+  </button>
+</div>
           </div>
           
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">

@@ -232,11 +232,14 @@ export const getTransactions = async (req, res) => {
       minAmount,
       maxAmount,
       startDate,
-      endDate
+      endDate,
+      user,
+      category,
+      label
     } = req.query;
 
     const { error, value } = getTransactionsValidation.validate(
-      { search, type, page, limit, minAmount, maxAmount, startDate, endDate },
+      { search, type, page, limit, minAmount, maxAmount, startDate, endDate, user, category, label },
       { abortEarly: false }
     );
 
@@ -253,22 +256,55 @@ export const getTransactions = async (req, res) => {
       });
     }
 
-    const pageNum = value.page || 1;
-    const limitNum = Math.min(value.limit || 10, 50);
+    const pageNum = value.page;
+    const limitNum = value.limit;
     const skip = (pageNum - 1) * limitNum;
 
     const query = {
       family: req.user.familyId
     };
 
-    if (value.type) query.type = value.type;
+    // ✅ type
+    if (value.type) {
+      query.type = value.type;
+    }
 
+    // ✅ user
+    if (value.user?.length) {
+      query.user = {
+        $in: value.user.map(id => new mongoose.Types.ObjectId(id))
+      };
+    }
+
+    // ✅ category (ARRAY)
+    if (value.category?.length) {
+      query.category = {
+        $in: value.category.map(id => new mongoose.Types.ObjectId(id))
+      };
+    }
+
+    // ✅ labels (ARRAY)
+    if (value.label?.length) {
+      query.labels = {
+        $in: value.label.map(id => new mongoose.Types.ObjectId(id))
+      };
+    }
+
+    // ✅ amount range
     if (value.minAmount || value.maxAmount) {
       query.amount = {};
       if (value.minAmount) query.amount.$gte = value.minAmount;
       if (value.maxAmount) query.amount.$lte = value.maxAmount;
     }
 
+    // ✅ date range
+    if (value.startDate || value.endDate) {
+      query.date = {};
+      if (value.startDate) query.date.$gte = new Date(value.startDate);
+      if (value.endDate) query.date.$lte = new Date(value.endDate);
+    }
+
+    // ✅ search
     if (value.search) {
       const safeSearch = value.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -307,7 +343,6 @@ export const getTransactions = async (req, res) => {
     });
   }
 };
-
 
 // =======================
 // 🔍 GET TRANSACTION BY ID
