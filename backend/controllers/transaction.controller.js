@@ -318,6 +318,7 @@ export const getTransactions = async (req, res) => {
     const [transactions, total] = await Promise.all([
       Transaction.find(query)
         .populate("category labels")
+        .populate("user", "name")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)

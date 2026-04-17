@@ -42,26 +42,6 @@ export const updateTransactionSchema = Joi.object({
 .min(1)    // Ensure at least one field is being updated
 .options(commonOptions);
 
-// //3. Get Transactions Validation (For query params like filtering/pagination)
-// export const getTransactionsValidation = Joi.object({
-//   familyId: Joi.string().custom(objectId),
-
-//   type: Joi.string().valid("income", "expense", "investment"),
-
-//   search: Joi.string().trim().allow("", null),
-
-//   minAmount: Joi.number().min(0),
-
-//   maxAmount: Joi.number().min(0),
-
-//   startDate: Joi.date(),
-
-//   endDate: Joi.date(),
-
-//   page: Joi.number().integer().min(1).default(1),
-
-//   limit: Joi.number().integer().min(1).max(50).default(10),
-// }).options(commonOptions);
 
 export const getTransactionsValidation = Joi.object({
   type: Joi.string().valid("income", "expense", "investment"),

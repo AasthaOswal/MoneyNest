@@ -1,4 +1,6 @@
 import api from "../axios/axios";
+import qs from "qs";
+
 
 /**
  * Create a new transaction
@@ -49,12 +51,29 @@ const createTransaction = async (transactionData) => {
 /**
  * Get all transactions (with filters)
  */
+// const getTransactions = async (params = {}) => {
+//   try {
+//     const response = await api.get("/transactions", { params });
+//     console.log(response)
+//     return response.data;
+
+//   } catch (error) {
+//     console.error("Get Transactions Error:", error.response?.data || error.message);
+//     throw error;
+//   }
+// };
+
+
+
 const getTransactions = async (params = {}) => {
   try {
-    const response = await api.get("/transactions", { params });
-    console.log(response)
-    return response.data;
+    const response = await api.get("/transactions", {
+      params,
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: "repeat" }) // ✅ FIX
+    });
 
+    return response.data;
   } catch (error) {
     console.error("Get Transactions Error:", error.response?.data || error.message);
     throw error;

@@ -61,9 +61,20 @@ useEffect(() => {
         FamilyService.getMyFamily()
       ]);
 
-      setCategories(catRes?.data?.data || []);
-      setLabels(labelRes?.data?.data || []);
-      setUsers(userRes?.data?.data?.members || []);
+      console.log(catRes)
+      console.log(labelRes)
+      console.log(userRes)
+
+      const catData = catRes?.data || [];
+      const userData = userRes.data.members || [];
+      const labelData = labelRes.data || [];
+      console.log("API categories:", catData);
+      console.log("API users:", userData);
+      console.log("API labels:", labelData);
+
+      setCategories(catData);
+      setLabels(labelData);
+      setUsers(userData);
     } catch (err) {
       console.error("Failed to load filter data", err);
     }
@@ -76,9 +87,23 @@ useEffect(() => {
     setLoading(true);
     try {
       const activeFilters = {};
+      // Object.keys(filters).forEach(k => {
+      //   if (filters[k]) activeFilters[k] = filters[k];
+      // });
+
       Object.keys(filters).forEach(k => {
-        if (filters[k]) activeFilters[k] = filters[k];
+        const value = filters[k];
+
+        if (
+          value !== "" &&
+          value !== null &&
+          !(Array.isArray(value) && value.length === 0)
+        ) {
+          activeFilters[k] = value;
+        }
       });
+
+      console.log(activeFilters)
 
       const res = await TransactionService.getTransactions({ ...activeFilters, page: pageToFetch });
       setTransactions(res.data);
@@ -205,45 +230,46 @@ useEffect(() => {
             </div>
 
             <MultiSelectSheet
-  label="Category"
-  title="Select Categories"
-  options={categories}
-  selectedIds={filters.category}
-  onChange={(ids) => setFilters({ ...filters, category: ids })}
-  placeholder="Select categories"
-/>
-<MultiSelectSheet
-  label="Label"
-  title="Select Labels"
-  options={labels}
-  selectedIds={filters.label}
-  onChange={(ids) => setFilters({ ...filters, label: ids })}
-  placeholder="Select labels"
-/>
-<MultiSelectSheet
-  label="User"
-  title="Select Users"
-  options={users}
-  selectedIds={filters.user}
-  onChange={(ids) => setFilters({ ...filters, user: ids })}
-  placeholder="Select users"
-/>
+              label="Category"
+              title="Select Categories"
+              options={categories}
+              selectedIds={filters.category}
+              onChange={(ids) => setFilters({ ...filters, category: ids })}
+              placeholder="Select categories"
+            />
+            <MultiSelectSheet
+              label="Label"
+              title="Select Labels"
+              options={labels}
+              selectedIds={filters.label}
+              onChange={(ids) => setFilters({ ...filters, label: ids })}
+              placeholder="Select labels"
+            />
+            <MultiSelectSheet
+              label="User"
+              title="Select Users"
+              options={users}
+              selectedIds={filters.user}
+              onChange={(ids) => setFilters({ ...filters, user: ids })}
+              placeholder="Select users"
+            />
 
-<div className="flex gap-2">
-  <button
-    onClick={() => applyQuickFilter("1m")}
-    className="px-3 py-1 bg-bg border rounded-lg text-sm"
-  >
-    Past Month
-  </button>
+            {/* Past Month and Past 3 moonths filter */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => applyQuickFilter("1m")}
+                className="px-3 py-1 bg-bg border rounded-lg text-sm"
+              >
+                Past Month
+              </button>
 
-  <button
-    onClick={() => applyQuickFilter("3m")}
-    className="px-3 py-1 bg-bg border rounded-lg text-sm"
-  >
-    Past 3 Months
-  </button>
-</div>
+              <button
+                onClick={() => applyQuickFilter("3m")}
+                className="px-3 py-1 bg-bg border rounded-lg text-sm"
+              >
+                Past 3 Months
+              </button>
+            </div>
           </div>
           
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
@@ -297,7 +323,9 @@ useEffect(() => {
                     <th className="p-4 text-sm font-medium text-muted">Title</th>
                     <th className="p-4 text-sm font-medium text-muted">Type</th>
                     <th className="p-4 text-sm font-medium text-muted">Categories</th>
+                    <th className="p-4 text-sm font-medium text-muted">Labels</th>
                     <th className="p-4 text-sm font-medium text-muted">Date</th>
+                    <th className="p-4 text-sm font-medium text-muted">Member</th>
                     <th className="p-4 text-sm font-medium text-muted text-right">Amount</th>
                   </tr>
                 </thead>
@@ -324,8 +352,20 @@ useEffect(() => {
                           ))}
                         </div>
                       </td>
+                      <td className="p-4">
+                        <div className="flex flex-wrap gap-1">
+                          {t.labels?.map(l => (
+                            <span key={l._id || l} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md text-text">
+                              {l.name || "N/A"}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
                       <td className="p-4 text-sm text-muted">
                         {t.date ? new Date(t.date).toLocaleDateString() : "N/A"}
+                      </td>
+                      <td className="p-4 text-sm text-muted">
+                        {t.user?.name || "N/A"}
                       </td>
                       <td className={`p-4 text-right font-semibold ${t.type === 'expense' ? 'text-expense' : t.type === 'income' ? 'text-income' : 'text-investment'}`}>
                         ₹{t.amount?.toLocaleString()}
