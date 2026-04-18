@@ -146,6 +146,98 @@ const FamilyDashboard = () => {
 
             </div>
 
+
+            {/* Contribution charts */}
+            <Section title="Contribution Charts">
+
+            <div className="flex flex-wrap justify-between items-center gap-2">
+
+                {/* Income */}
+                <div className="flex flex-col items-center bg-surface p-4 rounded-2xl shadow-sm">
+                    <h3 className="font-semibold mb-2 text-income">
+                        Income Distribution
+                    </h3>
+
+                    <PieChart width={300} height={300} style={{ background: "transparent" }}>
+                        <Pie
+                        data={contributionChartData.income}
+                        dataKey="amount"
+                        nameKey="name"
+                        outerRadius={90}
+                        label
+                        stroke="none"
+                        >
+                        {contributionChartData.income.map((_, index) => (
+                            <Cell
+                            key={index}
+                            fill={COLORS.income[index % COLORS.income.length]}
+                            />
+                        ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
+                </div>
+
+                {/* Expense */}
+                <div className="flex flex-col items-center bg-surface p-4 rounded-2xl shadow-sm">
+                    <h3 className="font-semibold mb-2 text-expense">
+                        Expense Distribution
+                    </h3>
+
+                    <PieChart width={300} height={300} style={{ background: "transparent" }}>
+                        <Pie
+                        data={contributionChartData.expense}
+                        dataKey="amount"
+                        nameKey="name"
+                        outerRadius={90}
+                        label
+                        stroke="none"
+                        >
+                        {contributionChartData.expense.map((_, index) => (
+                            <Cell
+                            key={index}
+                            fill={COLORS.expense[index % COLORS.expense.length]}
+                            />
+                        ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
+                </div>
+
+                {/* Investment */}
+                <div className="flex flex-col items-center bg-surface p-4 rounded-2xl shadow-sm">
+                    <h3 className="font-semibold mb-2 text-investment">
+                        Investment Distribution
+                    </h3>
+
+                    <PieChart width={300} height={300} style={{ background: "transparent" }}>
+                        <Pie
+                        data={contributionChartData.investment}
+                        dataKey="amount"
+                        nameKey="name"
+                        outerRadius={90}
+                        label
+                        stroke="none"
+                        >
+                        {contributionChartData.investment.map((_, index) => (
+                            <Cell
+                            key={index}
+                            fill={COLORS.investment[index % COLORS.investment.length]}
+                            />
+                        ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
+                </div>
+
+            </div>
+
+            </Section>
+
+
             {/* 🔹 CATEGORY STATS */}
             <Section title="Category Breakdown">
 
@@ -175,11 +267,11 @@ const FamilyDashboard = () => {
 
 
 
-
             {/* 🔹 LABEL STATS */}
             <Section title="Label Breakdown">
                 <StatsList data={labelStats} />
             </Section>
+
 
             {/* 🔹 CONTRIBUTIONS */}
             <Section title="User Contributions">
@@ -201,92 +293,7 @@ const FamilyDashboard = () => {
                 </div>
             </Section>
 
-            {/* Contribution charts */}
-            <Section title="Contribution Charts">
-
-                <div className="grid md:grid-cols-3 gap-6">
-
-                    {/* Income */}
-                    <div className="flex flex-col items-center">
-                    <h3 className="font-semibold mb-2 text-income">
-                        Income Distribution
-                    </h3>
-
-                    <PieChart width={250} height={250}>
-                        <Pie
-                        data={contributionChartData.income}
-                        dataKey="amount"
-                        nameKey="name"
-                        outerRadius={90}
-                        label
-                        >
-                        {contributionChartData.income.map((_, index) => (
-                            <Cell
-                            key={index}
-                            fill={COLORS.income[index % COLORS.income.length]}
-                            />
-                        ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                    </PieChart>
-                    </div>
-
-                    {/* Expense */}
-                    <div className="flex flex-col items-center">
-                    <h3 className="font-semibold mb-2 text-expense">
-                        Expense Distribution
-                    </h3>
-
-                    <PieChart width={250} height={250}>
-                        <Pie
-                        data={contributionChartData.expense}
-                        dataKey="amount"
-                        nameKey="name"
-                        outerRadius={90}
-                        label
-                        >
-                        {contributionChartData.expense.map((_, index) => (
-                            <Cell
-                            key={index}
-                            fill={COLORS.expense[index % COLORS.expense.length]}
-                            />
-                        ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                    </PieChart>
-                    </div>
-
-                    {/* Investment */}
-                    <div className="flex flex-col items-center">
-                    <h3 className="font-semibold mb-2 text-investment">
-                        Investment Distribution
-                    </h3>
-
-                    <PieChart width={250} height={250}>
-                        <Pie
-                        data={contributionChartData.investment}
-                        dataKey="amount"
-                        nameKey="name"
-                        outerRadius={90}
-                        label
-                        >
-                        {contributionChartData.investment.map((_, index) => (
-                            <Cell
-                            key={index}
-                            fill={COLORS.investment[index % COLORS.investment.length]}
-                            />
-                        ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                    </PieChart>
-                    </div>
-
-                </div>
-
-                </Section>
+            
         </div>
     );
 };
