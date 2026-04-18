@@ -41,9 +41,9 @@ const validateCategoryOrLabel = async ({
   );
 
   if (invalidIds.length > 0) {
-    throw new Error(
-      `Invalid ${fieldName}: ${invalidIds.join(", ")} not found in your family`
-    );
+    const error = new Error(`Invalid ${fieldName} IDs: ${invalidIds.join(", ")}`);
+    error.name = "InvalidCategoryOrLabel"; // Assign a custom name
+    throw error;
   }
 };
 
@@ -135,6 +135,10 @@ export const createTransaction = async (req, res) => {
       await deleteMultipleFiles(publicIds);
     }
 
+    if(err.name === "InvalidCategoryOrLabel"){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels."})
+    }
+
     return res.status(500).json({
       success: false,
       message: "Server Error"
@@ -151,7 +155,7 @@ export const updateTransaction = async (req, res) => {
 
   try {
     const { transactionId } = req.params;
-    const userFamilyId = req.user.family;
+    const userFamilyId = req.user.familyId;
 
     if (!transactionId || !mongoose.Types.ObjectId.isValid(transactionId)) {
       return res.status(400).json({
@@ -242,10 +246,10 @@ export const updateTransaction = async (req, res) => {
       });
     }
 
-    const updatedTransaction = await Transaction.findByIdAndUpdate(
-      transactionId,
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { _id: transactionId, user: req.user._id },
       { $set: value },
-      { new: true, runValidators: true }
+      { new: true }
     );
 
     dbSaved = true;
@@ -269,6 +273,10 @@ export const updateTransaction = async (req, res) => {
     if (!dbSaved && uploadedFiles) {
       const publicIds = Object.values(uploadedFiles).map(f => f.publicId);
       await deleteMultipleFiles(publicIds);
+    }
+
+    if(err.name === "InvalidCategoryOrLabel"){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels."})
     }
 
     return res.status(500).json({
@@ -411,6 +419,10 @@ export const getTransactions = async (req, res) => {
 
   } catch (err) {
     console.error("Error in getTransactions:", err);
+
+    if(err.name === "InvalidCategoryOrLabel"){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels."})
+    }
 
     return res.status(500).json({
       success: false,
