@@ -47,7 +47,9 @@ import JoinFamily from "./pages/family/JoinFamily";
 import FamilyPage from './pages/family/FamilyPage';
 import ManageFamily from './pages/family/ManageFamily';
 
-
+// Dashboard pages
+import FamilyDashboard from './pages/dashboard/FamilyDashboard.jsx';
+import IndividualDashboard from './pages/dashboard/IndividualDashboard.jsx';
 
 function App() {
 
@@ -91,8 +93,8 @@ function App() {
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>
       
-                  <Route path="/dashboard/family" element={<Dashboard />} />
-                  <Route path="/dashboard/individual" element={<div>Individual Dashboard</div>} />
+                  <Route path="/dashboard/family" element={<FamilyDashboard />} />
+                  <Route path="/dashboard/individual" element={<IndividualDashboard />} />
                   <Route path="/reminders" element={<div>Reminders</div>} />
 
 

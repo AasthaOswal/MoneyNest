@@ -29,8 +29,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck }
       ]
     : [
-        { name: 'Combined Dashboard', path: '/dashboard', icon: LayoutDashboard },
-        { name: 'Individual Dashboard', path: '/individual-dashboard', icon: User },
+        { name: 'Combined Dashboard', path: '/dashboard/family', icon: LayoutDashboard },
+        { name: 'Individual Dashboard', path: '/dashboard/individual', icon: User },
         { name: 'Transactions', path: '/transactions', icon: ArrowRightLeft },
         { name: 'Categories', path: '/categories', icon: List },
         { name: 'Labels', path: '/labels', icon: Tag },
