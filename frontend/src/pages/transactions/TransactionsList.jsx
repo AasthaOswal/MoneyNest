@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import TransactionService from "../../services/transaction.service";
 import LabelService from "../../services/label.service";
 import CategoryService from "../../services/category.service";
@@ -139,6 +139,9 @@ useEffect(() => {
     if (type === "expense") return "text-expense bg-red-50 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
     return "text-investment bg-purple-50 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
   };
+
+
+
 
   return (
     <div className="bg-bg min-h-[calc(100vh-64px)] p-0 sm:p-4 md:p-8 flex flex-col items-center">
@@ -308,14 +311,16 @@ useEffect(() => {
             </div>
           )}
 
-          {transactions !== null && transactions.length === 0 && !loading && (
-             <div className="p-12 text-center">
-               <h3 className="text-lg font-semibold text-text mb-1">No transactions found</h3>
-               <p className="text-sm text-muted">Try adjusting your filters.</p>
-             </div>
-          )}
+          {transactions !== null &&
+  Object.values(transactions).every(group => group.transactions.length === 0) &&
+  !loading && (
+    <div className="p-12 text-center">
+      <h3 className="text-lg font-semibold text-text mb-1">No transactions found</h3>
+      <p className="text-sm text-muted">Try adjusting your filters.</p>
+    </div>
+)}
 
-          {transactions !== null && transactions.length > 0 && (
+          {transactions !== null  && (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -329,7 +334,7 @@ useEffect(() => {
                     <th className="p-4 text-sm font-medium text-muted text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                {/* <tbody className="divide-y divide-border">
                   {transactions.map(t => (
                     <tr 
                       key={t._id} 
@@ -372,7 +377,96 @@ useEffect(() => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody> */}
+                <tbody className="divide-y divide-border">
+  {["income", "expense", "investment"].map(type => {
+    const group = transactions[type];
+    if (!group || group.transactions.length === 0) return null;
+
+    return (
+      <React.Fragment key={type}>
+        {/* SECTION HEADER */}
+        <tr className="bg-bg">
+          <td colSpan="7" className="p-4 font-bold uppercase text-sm text-muted">
+            {type}
+          </td>
+        </tr>
+
+        {/* ROWS */}
+        {group.transactions.map(t => (
+          <tr
+            key={t._id}
+            onClick={() => navigate(`/transactions/${t._id}`)}
+            className="hover:bg-bg cursor-pointer transition-colors duration-150 group"
+          >
+            <td className="p-4">
+              <div className="font-medium text-text group-hover:text-primary">
+                {t.title}
+              </div>
+              {t.description && (
+                <div className="text-xs text-muted truncate max-w-xs">
+                  {t.description}
+                </div>
+              )}
+            </td>
+
+            <td className="p-4">
+              <span className={getTypeColor(t.type)}>{t.type}</span>
+            </td>
+
+            <td className="p-4">
+              <div className="flex flex-wrap gap-1">
+                {t.category?.map(c => (
+                  <span key={c._id || c} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md">
+                    {c.name || "N/A"}
+                  </span>
+                ))}
+              </div>
+            </td>
+
+            <td className="p-4">
+              <div className="flex flex-wrap gap-1">
+                {t.labels?.map(l => (
+                  <span key={l._id || l} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md">
+                    {l.name || "N/A"}
+                  </span>
+                ))}
+              </div>
+            </td>
+
+            <td className="p-4 text-sm text-muted">
+              {t.date ? new Date(t.date).toLocaleDateString() : "N/A"}
+            </td>
+
+            <td className="p-4 text-sm text-muted">
+              {t.user?.name || "N/A"}
+            </td>
+
+            <td className={`p-4 text-right font-semibold ${
+              t.type === 'expense'
+                ? 'text-expense'
+                : t.type === 'income'
+                ? 'text-income'
+                : 'text-investment'
+            }`}>
+              ₹{t.amount?.toLocaleString()}
+            </td>
+          </tr>
+        ))}
+
+        {/* TOTAL ROW */}
+        <tr className="bg-bg border-t">
+          <td colSpan="6" className="p-4 text-right font-semibold text-text">
+            Total {type}
+          </td>
+          <td className="p-4 text-right font-bold">
+            ₹{group.total.toLocaleString()}
+          </td>
+        </tr>
+      </React.Fragment>
+    );
+  })}
+</tbody>
               </table>
 
               {/* Pagination */}

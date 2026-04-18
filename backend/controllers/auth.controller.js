@@ -515,7 +515,7 @@ export const googleCallback = async (req, res) => {
     sendRefreshToken(res, refreshToken);
     sendAccessToken(res, accessToken);
 
-    return res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+    return res.redirect(`${process.env.CLIENT_URL}/dashboard/family`);
 
   } catch (err) {
     console.error("Google OAuth Error:", err);

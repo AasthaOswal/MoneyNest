@@ -409,9 +409,24 @@ export const getTransactions = async (req, res) => {
       Transaction.countDocuments(query)
     ]);
 
+    const groupedTransactions = {
+  income: { transactions: [], total: 0 },
+  expense: { transactions: [], total: 0 },
+  investment: { transactions: [], total: 0 }
+};
+
+transactions.forEach(t => {
+  const type = t.type;
+
+  if (!groupedTransactions[type]) return;
+
+  groupedTransactions[type].transactions.push(t);
+  groupedTransactions[type].total += t.amount || 0;
+});
+
     return res.status(200).json({
       success: true,
-      data: transactions,
+      data: groupedTransactions,
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limitNum)
