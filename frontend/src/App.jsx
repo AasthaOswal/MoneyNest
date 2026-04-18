@@ -91,8 +91,8 @@ function App() {
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>
       
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/individual-dashboard" element={<div>Individual Dashboard</div>} />
+                  <Route path="/dashboard/family" element={<Dashboard />} />
+                  <Route path="/dashboard/individual" element={<div>Individual Dashboard</div>} />
                   <Route path="/reminders" element={<div>Reminders</div>} />
 
 

@@ -35,12 +35,12 @@ const Login = () => {
       navigate("/admin-dashboard");
     } else if (user.role === "member") {
       if(user.familyId != null){
-        navigate("/dashboard");
+        navigate("/dashboard/family");
       }else{
         navigate("/family/onboarding");
       }
     }else {
-      navigate("/dashboard");
+      navigate("/dashboard/family");
     }
   } catch (err) {
     console.log(err);

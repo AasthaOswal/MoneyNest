@@ -16,6 +16,7 @@ import labelRoutes from './routes/label.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
 import goalRoutes from './routes/goal.routes.js';
 import userRoutes from './routes/user.routes.js'
+import dashboardRoutes from './routes/dashboard.routes.js'
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
 
@@ -57,6 +58,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/labels", labelRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/goals", goalRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // run cron job
 startGoalTracker();
