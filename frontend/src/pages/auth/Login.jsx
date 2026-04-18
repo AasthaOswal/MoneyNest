@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthService from "../../services/authService"; 
 import { useAuth } from "../../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -13,6 +15,10 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleGoogleLogin = () => {
@@ -83,7 +89,7 @@ const Login = () => {
         />
       </div>
 
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium mb-1 text-muted">
           Password
         </label>
@@ -98,7 +104,29 @@ const Login = () => {
           value={credentials.password}
           onChange={handleChange}
         />
-      </div>
+      </div> */}
+
+      <div>
+            <label className="block text-sm font-medium mb-1 text-muted">Password</label>
+            <div className="relative"> {/* 👈 Container for positioning icon */}
+              <input
+                type={showPassword ? "text" : "password"} // 👈 Toggle type
+                name="password"
+                required
+                className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary focus:outline-none pr-10"
+                placeholder="••••••••"
+                value={credentials.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button" // 👈 Important: prevent form submission
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-primary transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
 
       <button
         type="submit"
