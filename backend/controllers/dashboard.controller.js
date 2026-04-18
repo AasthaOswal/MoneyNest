@@ -74,33 +74,64 @@ export const familyDashboardController = async (req, res) => {
       ]),
 
       // 🔹 Category-wise stats
+    //   Transaction.aggregate([
+    //     { $match: match },
+    //     { $unwind: "$category" },
+    //     {
+    //       $group: {
+    //         _id: "$category",
+    //         total: { $sum: "$amount" }
+    //       }
+    //     },
+    //     {
+    //       $lookup: {
+    //         from: "categories",
+    //         localField: "_id",
+    //         foreignField: "_id",
+    //         as: "category"
+    //       }
+    //     },
+    //     { $unwind: "$category" },
+    //     {
+    //       $project: {
+    //         _id: 0,
+    //         categoryId: "$category._id",
+    //         name: "$category.name",
+    //         total: 1
+    //       }
+    //     }
+    //   ]),
       Transaction.aggregate([
-        { $match: match },
-        { $unwind: "$category" },
-        {
-          $group: {
-            _id: "$category",
-            total: { $sum: "$amount" }
-          }
-        },
-        {
-          $lookup: {
-            from: "categories",
-            localField: "_id",
-            foreignField: "_id",
-            as: "category"
-          }
-        },
-        { $unwind: "$category" },
-        {
-          $project: {
-            _id: 0,
-            categoryId: "$category._id",
-            name: "$category.name",
-            total: 1
-          }
-        }
-      ]),
+  { $match: match },
+  { $unwind: "$category" },
+  {
+    $group: {
+      _id: {
+        category: "$category",
+        type: "$type"   // ✅ ADD THIS
+      },
+      total: { $sum: "$amount" }
+    }
+  },
+  {
+    $lookup: {
+      from: "categories",
+      localField: "_id.category",
+      foreignField: "_id",
+      as: "category"
+    }
+  },
+  { $unwind: "$category" },
+  {
+    $project: {
+      _id: 0,
+      categoryId: "$category._id",
+      name: "$category.name",
+      type: "$_id.type",   // ✅ RETURN TYPE
+      total: 1
+    }
+  }
+]),
 
       // 🔹 Label-wise stats
       Transaction.aggregate([
@@ -220,6 +251,19 @@ export const familyDashboardController = async (req, res) => {
         : 0
     }));
 
+    const groupedCategoryStats = {
+  income: [],
+  expense: [],
+  investment: []
+};
+
+categoryStats.forEach(cat => {
+  if (groupedCategoryStats[cat.type]) {
+    groupedCategoryStats[cat.type].push(cat);
+  }
+});
+
+
     // 🔹 Derived values
     const balance =
       formattedSummary.income -
@@ -237,7 +281,7 @@ export const familyDashboardController = async (req, res) => {
           totalGains
         },
         totalTransactions: totalCounts[0]?.totalTransactions || 0,
-        categoryStats,
+        categoryStats: groupedCategoryStats,
         labelStats,
         contributions:contributionsWithPercent
       }

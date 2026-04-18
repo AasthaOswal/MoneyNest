@@ -32,10 +32,14 @@ const FamilyDashboard = () => {
     
 
     const summary = data?.summary || {};
-    const categoryStats = data?.categoryStats || [];
     const labelStats = data?.labelStats || [];
     const contributions = data?.contributions || [];
     const totalTransactions = data?.totalTransactions || 0;
+    const categoryStats = data?.categoryStats || {
+        income: [],
+        expense: [],
+        investment: []
+    };
 
 
     const contributionChartData = {
@@ -144,8 +148,33 @@ const FamilyDashboard = () => {
 
             {/* 🔹 CATEGORY STATS */}
             <Section title="Category Breakdown">
-                <StatsList data={categoryStats} />
+
+                <div className="grid  gap-6">
+
+                    {/* INCOME */}
+                    <div>
+                    <h3 className="text-income font-semibold mb-2">Income</h3>
+                    <StatsList data={categoryStats.income} />
+                    </div>
+
+                    {/* EXPENSE */}
+                    <div>
+                    <h3 className="text-expense font-semibold mb-2">Expense</h3>
+                    <StatsList data={categoryStats.expense} />
+                    </div>
+
+                    {/* INVESTMENT */}
+                    <div>
+                    <h3 className="text-investment font-semibold mb-2">Investment</h3>
+                    <StatsList data={categoryStats.investment} />
+                    </div>
+
+                </div>
+            
             </Section>
+
+
+
 
             {/* 🔹 LABEL STATS */}
             <Section title="Label Breakdown">
