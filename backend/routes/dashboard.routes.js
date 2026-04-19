@@ -1,7 +1,8 @@
 import express from "express";
 import {
   familyDashboardController,
-  individualDashboardController
+  individualDashboardController,
+  getTrendsSummary
 } from "../controllers/dashboard.controller.js";
 
 
@@ -17,6 +18,8 @@ router.use(authenticateToken, requireFamily);
 router.get("/family", familyDashboardController);
 
 router.get("/individual", individualDashboardController)
+
+router.get("/trends", getTrendsSummary)
 
 
 export default router;

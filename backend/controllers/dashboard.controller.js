@@ -445,3 +445,182 @@ export const individualDashboardController = async (req, res) => {
     });
   }
 };
+
+
+export const getTrendsSummary = async (req, res) => {
+  try {
+    const { familyId } = req.user;
+
+    const now = new Date();
+
+    // 🔥 DATE RANGES
+    const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    // 🔥 COMMON MATCH
+    const matchStage = {
+      family: new mongoose.Types.ObjectId(familyId)
+    };
+
+    // =========================
+    // 🔹 1. TIME BASED SUMMARY
+    // =========================
+    const summary = await Transaction.aggregate([
+      { $match: matchStage },
+
+      {
+        $facet: {
+          today: [
+            { $match: { date: { $gte: startOfToday } } },
+            {
+              $group: {
+                _id: "$type",
+                total: { $sum: "$amount" }
+              }
+            }
+          ],
+
+          week: [
+            { $match: { date: { $gte: startOfWeek } } },
+            {
+              $group: {
+                _id: "$type",
+                total: { $sum: "$amount" }
+              }
+            }
+          ],
+
+          month: [
+            { $match: { date: { $gte: startOfMonth } } },
+            {
+              $group: {
+                _id: "$type",
+                total: { $sum: "$amount" }
+              }
+            }
+          ],
+
+          year: [
+            { $match: { date: { $gte: startOfYear } } },
+            {
+              $group: {
+                _id: "$type",
+                total: { $sum: "$amount" }
+              }
+            }
+          ]
+        }
+      }
+    ]);
+
+    // =========================
+    // 🔹 2. MONTHLY BREAKDOWN
+    // =========================
+    const monthly = await Transaction.aggregate([
+      {
+        $match: {
+          ...matchStage,
+          date: { $gte: startOfYear }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$date" },
+            type: "$type"
+          },
+          total: { $sum: "$amount" }
+        }
+      },
+      {
+        $group: {
+          _id: "$_id.month",
+          data: {
+            $push: {
+              type: "$_id.type",
+              total: "$total"
+            }
+          }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // =========================
+    // 🔹 3. USER CONTRIBUTION
+    // =========================
+    const userContribution = await Transaction.aggregate([
+      { $match: matchStage },
+
+      {
+        $group: {
+          _id: {
+            user: "$user",
+            type: "$type"
+          },
+          total: { $sum: "$amount" }
+        }
+      },
+      {
+        $group: {
+          _id: "$_id.user",
+          types: {
+            $push: {
+              type: "$_id.type",
+              total: "$total"
+            }
+          },
+          totalAmount: { $sum: "$total" }
+        }
+      }
+    ]);
+
+    // =========================
+    // 🔹 4. TOTAL FOR PERCENTAGE
+    // =========================
+    const totalAll = await Transaction.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    const grandTotal = totalAll[0]?.total || 0;
+
+    // 🔥 ADD PERCENTAGE
+    const userContributionWithPercent = userContribution.map(u => ({
+      ...u,
+      percentage: grandTotal
+        ? ((u.totalAmount / grandTotal) * 100).toFixed(2)
+        : 0
+    }));
+
+    // =========================
+    // FINAL RESPONSE
+    // =========================
+    res.json({
+      success: true,
+      data: {
+        summary: summary[0],
+        monthly,
+        userContribution: userContributionWithPercent
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching trends"
+    });
+  }
+};
