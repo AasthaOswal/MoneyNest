@@ -11,11 +11,14 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if (!user) {
+    console.log("User is not logged in. From ProtectedRoute.jsx")
+    
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    console.log("User is not authorized")
+    return <Navigate to="/dashboard/family" replace />;
   }
 
   return <Outlet />; // 🔥 THIS FIXES YOUR ISSUE

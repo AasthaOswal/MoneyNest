@@ -74,8 +74,8 @@ function App() {
   }, []);
   return (
     <ThemeProvider>
+      <BrowserRouter>
       <AuthProvider>
-        <BrowserRouter>
           <Routes>
             {/* Public Routes - Landing, Login, Signup */}
             <Route element={<PublicLayout />}>
@@ -144,8 +144,8 @@ function App() {
             {/* Catch-all Redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </BrowserRouter>
       </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

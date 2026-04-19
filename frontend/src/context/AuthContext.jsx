@@ -57,33 +57,38 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+import { useLocation } from "react-router-dom";
+
+
+
+
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
+  const location = useLocation();
+
   // ✅ Fetch user from backend
   const fetchUser = async () => {
-    try {
-      const res = await api.get("/user/me");
-      setUser(res.data.user);
-    } catch (err) {
-      console.log("First attempt failed, retrying...");
-
-      try {
-        console.log("Second attempt at getting user from /user/me endpoint");
-        const res = await api.get("/user/me"); // retry after refresh
-        setUser(res.data.user);
-      } catch (err2) {
-        setUser(null);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
+  try {
+    const res = await api.get("/user/me");
+    setUser(res.data.user);
+  } catch (err) {
+    console.log(err)
+    setUser(null);
+  } finally {
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  if (location.pathname !== "/login" && location.pathname !== "/signup") {
     fetchUser();
-  }, []);
+  } else {
+    setLoading(false);
+  }
+}, [location.pathname]);  
 
   const login = async () => {
     await fetchUser(); // after login

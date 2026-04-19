@@ -152,7 +152,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const instance = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // ✅ IMPORTANT (cookies)
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -161,71 +161,70 @@ const instance = axios.create({
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-// ✅ Notify waiting requests
-const onRefreshed = () => {
-  refreshSubscribers.forEach((cb) => cb(null));
-  refreshSubscribers = [];
-};
-
-// ❌ Notify failure
-const onRefreshFailed = (error) => {
-  refreshSubscribers.forEach((cb) => cb(error));
-  refreshSubscribers = [];
-};
-
-const addRefreshSubscriber = (cb) => {
+const subscribeTokenRefresh = (cb) => {
   refreshSubscribers.push(cb);
 };
 
-// 🔴 Logout helper
-const logoutUser = () => {
-  window.location.href = "/login";
+const onRefreshed = () => {
+  refreshSubscribers.forEach((cb) => cb());
+  refreshSubscribers = [];
 };
 
-// =======================
-// 🔹 RESPONSE INTERCEPTOR
-// =======================
+const onRefreshFailed = (err) => {
+  refreshSubscribers.forEach((cb) => cb(err));
+  refreshSubscribers = [];
+};
+
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (!error.response) return Promise.reject(error);
 
     const originalRequest = error.config;
-    const code = error.response?.data?.code;
 
-    // 🔴 ACCESS TOKEN EXPIRED
-    if (error.response.status === 401 && code === "ACCESS_TOKEN_EXPIRED") {
-      if (!isRefreshing) {
-        isRefreshing = true;
+    const isAuthRoute =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/signup") ||
+      originalRequest.url?.includes("/auth/refresh-token") ||
+      originalRequest.url?.includes("/auth/logout");
 
-        try {
-          await axios.post(
-            `${API_URL}/auth/refresh-token`,
-            {},
-            { withCredentials: true }
-          );
+    // only handle 401 for non-auth routes
+    if (error.response.status === 401 && !isAuthRoute && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-          onRefreshed();
-          isRefreshing = false;
-        } catch (refreshError) {
-          isRefreshing = false;
-          onRefreshFailed(refreshError);
-
-          logoutUser();
-          return Promise.reject(refreshError);
-        }
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          subscribeTokenRefresh((err) => {
+            if (err) return reject(err);
+            resolve(instance(originalRequest));
+          });
+        });
       }
 
-      return new Promise((resolve, reject) => {
-        addRefreshSubscriber((err) => {
-          if (err) return reject(err);
-          resolve(instance(originalRequest)); // retry
-        });
-      });
-    }
+      isRefreshing = true;
 
-    if (code === "INVALID_TOKEN" || code === "AUTH_FAILED") {
-      logoutUser();
+      try {
+        await axios.post(
+          `${API_URL}/auth/refresh-token`,
+          {},
+          { withCredentials: true }
+        );
+
+        isRefreshing = false;
+        onRefreshed();
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        onRefreshFailed(refreshError);
+
+        // only redirect if you're not already on login
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);

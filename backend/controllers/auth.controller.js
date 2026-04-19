@@ -19,15 +19,15 @@ If someone tries to use an expired or already used refresh token, it’s a sign 
 const refreshTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
 const accessTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-  maxAge: 15 * 60 * 1000
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 1 * 60 * 1000 //1 minute - just to test auth retry issue
 };
 
 /*
@@ -254,36 +254,50 @@ export const refreshAccessToken = async (req, res) => {
     }
 
     if (!isValid) {
+  return res.status(403).json({
+    success: false,
+    code: "INVALID_REFRESH_TOKEN",
+    message: "Invalid refresh token"
+  });
+}
 
-      // possible token theft or reuse
-      user.refreshToken = []; // clear all sessions
-      await user.save();
+    // let newTokens = [];
 
-      return res.status(403).json({
-        success: false,
-        code: "TOKEN_REUSE_DETECTED",
-        message: "Security issue detected. Logged out from all devices."
-      });
-    }
+    // for (let rt of user.refreshToken) {
+    //   const match = await bcrypt.compare(token, rt);
+    //   if (!match) newTokens.push(rt);
+    // }
 
-    let newTokens = [];
+    // const { accessToken, refreshToken } = generateTokens(user._id);
+    // const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    for (let rt of user.refreshToken) {
-      const match = await bcrypt.compare(token, rt);
-      if (!match) newTokens.push(rt);
-    }
+    // newTokens.push(hashedRefreshToken);
+    // user.refreshToken = newTokens;
 
-    const { accessToken, refreshToken } = generateTokens(user._id);
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    // await user.save();
 
-    newTokens.push(hashedRefreshToken);
-    user.refreshToken = newTokens;
+    // sendRefreshToken(res, refreshToken);
+    // sendAccessToken(res, accessToken);
 
-    await user.save();
 
-    sendRefreshToken(res, refreshToken);
-    sendAccessToken(res, accessToken);
+    const updatedTokens = [];
 
+for (let rt of user.refreshToken) {
+  const match = await bcrypt.compare(token, rt);
+  if (!match) updatedTokens.push(rt);
+}
+
+const { accessToken, refreshToken: newRefreshToken } = generateTokens(user._id);
+const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+
+updatedTokens.push(hashedRefreshToken);
+
+// 🔥 ATOMIC UPDATE (NO VERSION ERROR)
+await User.findByIdAndUpdate(user._id, {
+  refreshToken: updatedTokens
+});
+sendRefreshToken(res, newRefreshToken);
+sendAccessToken(res, accessToken);
     // return res.json({
     //   success: true,
     //   accessToken
