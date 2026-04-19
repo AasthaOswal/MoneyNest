@@ -4,7 +4,9 @@ import {
   updateTransaction,
   getTransactions,
   getTransactionById,
-  deleteTransaction
+  deleteTransaction,
+  downloadTransactionsExcel,
+  emailTransactionsExcel
 } from "../controllers/transaction.controller.js";
 
 import upload from "../middlewares/multer.middleware.js"; // your multer config
@@ -52,5 +54,12 @@ router.patch(
 // ❌ DELETE TRANSACTION
 // =======================
 router.delete("/:transactionId", deleteTransaction);
+
+
+// 📥 Download Excel
+router.get("/export/excel", downloadTransactionsExcel);
+
+// 📧 Send Excel via email
+router.post("/export/email", emailTransactionsExcel);
 
 export default router;

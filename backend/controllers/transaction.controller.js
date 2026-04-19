@@ -9,6 +9,12 @@ import { validateAndUploadFiles } from "../utils/cloudinary/validateAndUploadFil
 import { deleteFromCloudinary } from "../utils/cloudinary/deleteFromCloudinary.js";
 import { deleteMultipleFiles } from "../utils/cloudinary/deleteMultipleFiles.js";
 
+import { generateTransactionsExcel } from "../utils/excel/generateExcel.js";
+import sendEmailBrevo from "../utils/email/sendEmailBrevo.js";
+
+import { buildTransactionQuery } from "../services/transaction/buildTransactionQuery.js";
+
+
 // =======================
 // 📁 FILE CONFIG
 // =======================
@@ -547,5 +553,100 @@ export const deleteTransaction = async (req, res) => {
       success: false,
       message: "Server Error"
     });
+  }
+};
+
+
+
+
+export const downloadTransactionsExcel = async (req, res) => {
+  try {
+    const { error, value } = getTransactionsValidation.validate(req.query);
+
+    if (error) {
+      return res.status(400).json({ success: false, message: "Invalid filters" });
+    }
+
+    // 🔥 REMOVE pagination fields
+    const { page, limit, ...filters } = value;
+
+    const query = await buildTransactionQuery(filters, req.user);
+
+    const transactions = await Transaction.find(query)
+      .populate("category labels")
+      .populate("user", "name")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const workbook = await generateTransactionsExcel(transactions);
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=transactions.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+  } catch (err) {
+    console.error("Excel Download Error:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export const emailTransactionsExcel = async (req, res) => {
+  try {
+    const { email } = req.user;
+
+    if(!email){
+      return res.status(400).json({ success: false, message: "Email not found" });
+    }
+
+    const { error, value } = getTransactionsValidation.validate(req.query);
+
+    if (error) {
+      return res.status(400).json({ success: false, message: "Invalid filters" });
+    }
+
+
+    // 🔥 REMOVE pagination fields
+    const { page, limit, ...filters } = value;
+
+    const query = await buildTransactionQuery(filters, req.user);
+
+    const transactions = await Transaction.find(query)
+      .populate("category labels")
+      .populate("user", "name")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const workbook = await generateTransactionsExcel(transactions);
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    await sendEmailBrevo({
+      toEmail: email,
+      subject: "Filtered Transactions Report",
+      htmlContent: "<p>Your filtered transactions are attached.</p>",
+      attachments: [
+        {
+          content: buffer.toString("base64"),
+          name: "transactions.xlsx",
+        },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Email sent successfully",
+    });
+
+  } catch (err) {
+    console.error("Email Excel Error:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
