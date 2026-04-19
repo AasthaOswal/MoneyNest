@@ -19,14 +19,14 @@ If someone tries to use an expired or already used refresh token, it’s a sign 
 const refreshTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
 const accessTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "lax" : "strict",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
   maxAge: 15 * 60 * 1000
 };
 
