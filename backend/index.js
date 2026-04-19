@@ -20,6 +20,7 @@ import dashboardRoutes from './routes/dashboard.routes.js'
 import reportRoutes from './routes/report.routes.js'
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
+import { startMonthlyReportJob } from "./services/cron/monthlyReport.js";
 
 
 
@@ -63,6 +64,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 // run cron job
 startGoalTracker();
+startMonthlyReportJob();
 
 // Basic test route
 app.get("/", (req, res) => {
