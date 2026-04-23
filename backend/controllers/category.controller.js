@@ -167,6 +167,7 @@ export const getCategoryById = async (req, res) => {
 // =======================
 // ❌ DELETE CATEGORY
 // =======================
+//if a category is deleted its corresponsing transactions will be deleted as well --this needs to be implemented
 export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;

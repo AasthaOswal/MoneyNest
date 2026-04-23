@@ -1,18 +1,34 @@
 import Label from "../models/label.model.js";
+import { createLabelSchema, updateLabelSchema, getLabelsSchema } from "../validators/label.validation.js";
+import mongoose from "mongoose";
+import Transaction from "../models/transaction.model.js";
+
+
+
+export const isValidObjectId = (id) => {
+  return mongoose.Types.ObjectId.isValid(id);
+};
+
+const escapeRegex = (text) => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 
 // =======================
 // ➕ CREATE LABEL
 // =======================
 export const createLabel = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { value, error } = createLabelSchema.validate(req.body);
 
-    if (!name) {
+    if (error) {
       return res.status(400).json({
         success: false,
-        message: "Name is required"
+        message: error.details[0].message
       });
     }
+
+    const { name } = value;
 
     const label = await Label.create({
       name,
@@ -26,8 +42,6 @@ export const createLabel = async (req, res) => {
     });
 
   } catch (err) {
-    console.log("Error in create label:", err);
-
     if (err.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -43,31 +57,51 @@ export const createLabel = async (req, res) => {
 };
 
 
+
 // =======================
 // ✏️ UPDATE LABEL
 // =======================
 export const updateLabel = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
 
-    if (!name) {
+    if (!isValidObjectId(id)) {
       return res.status(400).json({
         success: false,
-        message: "Name is required"
+        message: "Invalid label ID"
+      });
+    }
+
+    const { value, error } = updateLabelSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message
+      });
+    }
+
+    if (!Object.keys(value).length) {
+      return res.status(400).json({
+        success:false,
+        message: "No fields to update"
       });
     }
 
     const label = await Label.findOneAndUpdate(
-      { _id: id, family: req.user.familyId },
-      { name },
+      {
+        _id: id,
+        family: req.user.familyId,
+        createdBy: req.user._id   // ✅ ownership check
+      },
+      value,
       { new: true, runValidators: true }
     );
 
     if (!label) {
       return res.status(404).json({
         success: false,
-        message: "Label not found"
+        message: "Label not found or unauthorized"
       });
     }
 
@@ -97,14 +131,24 @@ export const updateLabel = async (req, res) => {
 // =======================
 export const getLabels = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { value, error } = getLabelsSchema.validate(req.query);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message
+      });
+    }
+
+    const { search } = value;
 
     let query = {
       family: req.user.familyId
     };
 
     if (search) {
-      query.name = { $regex: search, $options: "i" };
+      const escapedSearch = escapeRegex(search);
+      query.name = { $regex: escapedSearch, $options: "i" };
     }
 
     const labels = await Label.find(query).sort({ createdAt: -1 });
@@ -130,6 +174,13 @@ export const getLabels = async (req, res) => {
 export const getLabelById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid label ID"
+      });
+    }
 
     const label = await Label.findOne({
       _id: id,
@@ -160,25 +211,40 @@ export const getLabelById = async (req, res) => {
 // =======================
 // ❌ DELETE LABEL
 // =======================
+
 export const deleteLabel = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid label ID"
+      });
+    }
+
     const label = await Label.findOneAndDelete({
       _id: id,
-      family: req.user.familyId
+      family: req.user.familyId,
+      createdBy: req.user._id   // ✅ ownership
     });
 
     if (!label) {
       return res.status(404).json({
         success: false,
-        message: "Label not found"
+        message: "Label not found or unauthorized"
       });
     }
 
+    // ✅ CASCADE DELETE
+    await Transaction.deleteMany({
+      labels: id,
+      family: req.user.familyId
+    });
+
     return res.json({
       success: true,
-      message: "Label deleted successfully"
+      message: "Label and related transactions deleted"
     });
 
   } catch (err) {
