@@ -22,14 +22,24 @@ export const startMonthlyReportJob = () => {
           if (!user.email || !user.familyId) continue;
 
           // 👉 Last month
-          const from = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1);
-          const to = new Date(new Date().getFullYear(), new Date().getMonth(), 0);
+          const now = new Date();
+
+          const from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+          const to = new Date(now.getFullYear(), now.getMonth(), 0);
+          to.setHours(23, 59, 59, 999); // 🔥 IMPORTANT
+
+          //just for testing
+          // const from = new Date(0); // all data
+          // const to = new Date();
 
           const data = await getFamilyReportData({
             familyId: user.familyId,
             from,
             to
           });
+
+          console.log(data)
 
           const pdfBuffer = await generateReportPDF(data);
 
