@@ -5,7 +5,9 @@ import {
   googleAuth,     
   googleCallback,
   refreshAccessToken,
-  logout
+  logout,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 
 const router = express.Router();
@@ -29,6 +31,12 @@ router.get("/google/callback", googleCallback);
 
 // Refresh Access Token
 router.post("/refresh-token", refreshAccessToken);
+
+router.post("/forgot-password",  forgotPassword );
+
+
+
+router.post("/reset-password/:token",  resetPassword );
 
 // Logout
 router.post("/logout", logout);

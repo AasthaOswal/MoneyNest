@@ -46,7 +46,16 @@ export const userSchema = new mongoose.Schema({
             device: { type: String },
             createdAt: { type: Date, default: Date.now }
         }
-    ]
+    ],
+
+
+
+    resetPasswordToken: {
+        type: String
+    },
+    resetPasswordExpires: {
+        type: Date
+    },
 
 }, { timestamps: true });
 

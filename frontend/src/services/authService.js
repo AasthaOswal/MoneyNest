@@ -172,12 +172,32 @@ const logout = async () => {
   window.location.href = "/login";
 };
 
+// =======================
+// 🔹 PASSWORD RESET
+// =======================
+
+// 📩 Forgot Password (send email)
+const forgotPassword = async (email) => {
+  const res = await api.post("/auth/forgot-password", { email });
+  return res.data;
+};
+
+// 🔐 Reset Password (using token from URL)
+const resetPassword = async (token, password) => {
+  const res = await api.post(`/auth/reset-password/${token}`, {
+    password,
+  });
+  return res.data;
+};
+
 const AuthService = {
   signup,
   login,
   loginWithGoogle, // Added
   logout,
   handlePostLogin,
+  forgotPassword,
+  resetPassword,
 };
 
 export default AuthService;

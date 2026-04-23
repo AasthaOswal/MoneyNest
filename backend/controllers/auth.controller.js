@@ -6,6 +6,7 @@ import {
   loginValidation
 } from "../validators/authValidation.js";
 import crypto from "crypto";
+import {sendEmailBrevoNoAttachments} from '../utils/email/sendEmailBrevo.js';
 
 const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -537,6 +538,130 @@ export const googleCallback = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Google login failed"
+    });
+  }
+};
+
+
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    // 🔐 Prevent email enumeration
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: "If the email exists, a reset link has been sent"
+      });
+    }
+
+    // ❌ If Google-only account
+    if (!user.authProvider.includes("local")) {
+      return res.status(400).json({
+        success: false,
+        message: "This account uses Google login"
+      });
+    }
+
+    // 🔐 Generate token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    // Save hashed token
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 min
+
+    await user.save();
+
+    // 🔗 Reset URL
+    const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+    // 📩 Email content
+    const htmlContent = `
+      <h2>Password Reset Request</h2>
+      <p>You requested to reset your password.</p>
+      <p>Click below link (valid for 15 minutes):</p>
+      <a href="${resetURL}" target="_blank">${resetURL}</a>
+      <p>If you didn't request this, ignore this email.</p>
+    `;
+
+    await sendEmailBrevoNoAttachments({
+      toEmail: user.email,
+      subject: "Reset Your Password",
+      htmlContent
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Reset link sent to email"
+    });
+
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong"
+    });
+  }
+};
+
+
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    // 🔐 Hash incoming token
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired token"
+      });
+    }
+
+    // 🔒 Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+
+    // ❌ Clear reset fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    // 🔥 IMPORTANT: logout all sessions
+    user.refreshToken = [];
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successful. Please login again."
+    });
+
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong"
     });
   }
 };

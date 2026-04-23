@@ -58,7 +58,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 import { useLocation } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }) => {
 
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   // ✅ Fetch user from backend
   const fetchUser = async () => {
@@ -76,29 +77,43 @@ export const AuthProvider = ({ children }) => {
     const res = await api.get("/user/me");
     setUser(res.data.user);
   } catch (err) {
-    console.log(err)
+    console.log("Auth error:", err.response?.data || err.message);
     setUser(null);
   } finally {
     setLoading(false);
   }
 };
+
 useEffect(() => {
-  if (location.pathname !== "/login" && location.pathname !== "/signup") {
+  const isPublicRoute =
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/forgot-password" ||
+    location.pathname.startsWith("/reset-password");
+
+  if (!isPublicRoute) {
     fetchUser();
   } else {
     setLoading(false);
   }
-}, [location.pathname]);  
+}, [location.pathname]);
+
 
   const login = async () => {
     await fetchUser(); // after login
   };
 
   const logout = async () => {
+  try {
     await api.post("/auth/logout");
+  } catch (err) {
+    console.log("Logout error:", err.message);
+  } finally {
     setUser(null);
-    window.location.href = "/login";
-  };
+    setLoading(false);
+    navigate("/login", { replace: true });
+  }
+};
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>

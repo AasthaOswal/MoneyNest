@@ -157,6 +157,15 @@ const Login = () => {
       Continue with Google
     </button>
 
+    <p className="mt-4 text-center">
+      <Link
+        to="/forgot-password"
+        className="text-sm text-blue-600 hover:underline"
+      >
+        Forgot Password?
+      </Link>
+    </p>
+
   </div>
 </div>
   );
