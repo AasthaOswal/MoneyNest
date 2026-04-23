@@ -3,7 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {
   signupValidation,
-  loginValidation
+  loginValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation
 } from "../validators/authValidation.js";
 import crypto from "crypto";
 import {sendEmailBrevoNoAttachments} from '../utils/email/sendEmailBrevo.js';
@@ -546,7 +548,17 @@ export const googleCallback = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+
+    const { value, error } = forgotPasswordValidation.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message
+      });
+    }
+
+    const { email } = value;
 
     const user = await User.findOne({ email });
 
@@ -616,9 +628,17 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
+        const { value, error } = resetPasswordValidation.validate({password : req.body.password, token : req.params.token});
 
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message
+      });
+    }
+
+    const { password } = value;
+    const { token } = value;
     // 🔐 Hash incoming token
     const hashedToken = crypto
       .createHash("sha256")
