@@ -18,6 +18,8 @@ import goalRoutes from './routes/goal.routes.js';
 import userRoutes from './routes/user.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js'
 import reportRoutes from './routes/report.routes.js'
+import notificationRoutes from './routes/notification.routes.js';
+
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
 import { startMonthlyReportJob } from "./services/cron/monthlyReport.js";
@@ -62,6 +64,8 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/notifications", notificationRoutes);
+
 // run cron job
 startGoalTracker();
 startMonthlyReportJob();

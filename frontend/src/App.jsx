@@ -53,6 +53,10 @@ import ManageFamily from './pages/family/ManageFamily';
 import FamilyDashboard from './pages/dashboard/FamilyDashboard.jsx';
 import IndividualDashboard from './pages/dashboard/IndividualDashboard.jsx';
 
+// Notifications pages
+import NotificationsPage from './pages/notifications/NotificationsPage';
+import NotificationDetailsPage from './pages/notifications/NotificationDetailsPage';
+
 function App() {
 
   useEffect(() => {
@@ -96,6 +100,9 @@ function App() {
 
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>
+
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/notifications/:id" element={<NotificationDetailsPage />} />
       
                   <Route path="/dashboard/family" element={<FamilyDashboard />} />
                   <Route path="/dashboard/individual" element={<IndividualDashboard />} />

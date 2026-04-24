@@ -28,7 +28,7 @@ const labelSchema = new mongoose.Schema({
 
 
 // Prevent duplicate labels in same family
-labelSchema.index({ family: 1, name: 1 }, { unique: true });
+labelSchema.index({ family: 1, name: 1, isActive: true }, { unique: true });
 
 const Label = mongoose.model("Label", labelSchema);
 export default Label;

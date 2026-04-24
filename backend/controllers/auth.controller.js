@@ -30,7 +30,7 @@ const accessTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 1 * 60 * 1000 //1 minute - just to test auth retry issue
+  maxAge: 15 * 60 * 1000 //15 minutes - just to test auth retry issue
 };
 
 /*

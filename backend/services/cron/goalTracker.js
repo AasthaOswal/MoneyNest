@@ -5,6 +5,8 @@ import User from "../../models/user.model.js";
 import Transaction from "../../models/transaction.model.js";
 import { getDateRange } from "../../utils/goals/getDateRange.js";
 import { sendPushNotification } from "../firebase/sendPushNotification.js";
+import { createNotification } from "../../utils/notification/createNotification.js";
+
 
 // Solve N+1 problem cause by this for loop later on
 
@@ -103,9 +105,23 @@ export const startGoalTracker = () => {
 
                             for (const user of users) {
                                 await sendPushNotification(user._id, title, body);
+                                await createNotification({
+                                    userId: user._id,
+                                    title,
+                                    body,
+                                    type: "goal_alert",
+                                    data: { goalId: goal._id },
+                                });
                             }
                         } else {
                             await sendPushNotification(goal.user, title, body);
+                            await createNotification({
+                                userId: goal.user,
+                                title,
+                                body,
+                                type: "goal_alert",
+                                data: { goalId: goal._id },
+                            });
                         }
 
                         goal.triggeredAlerts.push({

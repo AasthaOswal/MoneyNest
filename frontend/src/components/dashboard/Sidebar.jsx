@@ -36,6 +36,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Labels', path: '/labels', icon: Tag },
         { name: 'Goals', path: '/goals', icon: Target },
         { name: 'Reminders', path: '/reminders', icon: Bell },
+        { name: 'Notifications', path: '/notifications', icon: Bell },
         { name: 'Family', path: '/family', icon: Users },
         ...(user?.role === 'familyAdmin' ? [{ name: 'Manage Family', path: '/family/manage', icon: Users }] : [])
       ];
