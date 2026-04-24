@@ -13,6 +13,11 @@ const labelSchema = new mongoose.Schema({
         trim: true
     },
 
+    isActive:{
+        default:true,
+        type:Boolean
+    },
+
 
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,

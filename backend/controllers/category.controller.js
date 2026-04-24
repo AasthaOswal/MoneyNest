@@ -1,5 +1,6 @@
 import Category from "../models/category.model.js";
 import { createCategorySchema } from "../validators/category.validation.js";
+import mongoose from "mongoose";
 
 // =======================
 // ➕ CREATE CATEGORY
@@ -62,8 +63,15 @@ export const updateCategory = async (req, res) => {
       });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid category ID"
+      });
+    }
+
     const category = await Category.findOneAndUpdate(
-      { _id: id, family: req.user.familyId },
+      { _id: id, family: req.user.familyId, createdBy: req.user._id, isActive:true },
       { name },
       { new: true, runValidators: true }
     );
@@ -172,10 +180,27 @@ export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const category = await Category.findOneAndDelete({
-      _id: id,
-      family: req.user.familyId
-    });
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(404).json({
+        success: false,
+        message: "Invalid category id"
+      });
+    }
+
+    const category = await Category.findOneAndUpdate(
+      {
+        _id: id,
+        family: req.user.familyId,   // ownership check
+        createdBy: req.user._id,
+        isActive:true
+      },
+      {
+        isActive: false
+      },
+      {
+        new: true
+      }
+    );
 
     if (!category) {
       return res.status(404).json({

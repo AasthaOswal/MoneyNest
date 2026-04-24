@@ -18,6 +18,11 @@ const categorySchema = new mongoose.Schema({
 		required: true
 	},
 
+	isActive:{
+		default:true,
+		type:Boolean
+	},
+
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User"

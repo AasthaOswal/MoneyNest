@@ -92,7 +92,8 @@ export const updateLabel = async (req, res) => {
       {
         _id: id,
         family: req.user.familyId,
-        createdBy: req.user._id   // ✅ ownership check
+        createdBy: req.user._id,   // ✅ ownership check
+        isActive:true
       },
       value,
       { new: true, runValidators: true }
@@ -223,11 +224,20 @@ export const deleteLabel = async (req, res) => {
       });
     }
 
-    const label = await Label.findOneAndDelete({
-      _id: id,
-      family: req.user.familyId,
-      createdBy: req.user._id   // ✅ ownership
-    });
+    const label = await Label.findOneAndUpdate(
+      {
+        _id: id,
+        family: req.user.familyId,
+        createdBy: req.user._id, //ownership check
+        isActive: true   //prevent re-delete
+      },
+      {
+        isActive: false
+      },
+      {
+        new: true
+      }
+    );
 
     if (!label) {
       return res.status(404).json({
@@ -236,15 +246,10 @@ export const deleteLabel = async (req, res) => {
       });
     }
 
-    // ✅ CASCADE DELETE
-    await Transaction.deleteMany({
-      labels: id,
-      family: req.user.familyId
-    });
 
     return res.json({
       success: true,
-      message: "Label and related transactions deleted"
+      message: "Label deleted successfully"
     });
 
   } catch (err) {

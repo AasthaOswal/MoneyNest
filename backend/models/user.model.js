@@ -57,6 +57,11 @@ export const userSchema = new mongoose.Schema({
         type: Date
     },
 
+    isActive:{
+        type:Boolean,
+        default:true
+    },
+
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

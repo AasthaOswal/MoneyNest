@@ -27,7 +27,7 @@ const fileConfigs = [
   }
 ];
 
-const validateCategoryOrLabel = async ({
+const validateCategoryOrLabel2 = async ({
   model,
   ids,
   familyId,
@@ -37,7 +37,8 @@ const validateCategoryOrLabel = async ({
 
   const docs = await model.find({
     _id: { $in: ids },
-    family: familyId
+    family: familyId,
+    isActive:true
   }).select("_id");
 
   const validIds = new Set(docs.map(doc => doc._id.toString()));
@@ -52,6 +53,42 @@ const validateCategoryOrLabel = async ({
     throw error;
   }
 };
+
+
+const validateCategoryOrLabel = async ({
+  model,
+  ids,
+  familyId,
+  fieldName,
+  isActive // 👈 make dynamic
+}) => {
+  if (!ids || ids.length === 0) return;
+
+  const query = {
+    _id: { $in: ids },
+    family: familyId
+  };
+
+  // ✅ Only apply when explicitly passed
+  if (isActive !== undefined) {
+    query.isActive = isActive;
+  }
+
+  const docs = await model.find(query).select("_id");
+
+  const validIds = new Set(docs.map(doc => doc._id.toString()));
+
+  const invalidIds = ids.filter(
+    id => !validIds.has(id.toString())
+  );
+
+  if (invalidIds.length > 0) {
+    const error = new Error(`Invalid ${fieldName} IDs: ${invalidIds.join(", ")}`);
+    error.name = "InvalidCategoryOrLabel";
+    throw error;
+  }
+};
+
 
 // =======================
 // ➕ CREATE TRANSACTION
@@ -97,12 +134,14 @@ export const createTransaction = async (req, res) => {
         model: Category,
         ids: value.category,
         familyId: req.user.familyId,
+        isActive:true,
         fieldName: "category"
       }),
       validateCategoryOrLabel({
         model: Label,
         ids: value.labels,
         familyId: req.user.familyId,
+        isActive:true,
         fieldName: "label"
       })
     ]);
@@ -219,12 +258,14 @@ export const updateTransaction = async (req, res) => {
           model: Category,
           ids: value.category,
           familyId: req.user.familyId,
+          isActive:true,
           fieldName: "category"
         }),
         validateCategoryOrLabel({
           model: Label,
           ids: value.labels,
           familyId: req.user.familyId,
+          isActive:true,
           fieldName: "label"
         })
       ]);

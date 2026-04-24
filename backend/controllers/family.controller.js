@@ -4,6 +4,7 @@ import Family from "../models/family.model.js";
 import User from "../models/user.model.js";
 import crypto from "crypto";
 import { createFamilySchema, joinFamilySchema, editFamilySchema } from "../validators/family.validation.js";
+import mongoose from "mongoose";
 
 //later on add(not now):-
 /* 
@@ -287,7 +288,222 @@ export const editFamily = async (req, res) => {
 
 
 
+export const leaveFamily = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    const user = await User.findById(userId);
+
+    if (!user.familyId) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not part of any family"
+      });
+    }
+
+    // ❗ Prevent admin from leaving (optional but recommended)
+    if (user.role === "familyAdmin") {
+      return res.status(400).json({
+        success: false,
+        message: "Family admin cannot leave. Transfer admin or delete family."
+      });
+    }
+
+    // ✅ Soft remove user from family
+    // user.familyId = null;
+    user.role = "member";
+    user.isActive = false;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Left family successfully"
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error leaving family"
+    });
+  }
+};
+
+
+export const removeFamilyMember = async (req, res) => {
+  try {
+    const adminId = req.user._id;
+    const { memberId } = req.params;
+
+    const admin = await User.findById(adminId);
+
+    // ✅ Only family admin allowed
+    if (admin.role !== "familyAdmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only family admin can remove members"
+      });
+    }
+
+    const member = await User.findById(memberId);
+
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // ✅ Ensure same family (ownership check 🔥)
+    if (!member.familyId || member.familyId.toString() !== admin.familyId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "User does not belong to your family"
+      });
+    }
+
+    // ❗ Prevent admin removing themselves
+    if (member._id.toString() === adminId.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin cannot remove themselves"
+      });
+    }
+
+    // ❗ Prevent removing another admin (future safety)
+    if (member.role === "familyAdmin") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot remove another admin"
+      });
+    }
+
+    // ✅ Soft remove member
+    // member.familyId = null;
+    member.role = "member";
+    member.isActive = false;
+
+    await member.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Member removed successfully"
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Error removing member"
+    });
+  }
+};
+
+export const transferFamilyAdmin = async (req, res) => {
+  try {
+    const currentAdminId = req.user._id;
+    const { newAdminId } = req.params;
+
+    // ✅ Validate ID
+    if (!newAdminId || !mongoose.Types.ObjectId.isValid(newAdminId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID"
+      });
+    }
+
+    const currentAdmin = await User.findById(currentAdminId);
+
+    // ✅ Only current admin can transfer
+    if (currentAdmin.role !== "familyAdmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only current family admin can transfer admin role"
+      });
+    }
+
+    const newAdmin = await User.findById(newAdminId);
+
+    if (!newAdmin) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // ✅ Same family check
+    if (
+      !newAdmin.familyId ||
+      newAdmin.familyId.toString() !== currentAdmin.familyId.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "User does not belong to your family"
+      });
+    }
+
+    // ❗ Prevent transferring to inactive user
+    if (!newAdmin.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot transfer admin role to inactive user"
+      });
+    }
+
+    // ❗ Prevent self-transfer (optional)
+    if (newAdminId.toString() === currentAdminId.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "You are already the admin"
+      });
+    }
+
+    // ✅ TRANSACTION (important for consistency)
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 1️⃣ Update Family document
+      await Family.findByIdAndUpdate(
+        currentAdmin.familyId,
+        { familyAdmin: newAdmin._id },
+        { session }
+      );
+
+      // 2️⃣ Update roles
+      await User.findByIdAndUpdate(
+        currentAdminId,
+        { role: "member" },
+        { session }
+      );
+
+      await User.findByIdAndUpdate(
+        newAdmin._id,
+        { role: "familyAdmin" },
+        { session }
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.status(200).json({
+        success: true,
+        message: "Admin role transferred successfully"
+      });
+
+    } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+      throw err;
+    }
+
+  } catch (err) {
+    console.error("Error transferring admin:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Error transferring admin role"
+    });
+  }
+};
 
 // export const leaveFamily = async (req, res) => {
 //   try {
