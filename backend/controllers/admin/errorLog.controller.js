@@ -1,4 +1,4 @@
-import ErrorLog from "../models/errorLog.model.js";
+import ErrorLog from "../../models/admin/errorLog.model.js";
 
 export const getErrorLogs = async (req, res) => {
   try {

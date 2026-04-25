@@ -1,4 +1,4 @@
-import RequestLog from "../models/requestLog.model.js";
+import RequestLog from "../../models/admin/requestLog.model.js";
 import { exportRequestLogsAndEmail } from "../services/requestLogExport.service.js";
 
 export const getRequestLogs = async (req, res) => {

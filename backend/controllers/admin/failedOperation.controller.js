@@ -1,9 +1,9 @@
-import FailedOperation from "../models/failedOperation.model.js";
+import FailedOperation from "../../models/admin/failedOperation.model.js";
 import {
   executeOperation,
   toggleAutoRetryStatus,
   getAutoRetryStatus,
-} from "../services/admin/failedOperation.service.js";
+} from "../../services/admin/failedOperation.service.js";
 
 export const getFailedOperations = async (req, res) => {
   try {

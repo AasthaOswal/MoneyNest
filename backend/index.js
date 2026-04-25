@@ -19,6 +19,10 @@ import userRoutes from './routes/user.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js'
 import reportRoutes from './routes/report.routes.js'
 import notificationRoutes from './routes/notification.routes.js';
+import { requestLogRoutes } from "./routes/admin/requestLog.routes.js";
+import { errorLogRoutes } from "./routes/admin/errorLog.routes.js";
+import { failedOperationRoutes } from "./routes/admin/failedOperation.routes.js";
+
 
 
 import {startGoalTracker} from './services/cron/goalTracker.js'
@@ -65,6 +69,10 @@ app.use("/api/goals", goalRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin/request-logs", requestLogRoutes);
+app.use("/api/admin/error-logs", errorLogRoutes);
+app.use("/api/admin/failed-operations", failedOperationRoutes);
+
 
 // run cron job
 startGoalTracker();
