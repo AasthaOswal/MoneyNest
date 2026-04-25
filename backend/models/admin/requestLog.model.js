@@ -2,9 +2,15 @@ import mongoose from "mongoose";
 
 const requestLogSchema = new mongoose.Schema(
   {
+    requestId: {
+      type: String,
+      index: true,
+    },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: null,
     },
 
     method: {
@@ -12,7 +18,7 @@ const requestLogSchema = new mongoose.Schema(
       required: true,
     },
 
-    url: {
+    path: {
       type: String,
       required: true,
     },
@@ -22,18 +28,33 @@ const requestLogSchema = new mongoose.Schema(
       required: true,
     },
 
-    responseTime: {
+    responseTimeMs: {
       type: Number,
-      default: 0,
+      required: true,
     },
 
     ip: String,
     userAgent: String,
+
+    actorType: {
+      type: String,
+      enum: ["anonymous", "authenticated"],
+      default: "anonymous",
+    },
+
+    query: Object,
+    body: Object,
+    headers: Object,
   },
   { timestamps: true }
 );
 
+// 🔍 Indexes (VERY IMPORTANT)
 requestLogSchema.index({ createdAt: -1 });
 requestLogSchema.index({ statusCode: 1, createdAt: -1 });
+requestLogSchema.index({ user: 1, createdAt: -1 });
+requestLogSchema.index({ path: 1, createdAt: -1 });
+
+
 
 export default mongoose.model("RequestLog", requestLogSchema);

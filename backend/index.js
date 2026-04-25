@@ -28,7 +28,8 @@ import failedOperationRoutes from "./routes/admin/failedOperation.routes.js";
 import {startGoalTracker} from './services/cron/goalTracker.js'
 import { startMonthlyReportJob } from "./services/cron/monthlyReport.js";
 
-
+import { requestLogger } from "./middlewares/requestLogger.middleware.js";
+import { authenticateToken } from "./middlewares/auth.middleware.js";
 
 const app = express();
 
@@ -58,8 +59,19 @@ app.use(cookieParser());
 
 connectDB();
 
-// base route
+
+
+// log everything
+app.use(requestLogger);
+
+// public routes
 app.use("/api/auth", authRoutes);
+
+// 🔐 auth middleware
+app.use(authenticateToken);
+
+
+// protected routes
 app.use("/api/family" , familyRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/categories", categoryRoutes);
