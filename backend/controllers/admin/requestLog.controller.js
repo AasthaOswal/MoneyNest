@@ -1,5 +1,5 @@
 import RequestLog from "../../models/admin/requestLog.model.js";
-import { exportRequestLogsAndEmail } from "../services/requestLogExport.service.js";
+import { exportRequestLogsAndEmail } from "../../services/admin/requestLogExport.service.js";
 
 export const getRequestLogs = async (req, res) => {
   try {

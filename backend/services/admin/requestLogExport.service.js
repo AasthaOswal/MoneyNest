@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
-import RequestLog from "../models/requestLog.model.js";
-import FailedOperation from "../models/failedOperation.model.js";
-import sendEmailBrevo from "../utils/sendEmailBrevo.js";
+import RequestLog from "../../models/admin/requestLog.model.js";
+import FailedOperation from "../../models/admin/failedOperation.model.js";
+import sendEmailBrevo from "../../utils/email/sendEmailBrevo.js";
 
 export const exportRequestLogsAndEmail = async () => {
   const logs = await RequestLog.find({}).sort({ createdAt: 1 }).lean();

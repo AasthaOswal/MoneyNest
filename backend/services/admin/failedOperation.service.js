@@ -1,6 +1,6 @@
-import FailedOperation from "../models/failedOperation.model.js";
+import FailedOperation from "../../models/admin/failedOperation.model.js";
 import { exportRequestLogsAndEmail } from "./requestLogExport.service.js";
-import cloudinary from "../config/cloudinary.js";
+import cloudinary from "../../config/cloudinary.js";
 // Plug your notification sender here if you already have one.
 // import { sendNotification } from "./notification.service.js";
 

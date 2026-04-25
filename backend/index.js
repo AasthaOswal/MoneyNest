@@ -19,9 +19,9 @@ import userRoutes from './routes/user.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js'
 import reportRoutes from './routes/report.routes.js'
 import notificationRoutes from './routes/notification.routes.js';
-import { requestLogRoutes } from "./routes/admin/requestLog.routes.js";
-import { errorLogRoutes } from "./routes/admin/errorLog.routes.js";
-import { failedOperationRoutes } from "./routes/admin/failedOperation.routes.js";
+import requestLogRoutes from "./routes/admin/requestLog.routes.js";
+import errorLogRoutes from "./routes/admin/errorLog.routes.js";
+import failedOperationRoutes from "./routes/admin/failedOperation.routes.js";
 
 
 
