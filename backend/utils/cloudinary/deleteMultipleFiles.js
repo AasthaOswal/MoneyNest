@@ -1,6 +1,6 @@
 import cloudinary from "../../config/cloudinary.js";
 import {insertFailedCloudinaryDeletion} from "../failedCloudinaryDeletion/insertFailedCloudinaryDeletion.js"
-    
+import { createFailedOperation } from "../failedOperation/failedOperationCreator.js";
 export const deleteMultipleFiles = async (publicIds = []) => {
 
     // Filter out invalid IDs
@@ -45,6 +45,13 @@ export const deleteMultipleFiles = async (publicIds = []) => {
 
         // Store failures in DB
         await insertFailedCloudinaryDeletion(failed);
+
+
+        await createFailedOperation({
+            operationType: "cloudinary_delete_multiple",
+            payload: { publicIds: failed },
+            error: err,
+        });
 
         return {
             deleted: [],

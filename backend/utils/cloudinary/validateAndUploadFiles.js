@@ -3,6 +3,7 @@ import cloudinary from "../../config/cloudinary.js";
 import { deleteMultipleFiles } from "./deleteMultipleFiles.js";
 import { insertFailedCloudinaryDeletion } from "../failedCloudinaryDeletion/insertFailedCloudinaryDeletion.js";
 import { fileTypeFromBuffer } from "file-type";
+import { createFailedOperation } from "../failedOperation/failedOperationCreator.js";
 
 export const validateAndUploadFiles = async (filesObj, fileConfigs) => {
     const uploadedFiles = {};   
@@ -83,6 +84,12 @@ export const validateAndUploadFiles = async (filesObj, fileConfigs) => {
 
             if (result.failed.length > 0) {
                 await insertFailedCloudinaryDeletion(result.failed);
+
+                await createFailedOperation({
+                    operationType: "cloudinary_delete_multiple",
+                    payload: { publicIds: result.failed },
+                    error: err,
+                });
             }
         }
 

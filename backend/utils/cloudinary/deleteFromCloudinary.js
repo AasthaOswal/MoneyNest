@@ -1,6 +1,7 @@
 
 import cloudinary from "../../config/cloudinary.js";
 import { insertFailedCloudinaryDeletion } from "../failedCloudinaryDeletion/insertFailedCloudinaryDeletion.js";
+import { createFailedOperation } from "../failedOperation/failedOperationCreator.js";
 
 export const deleteFromCloudinary = async (publicId) => {
 
@@ -36,6 +37,12 @@ export const deleteFromCloudinary = async (publicId) => {
 				reason: err.message
 			}
 		]);
+
+		await createFailedOperation({
+            operationType: "cloudinary_delete",
+            payload: { publicId: publicId },
+            error: err,
+        });
 	}
 };
 
