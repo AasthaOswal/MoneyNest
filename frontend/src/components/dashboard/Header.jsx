@@ -43,11 +43,13 @@ import { Menu } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import NotificationButton from '../buttons/NotificationButton';
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({ setIsOpen }) => {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
 
+  const navigate=useNavigate();
   return (
     <header className="h-16 flex items-center justify-between px-6 border-b border-border bg-surface text-text shadow-sm">
       
@@ -80,7 +82,10 @@ const Header = ({ setIsOpen }) => {
           </span>
         </div>
 
-<NotificationButton/>
+{/* <NotificationButton/> */}
+<button onClick={() => navigate("/settings/push-notifications")}>
+  Manage Notifications
+</button>
 
         {/* THEME TOGGLE */}
         <button 

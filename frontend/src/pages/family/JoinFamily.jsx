@@ -15,6 +15,7 @@ const JoinFamily = () => {
       return input;
     }
   };
+  
 
   const handleJoin = async () => {
     if (!tokenInput.trim()) return;
@@ -23,6 +24,7 @@ const JoinFamily = () => {
       setLoading(true);
 
       const token = extractToken(tokenInput);
+console.log("Extracted token:", token);
 
       const res = await FamilyService.joinFamilyWithToken({
         token,

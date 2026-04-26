@@ -115,9 +115,10 @@ export const generateInvite = async (req, res) => {
 export const joinFamilyWithToken = async (req, res) => {
   try {
     const userId = req.user._id;
-    
+    console.log(req.query)
 
-    const { value, error } = joinFamilySchema.validate(req.query);
+    const { value, error } = joinFamilySchema.validate(req.body);
+    console.log(error)
 
     if (error) {
       return res.status(400).json({

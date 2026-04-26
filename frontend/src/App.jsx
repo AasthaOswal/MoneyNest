@@ -56,7 +56,7 @@ import IndividualDashboard from './pages/dashboard/IndividualDashboard.jsx';
 // Notifications pages
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import NotificationDetailsPage from './pages/notifications/NotificationDetailsPage';
-
+import PushNotificationSettings from './pages/notifications/PushNotificationSettings';
 
 import AuthCallback from './pages/auth/AuthCallback.jsx';
 
@@ -108,6 +108,7 @@ function App() {
 
                   <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/notifications/:id" element={<NotificationDetailsPage />} />
+                  <Route path="/settings/push-notifications" element={<PushNotificationSettings />} />
       
                   <Route path="/dashboard/family" element={<FamilyDashboard />} />
                   <Route path="/dashboard/individual" element={<IndividualDashboard />} />
