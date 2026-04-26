@@ -2,9 +2,13 @@ import mongoose from "mongoose";
 
 const failedOperationSchema = new mongoose.Schema(
   {
+
+    requestId: {
+  type: String,
+},
     operationType: {
       type: String,
-      enum: ["cloudinary_delete", "cron_job", "notification"],
+      enum: ["cloudinary_delete","cloudinary_delete_multiple", "monthly_report", "push_notification", "db_notification", "email_with_attachments", "email_without_attachments"],
       required: true,
     },
 

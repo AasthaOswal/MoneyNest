@@ -30,7 +30,7 @@ import { startMonthlyReportJob } from "./services/cron/monthlyReport.js";
 
 import { requestLogger } from "./middlewares/requestLogger.middleware.js";
 import { authenticateToken } from "./middlewares/auth.middleware.js";
-
+import { startFailedOperationsRetry } from "./services/cron/failedOperationRetry.js";
 const app = express();
 
 app.set("trust proxy", 1);
@@ -89,6 +89,7 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // run cron job
 startGoalTracker();
 startMonthlyReportJob();
+startFailedOperationsRetry();
 
 // Basic test route
 app.get("/", (req, res) => {

@@ -1,6 +1,7 @@
 
 import admin from "../../config/firebase.js";
 import User from "../../models/user.model.js";
+import { createFailedOperation } from "../../utils/failedOperation/failedOperationCreator.js";
 
 export const sendPushNotification = async (userId, title, body) => {
     try{
@@ -43,5 +44,14 @@ export const sendPushNotification = async (userId, title, body) => {
 
     }catch(err){
       	console.log(err);
+		    await createFailedOperation({
+        operationType: "push_notification",
+        payload: {
+            userId: userId,
+            title,
+            body,
+        },
+        error: err,
+    });
     }
 };

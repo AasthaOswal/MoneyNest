@@ -1,11 +1,11 @@
 // utils/failedOperation/createFailedOperation.js
-
 import FailedOperation from "../../models/admin/failedOperation.model.js";
 
 export const createFailedOperation = async ({
   operationType,
-  payload,
+  payload = {},
   error,
+  maxRetries = 3,
 }) => {
   try {
     await FailedOperation.create({
@@ -15,11 +15,12 @@ export const createFailedOperation = async ({
         message: error?.message || "Unknown error",
         stack: error?.stack || "",
       },
-      status: "failed",
       retryCount: 0,
-      nextRetryAt: new Date(), // retry ASAP
+      maxRetries,
+      nextRetryAt: new Date(),
+      status: "failed",
     });
   } catch (err) {
-    console.error("❌ Failed to log FailedOperation:", err);
+    console.error("❌ Failed to log failed operation:", err.message);
   }
 };

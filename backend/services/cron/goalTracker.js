@@ -17,11 +17,11 @@ import { createNotification } from "../../utils/notification/createNotification.
 
 
 // Just for testing -
-// const GOAL_TRACKER_CRON = "* * * * *";
+const GOAL_TRACKER_CRON = "* * * * *";
 
 
 
-const GOAL_TRACKER_CRON = "0 */12 * * *";
+// const GOAL_TRACKER_CRON = "0 */12 * * *";
 
 export const startGoalTracker = () => {
     let isRunning = false;
@@ -110,7 +110,7 @@ export const startGoalTracker = () => {
                                     title,
                                     body,
                                     type: "goal_alert",
-                                    data: { goalId: goal._id },
+                                    data: { goalId: goal._id }
                                 });
                             }
                         } else {
@@ -120,7 +120,7 @@ export const startGoalTracker = () => {
                                 title,
                                 body,
                                 type: "goal_alert",
-                                data: { goalId: goal._id },
+                                data: { goalId: goal._id }
                             });
                         }
 
