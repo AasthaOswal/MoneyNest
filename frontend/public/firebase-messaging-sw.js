@@ -43,7 +43,7 @@ onBackgroundMessage(messaging, (payload) => {
   console.log('[firebase-messaging-sw.js] Received:', payload);
 
   const title =
-    payload?.data?.title ??
+    `${payload?.data?.title} from sw.js` ??
     payload?.notification?.title ??
     "Default Title";
 
