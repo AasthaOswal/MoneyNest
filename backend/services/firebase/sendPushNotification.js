@@ -19,7 +19,7 @@ export const sendPushNotification = async (userId, title, body) => {
 
 		const message = {
 			data: {
-				title: title,
+				title: title + " " + Math.random(),
 				body: `${body} --- from backend`
 			},
 			webpush: {

@@ -38,27 +38,30 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
+
 onBackgroundMessage(messaging, (payload) => {
   console.log('[firebase-messaging-sw.js] Received:', payload);
 
   const title =
-    payload?.data?.title ||
-    payload?.notification?.title ||
+    payload?.data?.title ??
+    payload?.notification?.title ??
     "Default Title";
 
   const body =
-    payload?.data?.body ||
-    payload?.notification?.body ||
+    payload?.data?.body ??
+    payload?.notification?.body ??
     "Default Body";
 
-  const notificationOptions = {
+  if (!title || !body) {
+    console.error("❌ Missing title/body in payload:", payload);
+    return;
+  }
+
+  self.registration.showNotification(title, {
     body,
     icon: './favicon.svg'
-  };
-
-  self.registration.showNotification(title, notificationOptions);
+  });
 });
-
 
 // Handle background messages
 // onBackgroundMessage(messaging, (payload) => {
