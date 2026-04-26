@@ -23,11 +23,6 @@ export const sendPushNotification = async (userId, title, body) => {
     body: String(body + " --- from backend"),
   },
   webpush: {
-    notification: {
-      title: title,
-      body: body,
-      icon: "/favicon.svg",
-    },
     fcmOptions: {
       link: "https://project-money-nest.vercel.app/"
     }
