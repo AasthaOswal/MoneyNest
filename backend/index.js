@@ -89,7 +89,7 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // run cron job
 startGoalTracker();
 startMonthlyReportJob();
-startFailedOperationsRetry();
+// startFailedOperationsRetry();
 
 // Basic test route
 app.get("/", (req, res) => {

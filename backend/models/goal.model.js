@@ -95,12 +95,10 @@ const goalSchema = new mongoose.Schema({
 		default: "private"
 	},
 
-    // if alerts triggered at 50% then add to aarray
-    //so that again tomorrow when cron job runs same alert for 50% is not sent
-    triggeredAlerts: [{
-		percentage: Number,
-		lastTriggeredAt : Date,
-	}], // [50, 70]
+      lastNotifiedAt: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true });
 
 const Goal = mongoose.model("Goal", goalSchema);

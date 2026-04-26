@@ -59,25 +59,25 @@ import NotificationDetailsPage from './pages/notifications/NotificationDetailsPa
 
 function App() {
 
-  useEffect(() => {
-    // This listener stays active for the lifetime of the component
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Foreground message received:", payload);
+  // useEffect(() => {
+  //   // This listener stays active for the lifetime of the component
+  //   const unsubscribe = onMessage(messaging, (payload) => {
+  //     console.log("Foreground message received:", payload);
 
-      const { title, body } = payload.notification;
+  //     const { title, body } = payload.notification;
 
-      // Use the Service Worker to show the notification (High mobile compatibility)
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.showNotification(title, {
-          body: body,
-          icon: "/favicon.svg",
-          badge: "/favicon.svg", // Optional: small icon for mobile status bars
-        });
-      });
-    });
+  //     // Use the Service Worker to show the notification (High mobile compatibility)
+  //     navigator.serviceWorker.ready.then((registration) => {
+  //       registration.showNotification(title, {
+  //         body: body,
+  //         icon: "/favicon.svg",
+  //         badge: "/favicon.svg", // Optional: small icon for mobile status bars
+  //       });
+  //     });
+  //   });
 
-    return () => unsubscribe();
-  }, []);
+  //   return () => unsubscribe();
+  // }, []);
   return (
     <ThemeProvider>
       <BrowserRouter>
