@@ -12,23 +12,23 @@ export const sendPushNotification = async (userId, title, body) => {
 
 		if (!tokens.length) return;
 
-		// const message = {
-		// 	data: { title, body: body + " --- from backend" },
-		// 	tokens,
-		// };
-
 		const message = {
-  data: {
-    title: String(title),
-    body: String(body + " --- from backend"),
-  },
-  webpush: {
-    fcmOptions: {
-      link: "https://project-money-nest.vercel.app/"
-    }
-  },
-  tokens,
-};
+			data: { title, body: body + " --- from backend" },
+			tokens,
+		};
+
+// 		const message = {
+//   data: {
+//     title: String(title),
+//     body: String(body + " --- from backend"),
+//   },
+//   webpush: {
+//     fcmOptions: {
+//       link: "https://project-money-nest.vercel.app/"
+//     }
+//   },
+//   tokens,
+// };
 
 		const response = await admin.messaging().sendEachForMulticast(message);
 		console.log(response);
