@@ -45,7 +45,7 @@ onBackgroundMessage(messaging, (payload) => {
   
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.notification.body + "from sw.js",
     icon: './favicon.svg' 
   };
 
