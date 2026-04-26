@@ -110,7 +110,7 @@ export const startGoalTracker = () => {
                                     title,
                                     body,
                                     type: "goal_alert",
-                                    data: { goalId: goal._id }
+                                    data: "goalzzz"
                                 });
                             }
                         } else {
@@ -120,7 +120,7 @@ export const startGoalTracker = () => {
                                 title,
                                 body,
                                 type: "goal_alert",
-                                data: { goalId: goal._id }
+                                data: "goalzzz"
                             });
                         }
 

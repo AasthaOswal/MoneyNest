@@ -60,6 +60,7 @@ export const startFailedOperationsRetry = () => {
             const handler = operationHandlers[op.operationType];
 
             if (!handler) {
+              console.log(op)
               console.warn("⚠️ Unknown operationType:", op.operationType);
               continue;
             }
