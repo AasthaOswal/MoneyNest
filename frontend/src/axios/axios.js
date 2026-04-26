@@ -182,6 +182,10 @@ instance.interceptors.response.use(
 
     const originalRequest = error.config;
 
+    if (originalRequest?.skipAuthRefresh) {
+      return Promise.reject(error);
+    }
+
     const isAuthRoute =
       originalRequest.url?.includes("/auth/login") ||
       originalRequest.url?.includes("/auth/signup") ||

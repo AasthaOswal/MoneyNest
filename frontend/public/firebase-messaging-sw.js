@@ -24,11 +24,6 @@
 // });
 
 
-/**
- * 
- * 
- * 
- * ACtual code
  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getMessaging, onBackgroundMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-sw.js";
 
@@ -56,10 +51,7 @@ onBackgroundMessage(messaging, (payload) => {
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
-*
-*
-*
- */
+
 
 
 // Handle background messages

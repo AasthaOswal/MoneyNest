@@ -31,23 +31,25 @@ const Login = () => {
   setLoading(true);
 
   try {
-    const user = await AuthService.login(credentials);
-    console.log(user)
+    // const user = await AuthService.login(credentials);
+    // console.log(user)
 
-    // login(data.user); // 🔥 THIS IS THE MISSING 
-    await login(user)
+    // // login(data.user); // 🔥 THIS IS THE MISSING 
+    // await login(user)
 
-    if (user.role === "admin") {
-      navigate("/admin-dashboard");
-    } else if (user.role === "member") {
-      if(user.familyId != null){
-        navigate("/dashboard/family");
-      }else{
-        navigate("/family/onboarding");
-      }
-    }else {
-      navigate("/dashboard/family");
-    }
+    await AuthService.login(credentials);
+
+    // if (user.role === "admin") {
+    //   navigate("/admin-dashboard");
+    // } else if (user.role === "member") {
+    //   if(user.familyId != null){
+    //     navigate("/dashboard/family");
+    //   }else{
+    //     navigate("/family/onboarding");
+    //   }
+    // }else {
+    //   navigate("/dashboard/family");
+    // }
   } catch (err) {
     console.log(err);
     setError(err.response?.data?.message || "Invalid email or password");

@@ -57,6 +57,10 @@ import IndividualDashboard from './pages/dashboard/IndividualDashboard.jsx';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import NotificationDetailsPage from './pages/notifications/NotificationDetailsPage';
 
+
+import AuthCallback from './pages/auth/AuthCallback.jsx';
+
+
 function App() {
 
   // useEffect(() => {
@@ -90,6 +94,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
             </Route>
 
             {/* Protected Wrapper */}
