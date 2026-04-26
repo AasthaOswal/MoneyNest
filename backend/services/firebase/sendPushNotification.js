@@ -18,10 +18,7 @@ export const sendPushNotification = async (userId, title, body) => {
 		// };
 
 		const message = {
-			  notification: {
-				title,
-				body: body + " --- from backend - notificaiton"
-			},
+
 			data: {
 				title: title + " " + Math.random(),
 				body: `${body} --- from backend - data`
