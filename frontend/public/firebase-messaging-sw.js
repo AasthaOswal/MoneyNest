@@ -41,6 +41,7 @@ const messaging = getMessaging(app);
 
 onBackgroundMessage(messaging, (payload) => {
   console.log('[firebase-messaging-sw.js] Received:', payload);
+    console.log("🔥 SW HIT:", payload.messageId);
 
   const title =
     payload?.data?.title ??
@@ -59,7 +60,8 @@ onBackgroundMessage(messaging, (payload) => {
 
   self.registration.showNotification(title, {
     body,
-    icon: './favicon.svg'
+    icon: './favicon.svg',
+    tag: payload.messageId,
   });
 });
 
