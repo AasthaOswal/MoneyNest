@@ -13,7 +13,7 @@ export const sendPushNotification = async (userId, title, body) => {
 		if (!tokens.length) return;
 
 		const message = {
-			data: { title, body },
+			notification: { title, body },
 			tokens,
 		};
 
