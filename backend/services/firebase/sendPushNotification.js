@@ -13,11 +13,12 @@ export const sendPushNotification = async (userId, title, body) => {
 		if (!tokens.length) return;
 
 		const message = {
-			notification: { title, body: body + "from backend" },
+			notification: { title, body: body + " --- from backend" },
 			tokens,
 		};
 
 		const response = await admin.messaging().sendEachForMulticast(message);
+		console.log(response);
 
 		response.responses.forEach(async (res, idx) => {
 			if (!res.success) {
