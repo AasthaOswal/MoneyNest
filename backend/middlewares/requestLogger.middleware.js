@@ -7,10 +7,10 @@ export const requestLogger = (req, res, next) => {
   // ✅ generate requestId
   req.requestId = uuidv4();
 
-  const shouldLog =
-  process.env.NODE_ENV === "development" ||
-  res.statusCode >= 400 ||
-  responseTimeMs > 500;
+  // const shouldLog =
+  // process.env.NODE_ENV === "development" ||
+  // res.statusCode >= 400 ||
+  // responseTimeMs > 500;
 
 
 
