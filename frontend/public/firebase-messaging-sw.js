@@ -39,27 +39,30 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-// Handle background messages
 onBackgroundMessage(messaging, (payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
-  const notificationTitle = payload.notification.title;
+  console.log('[firebase-messaging-sw.js] Received:', payload);
+
+  const notificationTitle = payload.data?.title || "Default Title";
+
   const notificationOptions = {
-    body: `${payload.notification.body} --- from sw.js`,
-    icon: './favicon.svg' 
+    body: payload.data?.body || "Default Body",
+    icon: './favicon.svg'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// onBackgroundMessage(messaging, (payload) => {
-//   console.log('Background message:', payload);
 
-//   const notificationTitle = payload.data.title;
+// Handle background messages
+// onBackgroundMessage(messaging, (payload) => {
+//   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  
+//   const notificationTitle = payload.notification.title;
 //   const notificationOptions = {
-//     body: payload.data.body,
-//     icon: '/favicon.svg'
+//     body: `${payload.notification.body} --- from sw.js`,
+//     icon: './favicon.svg' 
 //   };
 
 //   self.registration.showNotification(notificationTitle, notificationOptions);
 // });
+
