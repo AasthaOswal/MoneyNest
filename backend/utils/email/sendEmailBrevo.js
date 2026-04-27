@@ -34,7 +34,7 @@ export const sendEmailBrevoNoAttachments = async ({ toEmail, subject, htmlConten
 
 
 
-const sendEmailBrevo = async ({
+export const sendEmailBrevo = async ({
   toEmail,
   subject,
   htmlContent,
@@ -58,6 +58,3 @@ const sendEmailBrevo = async ({
     throw error;
   }
 };
-
-
-export default sendEmailBrevo;

@@ -18,7 +18,9 @@ const notificationSchema = new mongoose.Schema({
       "transaction",
       "system",
       "family",
-      "reminder"
+      "reminder",
+      "report",
+      "notification"
     ],
   },
 

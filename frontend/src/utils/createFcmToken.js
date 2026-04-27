@@ -1,5 +1,5 @@
 //utils/createFcmToken
-
+import toast from "react-hot-toast";
 import { getToken } from "firebase/messaging";
 import { messaging } from "../services/firebase.service.js";
 
@@ -13,7 +13,7 @@ export const getFCMToken = async () => {
         console.log("Permission:", permission);
 
         if (Notification.permission === "denied") {
-            alert("Notifications are blocked. Please enable them from browser settings (🔒 icon → Allow).");
+            toast("🔔 Notifications are blocked. Please enable them from browser settings (🔒 icon → Allow)");
             return null;
         }
 

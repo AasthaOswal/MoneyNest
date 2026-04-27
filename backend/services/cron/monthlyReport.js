@@ -2,16 +2,20 @@ import cron from "node-cron";
 import User from "../../models/user.model.js"; // adjust path
 import { getFamilyReportData } from "../../services/report/analytics.service.js";
 import { generateReportPDF } from "../../services/report/report.service.js";
-import sendEmailBrevo from "../../utils/email/sendEmailBrevo.js";
+import {sendEmailBrevo} from "../../utils/email/sendEmailBrevo.js";
+import { createFailedOperation } from "../../utils/failedOperation/failedOperationCreator.js";
 
 const MONTHLY_REPORT_CRON = "0 9 1 * *"; //Runs at 9:00 AM on the 1st day of every month
 const MONTHLY_REPORT_CRON_TESTING = "* * * * *"; //every minute
 
+// const MONTHLY_REPORT_CRON_TESTING = "*/2 * * * *"; // every 2 minutes
+
 export const startMonthlyReportJob = () => {
 
   // 🔥 Runs on 1st of every month at 9:00 AM
-  cron.schedule(MONTHLY_REPORT_CRON, async () => {
+  cron.schedule(MONTHLY_REPORT_CRON_TESTING, async () => {
     console.log("📊 Running Monthly Report Cron...");
+    let from,to;
 
     try {
       // 👉 Get all users (or family heads - better later)
@@ -21,17 +25,21 @@ export const startMonthlyReportJob = () => {
         try {
           if (!user.email || !user.familyId) continue;
 
+          
+
           // 👉 Last month
           const now = new Date();
 
-          const from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          // from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-          const to = new Date(now.getFullYear(), now.getMonth(), 0);
-          to.setHours(23, 59, 59, 999); // 🔥 IMPORTANT
+          // to = new Date(now.getFullYear(), now.getMonth(), 0);
+          // to.setHours(23, 59, 59, 999); // 🔥 IMPORTANT
 
           //just for testing
-          // const from = new Date(0); // all data
-          // const to = new Date();
+          from = new Date(0); // all data
+          to = new Date();
+
+          // throw new Error("Simulated Cron Failure for testing retry logic");
 
           const data = await getFamilyReportData({
             familyId: user.familyId,
@@ -64,6 +72,16 @@ export const startMonthlyReportJob = () => {
 
         } catch (err) {
           console.error(`❌ Failed for ${user.email}`, err.message);
+              await createFailedOperation({
+                operationType: "monthly_report_email",
+                payload: {
+                  email: user.email,
+                  familyId: user.familyId,
+                  from,
+                  to,
+                },
+                error: err,
+              });
         }
       }
 

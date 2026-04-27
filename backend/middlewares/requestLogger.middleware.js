@@ -20,8 +20,9 @@ export const requestLogger = (req, res, next) => {
 
         await RequestLog.create({
         requestId: req.requestId,
-
-        user: req.user?._id || null,   // null if public
+        userId: req.user?._id || null,
+        userEmail: req.user?.email || null,
+        userRole: req.user?.role || null,
         ip: req.ip,                    // ALWAYS store
 
         method: req.method,
@@ -34,9 +35,7 @@ export const requestLogger = (req, res, next) => {
 
         actorType: req.user ? "authenticated" : "anonymous",
 
-        query: req.query,
-        body: req.body,
-        headers: req.headers,
+        
       });
       
     } catch (err) {

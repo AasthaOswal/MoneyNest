@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
+
+import { Toaster } from "react-hot-toast";
+
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -60,7 +63,6 @@ import PushNotificationSettings from './pages/notifications/PushNotificationSett
 
 import AuthCallback from './pages/auth/AuthCallback.jsx';
 
-
 function App() {
 
   // useEffect(() => {
@@ -85,6 +87,7 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
       <AuthProvider>
           <Routes>
             {/* Public Routes - Landing, Login, Signup */}

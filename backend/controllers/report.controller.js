@@ -28,7 +28,7 @@
 
 import { getFamilyReportData } from "../services/report/analytics.service.js";
 import { generateReportPDF } from "../services/report/report.service.js";
-import sendEmailBrevo from "../utils/email/sendEmailBrevo.js";
+import {sendEmailBrevo} from "../utils/email/sendEmailBrevo.js";
 
 export const downloadMonthlyReport = async (req, res) => {
   try {

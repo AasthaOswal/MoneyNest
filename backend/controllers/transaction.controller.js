@@ -10,7 +10,7 @@ import { deleteFromCloudinary } from "../utils/cloudinary/deleteFromCloudinary.j
 import { deleteMultipleFiles } from "../utils/cloudinary/deleteMultipleFiles.js";
 
 import { generateTransactionsExcel } from "../utils/excel/generateExcel.js";
-import sendEmailBrevo from "../utils/email/sendEmailBrevo.js";
+import {sendEmailBrevo} from "../utils/email/sendEmailBrevo.js";
 
 import { buildTransactionQuery } from "../services/transaction/buildTransactionQuery.js";
 

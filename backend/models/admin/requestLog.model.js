@@ -7,10 +7,18 @@ const requestLogSchema = new mongoose.Schema(
       index: true,
     },
 
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
+    },
+
+    userEmail: {
+      type: String,
+    },
+
+    userRole: {
+      type: String,
     },
 
     method: {
@@ -42,9 +50,7 @@ const requestLogSchema = new mongoose.Schema(
       default: "anonymous",
     },
 
-    query: Object,
-    body: Object,
-    headers: Object,
+
   },
   { timestamps: true }
 );
