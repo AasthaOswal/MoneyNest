@@ -58,7 +58,7 @@ const requestLogSchema = new mongoose.Schema(
 // 🔍 Indexes (VERY IMPORTANT)
 requestLogSchema.index({ createdAt: -1 });
 requestLogSchema.index({ statusCode: 1, createdAt: -1 });
-requestLogSchema.index({ user: 1, createdAt: -1 });
+requestLogSchema.index({ userId: 1, createdAt: -1 });
 requestLogSchema.index({ path: 1, createdAt: -1 });
 
 

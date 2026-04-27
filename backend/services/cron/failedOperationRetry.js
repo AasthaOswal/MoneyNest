@@ -14,8 +14,15 @@ import { generateReportPDF } from "../report/report.service.js";
 
 
 import {sendEmailBrevo} from "../../utils/email/sendEmailBrevo.js";
+
+
+import { exportRequestLogsAndEmail } from "../admin/requestLogExport.service.js";
 // 🔥 Handler Mapping
 const operationHandlers = {
+  request_log_export: async (payload) => {
+    await exportRequestLogsAndEmail(payload);
+  },
+
   push_notification: async (payload) => {
     const { userId, title, body } = payload;
     await sendPushNotification(userId, title, body);

@@ -4,10 +4,25 @@ import FailedOperation from "../../models/admin/failedOperation.model.js";
 import {sendEmailBrevo} from "../../utils/email/sendEmailBrevo.js";
 
 
-export const exportRequestLogsAndEmail = async () => {
+export const exportRequestLogsAndEmail = async (payload={}) => {
+  let now,yesterday;
   try {
-    // throw new Error("Testing retry cron");
-    const logs = await RequestLog.find({}).sort({ createdAt: 1 }).lean();
+
+    if (payload.from && payload.to) {
+      yesterday = new Date(payload.from);
+      now = new Date(payload.to);
+    } else {
+      now = new Date();
+      yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+    }
+
+    
+    // throw new Error("Testing retry cron for weekly log export");
+
+    const logs = await RequestLog.find({
+      createdAt: { $gte: yesterday, $lt: now }
+    }).sort({ createdAt: 1 }).lean();
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Request Logs");
@@ -63,16 +78,14 @@ export const exportRequestLogsAndEmail = async () => {
 
     const buffer = await workbook.xlsx.writeBuffer();
 
-    const fileName = `request-logs-${new Date()
-      .toISOString()
-      .slice(0, 10)}.xlsx`;
+    const fileName = `request-logs-${yesterday.toISOString().slice(0, 10)}.xlsx`;
 
     await sendEmailBrevo({
       toEmail: process.env.ADMIN_EMAIL,
-      subject: "Weekly Request Logs Export",
+      subject: "Daily Request Logs Export",
       htmlContent: `
         <p>Hi Admin,</p>
-        <p>Attached is the weekly request logs export.</p>
+        <p>Attached is the daily request logs export.</p>
         <p>Total logs exported: <b>${logs.length}</b></p>
       `,
       attachments: [
@@ -87,16 +100,17 @@ export const exportRequestLogsAndEmail = async () => {
   } catch (error) {
     console.error("❌ Export failed:", error.message);
 
-    await createFailedExportLog(error); // 🔥 IMPORTANT
+    await createFailedExportLog(error,yesterday,now); // 🔥 IMPORTANT
   }
 };
 
-export const createFailedExportLog = async (error) => {
+export const createFailedExportLog = async (error,from,to) => {
   await FailedOperation.create({
     operationType: "request_log_export",
     status: "failed",
     payload: {
-      task: "weekly_request_export",
+      from,
+      to,
     },
     error: {
       message: error.message,

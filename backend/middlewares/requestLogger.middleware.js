@@ -17,7 +17,7 @@ export const requestLogger = (req, res, next) => {
   res.on("finish", async () => {
     try {
       const responseTimeMs = Date.now() - start;
-
+    
         await RequestLog.create({
         requestId: req.requestId,
         userId: req.user?._id || null,
