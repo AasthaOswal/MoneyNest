@@ -92,7 +92,7 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // run cron job
 // startGoalTracker();
 // startMonthlyReportJob();
-startFailedOperationsRetry();
+// startFailedOperationsRetry();
 // startRequestLogExportCron();
 
 // Basic test route
