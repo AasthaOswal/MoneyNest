@@ -11,6 +11,8 @@ export const deleteFromCloudinary = async (publicId) => {
 
 	try {
 
+		// throw new Error("Testing cron - Error in cloudinary deletion")
+
 		const result = await cloudinary.uploader.destroy(publicId);
 
 		if (result.result === "ok" || result.result === "not found") {

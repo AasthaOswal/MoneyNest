@@ -4,7 +4,7 @@ import { retrySingleOperation } from "../retry/retrySingleFailedOperation.servic
 
 const RETRY_CRON = "* * * * *"; // every minute
 
-export const startFailedOperationsRetry = () => {
+export const startFailedOperationsRetryNew = () => {
     console.log("🔁 Failed Operations Retry Service Started");
 
     cron.schedule(

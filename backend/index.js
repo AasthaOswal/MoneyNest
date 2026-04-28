@@ -32,7 +32,7 @@ import { requestLogger } from "./middlewares/requestLogger.middleware.js";
 import { authenticateToken } from "./middlewares/auth.middleware.js";
 import { startFailedOperationsRetry } from "./services/cron/failedOperationRetry.js";
 import { startRequestLogExportCron } from "./services/cron/requestLogExport.js";
-
+import {startFailedOperationsRetryNew} from "./services/cron/failedOperationNew.cron.js";
 
 const app = express();
 
@@ -94,6 +94,8 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // startMonthlyReportJob();
 // startFailedOperationsRetry();
 // startRequestLogExportCron();
+
+// startFailedOperationsRetryNew()
 
 // Basic test route
 app.get("/", (req, res) => {

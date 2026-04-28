@@ -1,17 +1,19 @@
 import express from "express";
 import {
   getFailedOperations,
-  // retryFailedOperation,
+  retryFailedOperationById
   // deleteFailedOperation,
   // deleteAllFailedOperations,
   // toggleRetry,
   // getRetryStatus,
 } from "../../controllers/admin/failedOperation.controller.js";
 
+import { authorizeRoles } from "../../middlewares/auth.middleware.js";
+
 const router = express.Router();
 
-router.get("/", getFailedOperations);
-// router.patch("/:id/retry", retryFailedOperation);
+router.get("/", authorizeRoles("admin"), getFailedOperations);
+router.patch("/:id/retry", authorizeRoles("admin"), retryFailedOperationById);
 // router.delete("/:id", deleteFailedOperation);
 // router.delete("/", deleteAllFailedOperations);
 // router.patch("/retry-toggle", toggleRetry);
