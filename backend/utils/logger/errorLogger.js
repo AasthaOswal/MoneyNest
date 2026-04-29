@@ -1,3 +1,5 @@
+//utils/logger/errorLogger.js
+
 import ErrorLog from "../models/errorLog.model.js";
 
 export const createErrorLog = async (req, error, extra = {}) => {

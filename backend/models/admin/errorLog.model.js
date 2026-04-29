@@ -2,36 +2,43 @@ import mongoose from "mongoose";
 
 const errorLogSchema = new mongoose.Schema(
   {
+    errorName: {
+      type: String,
+      required: true,
+    },
     message: {
       type: String,
       required: true,
     },
 
+    requestId: {
+      type: String,
+    },
+
     stack: String,
 
     method: String,
-    url: String,
+    path: String,
     ip: String,
 
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
 
-    requestBody: {
-      type: Object,
-      default: {},
+    severity: {
+      type: String,
+      enum: ["low", "medium", "high", "critical"],
+      default: "low"
     },
 
-    query: {
-      type: Object,
-      default: {},
+    environment: {
+      type: String,
+      enum: ["development", "production"],
+      default: "production"
     },
 
-    headers: {
-      type: Object,
-      default: {},
-    },
+
   },
   { timestamps: true }
 );

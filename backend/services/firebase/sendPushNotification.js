@@ -31,6 +31,8 @@ export const sendPushNotification = async (userId, title, body) => {
 			tokens,
 		};
 
+		
+    	// throw new Error("Test error from sendPushNotification");
 		const response = await admin.messaging().sendEachForMulticast(message);
 		console.log(response);
 

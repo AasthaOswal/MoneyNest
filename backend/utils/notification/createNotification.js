@@ -9,6 +9,7 @@ export const createNotification = async ({
 }) => {
   try {
     console.log("inside notiifcaiton creator")
+    // throw new Error("Test error from createNotification");
     const notification = await Notification.create({
       user: userId,
       title,
