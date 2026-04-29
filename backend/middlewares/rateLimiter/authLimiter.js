@@ -1,5 +1,5 @@
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
-
+import { makeRateLimitHandler } from "../rateLimiterSecurity/rateLimitLog.handler.js";
 const isDev = process.env.NODE_ENV !== "production";
 //reduced the limits just for testing if rate limiter works
 const maxLimit = {
@@ -64,6 +64,7 @@ const makeHandler = (name) => (req, res, next, options) => {
   res.status(options.statusCode).json(options.message);
 };
 
+
 // =======================
 // 🚀 LIMITERS
 // =======================
@@ -78,7 +79,7 @@ export const signupLimiter = rateLimit({
     success: false,
     message: "Too many signup attempts. Try again after 15 minutes.",
   },
-  handler: makeHandler("signupLimiter"),
+  handler: makeRateLimitHandler("signupLimiter"),
 });
 
 // 🔐 LOGIN (brute-force protection)

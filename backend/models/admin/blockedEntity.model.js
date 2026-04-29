@@ -2,31 +2,80 @@ import mongoose from "mongoose";
 
 const blockedEntitySchema = new mongoose.Schema(
   {
-    type: {
+    identifierType: {
       type: String,
-      enum: ["ip", "user"],
+      enum: ["user", "ip"],
       required: true,
+      index: true,
     },
 
-    value: {
-      type: String, // IP string OR userId (stringified)
+    identifier: {
+      type: String,
       required: true,
+      trim: true,
+      index: true,
+    },
+
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+
+    ip: {
+      type: String,
+      required: true,
+      trim: true,
       index: true,
     },
 
     reason: {
       type: String,
-      default: "Suspicious activity",
+      required: true,
+      trim: true,
     },
 
-    isActive: {
+    blockedUntil: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+
+    isPermanent: {
+      type: Boolean,
+      default: false,
+    },
+
+    active: {
       type: Boolean,
       default: true,
+      index: true,
+    },
+
+    triggerCount: {
+      type: Number,
+      default: 0,
+    },
+
+    lastTriggeredAt: {
+      type: Date,
+      default: null,
+    },
+
+    metadata: {
+      type: Object,
+      default: {},
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-blockedEntitySchema.index({ type: 1, value: 1 });
+blockedEntitySchema.index({ identifierType: 1, identifier: 1 }, { unique: true });
+blockedEntitySchema.index({ active: 1, blockedUntil: 1 });
 
-export default mongoose.model("BlockedEntity", blockedEntitySchema);
+const BlockedEntity = mongoose.model("BlockedEntity", blockedEntitySchema);
+
+export default BlockedEntity;
