@@ -1,5 +1,16 @@
 import rateLimit from "express-rate-limit";
 
+const isDev = process.env.NODE_ENV !== "production";
+
+
+const maxLimit = {
+  general: isDev ? 2 : 100,
+  read: isDev ? 2 : 120,
+  write: isDev ? 2 : 30,
+  upload: isDev ? 2 : 10,
+  export: isDev ? 2 : 5,
+}
+
 // =======================
 // 🔑 KEY GENERATOR
 // =======================
@@ -42,7 +53,7 @@ const makeHandler = (name) => (req, res, next, options) => {
 export const generalLimiter = rateLimit({
   ...limiterDefaults,
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: maxLimit.general,
   message: {
     success: false,
     message: "Too many requests, please try again later.",
@@ -54,7 +65,7 @@ export const generalLimiter = rateLimit({
 export const readLimiter = rateLimit({
   ...limiterDefaults,
   windowMs: 15 * 60 * 1000,
-  max: 120, // slightly relaxed for dashboards
+  max: maxLimit.read,
   message: {
     success: false,
     message: "Too many requests, please slow down.",
@@ -66,7 +77,7 @@ export const readLimiter = rateLimit({
 export const writeLimiter = rateLimit({
   ...limiterDefaults,
   windowMs: 15 * 60 * 1000,
-  max: 30,
+  max: maxLimit.write,
   message: {
     success: false,
     message: "Too many write requests, please try again later.",
@@ -78,7 +89,7 @@ export const writeLimiter = rateLimit({
 export const uploadLimiter = rateLimit({
   ...limiterDefaults,
   windowMs: 60 * 60 * 1000,
-  max: 10,
+  max: maxLimit.upload,
   message: {
     success: false,
     message: "Too many uploads, please try again later.",
@@ -90,10 +101,21 @@ export const uploadLimiter = rateLimit({
 export const exportLimiter = rateLimit({
   ...limiterDefaults,
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: maxLimit.export,
   message: {
     success: false,
     message: "Too many export requests, please try again later.",
   },
   handler: makeHandler("exportLimiter"),
+});
+
+export const exportEmailLimiter = rateLimit({
+  ...limiterDefaults,
+  windowMs: 60 * 60 * 1000,
+  max: maxLimit.export,
+  message: {
+    success: false,
+    message: "Too many email requests, please try again later.",
+  },
+  handler: makeHandler("exportEmailLimiter"),
 });

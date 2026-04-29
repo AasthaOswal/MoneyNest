@@ -13,6 +13,8 @@ import upload from "../middlewares/multer.middleware.js"; // your multer config
 import { authenticateToken } from "../middlewares/auth.middleware.js";
 import { requireFamily } from "../middlewares/family.middleware.js";
 
+import { readLimiter, writeLimiter, uploadLimiter, exportLimiter, exportEmailLimiter } from "../middlewares/rateLimiter/apiLimiter.js";
+
 const router = express.Router();
 
 // 🔐 Apply auth + family middleware to all routes
@@ -26,18 +28,19 @@ router.post(
   upload.fields([
     { name: "transactionDoc", maxCount: 1 }
   ]),
+  uploadLimiter,
   createTransaction
 );
 
 // =======================
 // 📋 GET ALL TRANSACTIONS
 // =======================
-router.get("/", getTransactions);
+router.get("/", readLimiter, getTransactions);
 
 // =======================
 // 🔍 GET TRANSACTION BY ID
 // =======================
-router.get("/:transactionId", getTransactionById);
+router.get("/:transactionId", readLimiter, getTransactionById);
 
 // =======================
 // ✏️ UPDATE TRANSACTION
@@ -47,19 +50,20 @@ router.patch(
   upload.fields([
     { name: "transactionDoc", maxCount: 1 }
   ]),
+  uploadLimiter,
   updateTransaction
 );
 
 // =======================
 // ❌ DELETE TRANSACTION
 // =======================
-router.delete("/:transactionId", deleteTransaction);
+router.delete("/:transactionId", writeLimiter, deleteTransaction);
 
 
 // 📥 Download Excel
-router.get("/export/excel", downloadTransactionsExcel);
+router.get("/export/excel", exportLimiter, downloadTransactionsExcel);
 
 // 📧 Send Excel via email
-router.post("/export/email", emailTransactionsExcel);
+router.post("/export/email", exportEmailLimiter, emailTransactionsExcel);
 
 export default router;

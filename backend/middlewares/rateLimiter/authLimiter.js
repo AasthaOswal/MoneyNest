@@ -1,20 +1,43 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 const isDev = process.env.NODE_ENV !== "production";
+//reduced the limits just for testing if rate limiter works
+const maxLimit = {
+  signup: isDev ? 2 : 5,
+  login: isDev ? 2 : 5,
+  refreshToken: isDev ? 2 : 20,
+  forgotPassword: isDev ? 2 : 3,
+  resetPassword: isDev ? 2 : 5,
+  googleAuth: isDev ? 2 : 10,
+  logout: isDev ? 2 : 30,
+};
+
+
 
 // =======================
 // 🔑 KEY GENERATORS
 // =======================
 
-// IP (fallback)
 const keyGenIP = (req) => {
-  const ip = req.ip || req.socket?.remoteAddress || "unknown";
-  return ip.startsWith("::ffff:") ? ip.slice(7) : ip;
+  let ip =
+    req.ip ||
+    req.headers["x-forwarded-for"] ||
+    req.socket?.remoteAddress ||
+    "unknown";
+
+  if (Array.isArray(ip)) ip = ip[0];
+
+  // normalize localhost
+  if (ip === "::1" || ip.includes("127.0.0.1")) {
+    ip = "127.0.0.1";
+  }
+
+  return ip;
 };
 
 // Email-based (for login, signup, forgot password)
 const keyGenEmail = (req) => {
-  const ip = keyGenIP(req);
+  const ip = ipKeyGenerator(req);
   const email = req.body?.email?.toLowerCase() || "no-email";
   return `${ip}-${email}`;
 };
@@ -50,7 +73,7 @@ export const signupLimiter = rateLimit({
   ...limiterDefaults,
   keyGenerator: keyGenEmail,
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 50 : 5,
+  max: maxLimit.signup,
   message: {
     success: false,
     message: "Too many signup attempts. Try again after 15 minutes.",
@@ -64,7 +87,7 @@ export const loginLimiter = rateLimit({
   keyGenerator: keyGenEmail,
   skipSuccessfulRequests: true,
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 50 : 5,
+  max: maxLimit.login,
   message: {
     success: false,
     message: "Too many login attempts. Try again after 15 minutes.",
@@ -77,7 +100,7 @@ export const refreshTokenLimiter = rateLimit({
   ...limiterDefaults,
   keyGenerator: keyGenIP,
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 100 : 20,
+  max: maxLimit.refreshToken,
   message: {
     success: false,
     message: "Too many refresh requests. Please slow down.",
@@ -90,7 +113,7 @@ export const forgotPasswordLimiter = rateLimit({
   ...limiterDefaults,
   keyGenerator: keyGenEmail,
   windowMs: 60 * 60 * 1000,
-  max: isDev ? 50 : 3,
+  max: maxLimit.forgotPassword,
   message: {
     success: false,
     message: "Too many reset requests. Please try again later.",
@@ -103,10 +126,10 @@ export const resetPasswordLimiter = rateLimit({
   ...limiterDefaults,
   keyGenerator: keyGenToken,
   windowMs: 30 * 60 * 1000,
-  max: isDev ? 50 : 5,
+  max: maxLimit.resetPassword,
   message: {
     success: false,
-    message: "Too many attempts. Link may be invalid or expired.",
+    message: "Too many attempts. Link may be invalid or expired",
   },
   handler: makeHandler("resetPasswordLimiter"),
 });
@@ -116,7 +139,7 @@ export const googleAuthLimiter = rateLimit({
   ...limiterDefaults,
   keyGenerator: keyGenIP,
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 50 : 10,
+  max: maxLimit.googleAuth,
   message: {
     success: false,
     message: "Too many Google login attempts.",
@@ -124,12 +147,24 @@ export const googleAuthLimiter = rateLimit({
   handler: makeHandler("googleAuthLimiter"),
 });
 
+export const googleCallbackLimiter = rateLimit({
+  ...limiterDefaults,
+  keyGenerator: keyGenIP,
+  windowMs: 15 * 60 * 1000,
+  max: maxLimit.googleAuth,
+  message: {
+    success: false,
+    message: "Too many Google callback attempts.",
+  },
+  handler: makeHandler("googleCallbackLimiter"),
+});
+
 // 🚪 LOGOUT (very light limit)
 export const logoutLimiter = rateLimit({
   ...limiterDefaults,
   keyGenerator: keyGenIP,
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 100 : 30,
+  max: maxLimit.logout,
   message: {
     success: false,
     message: "Too many logout requests.",

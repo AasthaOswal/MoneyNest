@@ -10,6 +10,8 @@ import {
   resetPassword,
 } from "../controllers/auth.controller.js";
 
+import { signupLimiter, loginLimiter, refreshTokenLimiter, googleAuthLimiter, googleCallbackLimiter,  logoutLimiter, forgotPasswordLimiter, resetPasswordLimiter } from "../middlewares/rateLimiter/authLimiter.js";
+
 const router = express.Router();
 
 // =======================
@@ -17,28 +19,28 @@ const router = express.Router();
 // =======================
 
 // Signup
-router.post("/signup", signup);
+router.post("/signup", signupLimiter, signup);
 
 // Login
-router.post("/login", login);
+router.post("/login", loginLimiter, login);
 
 // Google OAuth
 // This initiates the Google login flow
-router.get("/google", googleAuth); 
+router.get("/google", googleAuthLimiter, googleAuth); 
 
 // This handles the redirect back from Google
-router.get("/google/callback", googleCallback);
+router.get("/google/callback", googleCallbackLimiter, googleCallback);
 
 // Refresh Access Token
-router.post("/refresh-token", refreshAccessToken);
+router.post("/refresh-token", refreshTokenLimiter, refreshAccessToken);
 
-router.post("/forgot-password",  forgotPassword );
+router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 
 
 
-router.post("/reset-password/:token",  resetPassword );
+router.post("/reset-password/:token", resetPasswordLimiter, resetPassword );
 
 // Logout
-router.post("/logout", logout);
+router.post("/logout", logoutLimiter, logout);
 
 export default router;
