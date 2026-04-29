@@ -1,22 +1,31 @@
-//utils/logger/errorLogger.js
+// utils/errorLogger.js
 
-import ErrorLog from "../models/errorLog.model.js";
+import ErrorLog from "../../models/admin/errorLog.model.js";
 
-export const createErrorLog = async (req, error, extra = {}) => {
+export const errorLogger = async ({
+  error,
+  req = null,
+  severity = "low",
+  requestId = null,
+}) => {
   try {
     await ErrorLog.create({
-      message: error.message,
+      errorName: error.name || "Error",
+      message: error.message || "Unknown error",
       stack: error.stack,
+
+      requestId: requestId || req?.requestId,
+
       method: req?.method,
-      url: req?.originalUrl,
+      path: req?.originalUrl || req?.path,
       ip: req?.ip,
-      user: req?.user?._id,
-      requestBody: req?.body || {},
-      query: req?.query || {},
-      headers: req?.headers || {},
-      ...extra,
+
+      userId: req?.user?.id || null,
+
+      severity: severity || "low",
+      environment: process.env.NODE_ENV || "development",
     });
-  } catch (logError) {
-    console.error("ErrorLog write failed:", logError.message);
+  } catch (logErr) {
+    console.error("❌ Failed to log error:", logErr.message);
   }
 };

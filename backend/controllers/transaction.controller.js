@@ -13,7 +13,7 @@ import { generateTransactionsExcel } from "../utils/excel/generateExcel.js";
 import {sendEmailBrevo} from "../utils/email/sendEmailBrevo.js";
 
 import { buildTransactionQuery } from "../services/transaction/buildTransactionQuery.js";
-
+import {errorLogger} from "../utils/logger/errorLogger.js";
 
 // =======================
 // 📁 FILE CONFIG
@@ -537,6 +537,11 @@ export const getTransactionById = async (req, res) => {
 
   } catch (err) {
     console.error("Error in getTransactionById:", err);
+    await errorLogger({
+      error: err,
+      req,
+      severity: "low",
+    });
 
     return res.status(500).json({
       success: false,

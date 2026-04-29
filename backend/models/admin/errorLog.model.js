@@ -44,6 +44,6 @@ const errorLogSchema = new mongoose.Schema(
 );
 
 errorLogSchema.index({ createdAt: -1 });
-errorLogSchema.index({ url: 1, createdAt: -1 });
+errorLogSchema.index({ path: 1, createdAt: -1 });
 
 export default mongoose.model("ErrorLog", errorLogSchema);
