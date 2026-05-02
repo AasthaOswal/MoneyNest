@@ -150,6 +150,158 @@
 // };
 
 
+
+
+
+
+
+//----------------------------------------------Version 2------------------------------------------------------------
+
+// import cron from "node-cron";
+// import Goal from "../../models/goal.model.js";
+// import User from "../../models/user.model.js";
+// import Transaction from "../../models/transaction.model.js";
+// import { getDateRange } from "../../utils/goals/getDateRange.js";
+// import { sendPushNotification } from "../firebase/sendPushNotification.js";
+// import { createNotification } from "../../utils/notification/createNotification.js";
+
+// // Just for testing
+// const GOAL_TRACKER_CRON = "* * * * *";
+
+// export const startGoalTracker = () => {
+//   let isRunning = false;
+
+//   cron.schedule(
+//     GOAL_TRACKER_CRON,
+//     async () => {
+//       if (isRunning) return;
+//       isRunning = true;
+
+//       console.log("⏰ Cron Triggered at:", new Date().toISOString());
+
+//       try {
+//         console.log("Running Goal Tracker...");
+
+//         const goals = await Goal.find({
+//           status: "active",
+//           goalMode: "recurring",
+//         });
+
+//         for (const goal of goals) {
+//           const { start, end } = getDateRange(goal.period);
+
+//           const matchStage = {
+//             type: goal.type,
+//             createdAt: { $gte: start, $lte: end },
+//           };
+
+//           if (goal.scope === "family") {
+//             matchStage.family = goal.family;
+//           } else {
+//             matchStage.user = goal.user;
+//           }
+
+//           console.log("Date Range:", start, end);
+//           console.log("Match Stage:", matchStage);
+
+//           const result = await Transaction.aggregate([
+//             { $match: matchStage },
+//             {
+//               $group: {
+//                 _id: null,
+//                 total: { $sum: "$amount" },
+//               },
+//             },
+//           ]);
+
+//           const currentAmount = result[0]?.total || 0;
+//           const percentage = (currentAmount / goal.amount) * 100;
+
+//           console.log("Current Amount:", currentAmount);
+//           console.log("Goal Amount:", goal.amount);
+//           console.log("Percentage:", percentage);
+
+//           const now = new Date();
+
+//         //   ⛔ skip if notified in last 1 hour
+//         //   if (
+//         //     goal.lastNotifiedAt &&
+//         //     now - goal.lastNotifiedAt < 60 * 60 * 1000
+//         //   ) {
+//         //     continue;
+//         //   }
+
+//           // ⛔ skip if notified in last 2 minutes (testing)
+//           if (
+//             goal.lastNotifiedAt &&
+//             now - goal.lastNotifiedAt < 2 * 60 * 1000
+//           ) {
+//             continue;
+//           }
+
+//           // ✅ SINGLE NOTIFICATION LOGIC
+//           const title = `📊 Goal Update: ${goal.title}`;
+//           const body = `You’ve reached ₹${currentAmount} (${percentage.toFixed(
+//             1
+//           )}%) of your goal`;
+
+//           if (goal.scope === "family") {
+//             const users = await User.find({ family: goal.family });
+
+//             for (const user of users) {
+//               await sendPushNotification(user._id, title, body);
+
+//               await createNotification({
+//                 userId: user._id,
+//                 title,
+//                 body,
+//                 type: "goal_alert",
+//                 data: "goalzzz",
+//               });
+//             }
+//           } else {
+//             await sendPushNotification(goal.user, title, body);
+
+//             await createNotification({
+//               userId: goal.user,
+//               title,
+//               body,
+//               type: "goal_alert",
+//               data: "goalzz"
+//             });
+//           }
+
+//           // Optional: auto-complete target goals
+//           if (percentage >= 100 && goal.goalType === "target") {
+//             goal.status = "completed";
+//           }
+//           goal.lastNotifiedAt = now;
+
+//           await goal.save();
+//         }
+//       } catch (error) {
+//         console.log("Error in goal tracker:", error);
+//       } finally {
+//         isRunning = false;
+//       }
+//     },
+//     {
+//       timezone: "Asia/Kolkata",
+//     }
+//   );
+// };
+
+
+
+
+
+
+
+
+
+
+
+//-------------------------------version 3--------------------------------
 import cron from "node-cron";
 import Goal from "../../models/goal.model.js";
 import User from "../../models/user.model.js";
@@ -180,7 +332,20 @@ export const startGoalTracker = () => {
           goalMode: "recurring",
         });
 
+        const now = new Date();
+
+        // 🔥 USER-WISE SUMMARY MAP
+        const userSummaryMap = new Map();
+
         for (const goal of goals) {
+          // ⛔ Skip if recently notified
+          if (
+            goal.lastNotifiedAt &&
+            now - goal.lastNotifiedAt < 2 * 60 * 1000
+          ) {
+            continue;
+          }
+
           const { start, end } = getDateRange(goal.period);
 
           const matchStage = {
@@ -193,9 +358,6 @@ export const startGoalTracker = () => {
           } else {
             matchStage.user = goal.user;
           }
-
-          console.log("Date Range:", start, end);
-          console.log("Match Stage:", matchStage);
 
           const result = await Transaction.aggregate([
             { $match: matchStage },
@@ -210,67 +372,72 @@ export const startGoalTracker = () => {
           const currentAmount = result[0]?.total || 0;
           const percentage = (currentAmount / goal.amount) * 100;
 
-          console.log("Current Amount:", currentAmount);
-          console.log("Goal Amount:", goal.amount);
-          console.log("Percentage:", percentage);
+          // 🎯 CATEGORY COUNTS
+          let category = "normal";
+          if (percentage >= 100) category = "exceeded";
+          else if (percentage >= 80) category = "nearing";
+          else if (percentage < 50) category = "attention";
 
-          const now = new Date();
-
-        //   ⛔ skip if notified in last 1 hour
-        //   if (
-        //     goal.lastNotifiedAt &&
-        //     now - goal.lastNotifiedAt < 60 * 60 * 1000
-        //   ) {
-        //     continue;
-        //   }
-
-          // ⛔ skip if notified in last 2 minutes (testing)
-          if (
-            goal.lastNotifiedAt &&
-            now - goal.lastNotifiedAt < 2 * 60 * 1000
-          ) {
-            continue;
-          }
-
-          // ✅ SINGLE NOTIFICATION LOGIC
-          const title = `📊 Goal Update: ${goal.title}`;
-          const body = `You’ve reached ₹${currentAmount} (${percentage.toFixed(
-            1
-          )}%) of your goal`;
+          // 👇 DETERMINE USERS (family vs individual)
+          let users = [];
 
           if (goal.scope === "family") {
-            const users = await User.find({ family: goal.family });
-
-            for (const user of users) {
-              await sendPushNotification(user._id, title, body);
-
-              await createNotification({
-                userId: user._id,
-                title,
-                body,
-                type: "goal_alert",
-                data: "goalzzz",
-              });
-            }
+            users = await User.find({ family: goal.family }, "_id");
           } else {
-            await sendPushNotification(goal.user, title, body);
-
-            await createNotification({
-              userId: goal.user,
-              title,
-              body,
-              type: "goal_alert",
-              data: "goalzz"
-            });
+            users = [{ _id: goal.user }];
           }
 
-          // Optional: auto-complete target goals
+          // 🔥 ADD TO USER SUMMARY
+          for (const user of users) {
+            const userId = user._id.toString();
+
+            if (!userSummaryMap.has(userId)) {
+              userSummaryMap.set(userId, {
+                totalGoals: 0,
+                nearing: 0,
+                exceeded: 0,
+                attention: 0,
+              });
+            }
+
+            const summary = userSummaryMap.get(userId);
+
+            summary.totalGoals++;
+
+            if (category === "exceeded") summary.exceeded++;
+            else if (category === "nearing") summary.nearing++;
+            else if (category === "attention") summary.attention++;
+          }
+
+          // ✅ Update goal status
           if (percentage >= 100 && goal.goalType === "target") {
             goal.status = "completed";
           }
-          goal.lastNotifiedAt = now;
 
+          goal.lastNotifiedAt = now;
           await goal.save();
+        }
+
+        // 🚀 SEND ONE NOTIFICATION PER USER
+        for (const [userId, summary] of userSummaryMap.entries()) {
+          const title = "📊 Update on your Goals Progress";
+
+          const body = `${summary.totalGoals} goals found
+• ${summary.nearing} nearing target
+• ${summary.exceeded} exceeded
+• ${summary.attention} need attention
+
+👉 Tap to view dashboard`;
+
+          await sendPushNotification(userId, title, body);
+
+          await createNotification({
+            userId,
+            title,
+            body,
+            type: "goal_alert",
+            data: "goalzzz",
+          });
         }
       } catch (error) {
         console.log("Error in goal tracker:", error);
