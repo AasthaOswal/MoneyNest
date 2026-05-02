@@ -9,6 +9,12 @@ export const errorLogger = async ({
   requestId = null,
 }) => {
   try {
+    const allowedSeverities = ["low", "medium", "high", "critical"];
+
+    const safeSeverity = allowedSeverities.includes(severity)
+      ? severity
+      : "low";
+      
     await ErrorLog.create({
       errorName: error.name || "Error",
       message: error.message || "Unknown error",
@@ -20,9 +26,9 @@ export const errorLogger = async ({
       path: req?.originalUrl || req?.path,
       ip: req?.ip,
 
-      userId: req?.user?.id || null,
+      userId: req?.user?._id || null,
 
-      severity: severity || "low",
+      severity: safeSeverity,
       environment: process.env.NODE_ENV || "development",
     });
   } catch (logErr) {

@@ -37,73 +37,46 @@
   --color-investment: rgb(192 132 252);
 }
 
+@theme {
+  /* Base */
+  --color-bg: rgb(245 247 250);        /* softer than gray-50 */
+  --color-surface: rgb(255 255 255);
+  --color-text: rgb(17 24 39);         /* deeper contrast */
+  --color-muted: rgb(100 116 139);     /* slate-500 */
+  --color-border: rgb(226 232 240);    /* slate-200 */
 
+  /* Primary (modern blue → slightly indigo) */
+  --color-primary: rgb(79 70 229);     /* indigo-600 */
+  --color-primary-hover: rgb(67 56 202);
 
-/* :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Semantic */
+  --color-income: rgb(22 163 74);      /* emerald-600 */
+  --color-expense: rgb(220 38 38);     /* red-600 */
+  --color-investment: rgb(147 51 234); /* purple-600 */
+/* Light mode */
+--color-investment: rgb(8 145 178);   /* cyan-600 */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* Dark Mode */
+@variant dark (&:where(.dark, .dark *));
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
+.dark {
+  --color-bg: rgb(10 15 25);           /* deeper, not gray */
+  --color-surface: rgb(20 25 35);
+  --color-text: rgb(226 232 240);
+  --color-muted: rgb(148 163 184);
+  --color-border: rgb(51 65 85);
 
-body {
-  margin: 0;
-}
+  /* Primary (slightly glowing feel) */
+  --color-primary: rgb(129 140 248);   /* indigo-400 */
+  --color-primary-hover: rgb(99 102 241);
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  /* Semantic (more vibrant for dark mode visibility) */
+  --color-income: rgb(74 222 128);     /* emerald-400 */
+  --color-expense: rgb(248 113 113);   /* red-400 */
+  --color-investment: rgb(196 181 253);/* purple-300 */
+
+/* Dark mode */
+--color-investment: rgb(34 211 238);  /* cyan-400 */
 }
- */
