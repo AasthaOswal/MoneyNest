@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV !== "production";
 
 const maxLimit = {
   general: isDev ? 2 : 100,
-  read: isDev ? 2 : 120,
+  read: isDev ? 2 : 200,
   write: isDev ? 2 : 30,
   upload: isDev ? 2 : 10,
   export: isDev ? 2 : 5,

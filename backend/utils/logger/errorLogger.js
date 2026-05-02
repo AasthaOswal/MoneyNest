@@ -1,4 +1,4 @@
-// utils/errorLogger.js
+// utils/logger/errorLogger.js
 
 import ErrorLog from "../../models/admin/errorLog.model.js";
 
