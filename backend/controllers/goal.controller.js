@@ -3,23 +3,20 @@ import Goal from "../models/goal.model.js";
 // ✅ CREATE GOAL
 export const createGoal = async (req, res) => {
     try {
+        console.log("inside create goal controller")
         const { title, type, goalType, goalMode, amount, period, startDate, endDate, scope, visibility } = req.body;
 
         const goal = new Goal({
             title,
             type,
             goalType,
-            goalMode,
             amount,
             period,
-            startDate,
-            endDate,
-            scope,
-            visibility,
+            owner: req.user._id,
             family: req.user.familyId,
-            user: scope === "individual" ? req.user._id : undefined,
-            createdBy: req.user._id
         });
+
+        console.log(goal)
 
         await goal.save();
 
@@ -33,12 +30,9 @@ export const createGoal = async (req, res) => {
 // ✅ GET ALL GOALS (for family)
 export const getAllGoals = async (req, res) => {
     try {
+        console.log("inside get all goals controller")
         const goals = await Goal.find({
             family: req.user.familyId,
-            $or: [
-                { visibility: "family" },
-                { user: req.user._id } // private goals
-            ]
         }).sort({ createdAt: -1 });
 
         res.status(200).json({ success: true, goals });
@@ -105,7 +99,7 @@ export const deleteGoal = async (req, res) => {
         const goal = await Goal.findOneAndDelete({
             _id: req.params.id,
             family: req.user.familyId,
-            createdBy: req.user._id
+            owner: req.user._id
         });
 
         if (!goal) {
