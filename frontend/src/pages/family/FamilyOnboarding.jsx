@@ -12,8 +12,10 @@ const FamilyOnboarding = () => {
         </h1>
 
         <p className="text-muted text-center">
-          Create a new family or join an existing one
+          Create a new family or join an existing family to access all tabss like transaction, goals,labels etc.
         </p>
+
+
 
         <div className="space-y-4">
           <button

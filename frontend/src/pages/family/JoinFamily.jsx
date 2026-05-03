@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FamilyService from "../../services/family.service";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../axios/axios";
+import toast from "react-hot-toast";
 
 const JoinFamily = () => {
   const [tokenInput, setTokenInput] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  const { setUser } = useAuth();
   const extractToken = (input) => {
     try {
       const url = new URL(input);
@@ -24,18 +27,28 @@ const JoinFamily = () => {
       setLoading(true);
 
       const token = extractToken(tokenInput);
-console.log("Extracted token:", token);
 
       const res = await FamilyService.joinFamilyWithToken({
         token,
       });
 
       if (res.success) {
+        toast.success("Family joined successfully");
+       const res = await api.get("/user/me", { skipAuthRefresh: true });
+        const user = res.data.user;
+        console.log(user)
+
+        if(!user){
+          navigate("/login", { replace: true });
+        }
+
+        setUser(user);
+        
         navigate("/family");
       }
     } catch (err) {
       console.log(err);
-      alert(err.message || "Failed to join family");
+      toast.error(err.message || "Failed to join family");
     } finally {
       setLoading(false);
     }

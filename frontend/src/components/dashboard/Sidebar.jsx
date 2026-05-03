@@ -12,7 +12,8 @@ import {
   Users, 
   ShieldCheck, 
   LogOut,
-  X
+  X,
+  LockIcon
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -29,15 +30,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck }
       ]
     : [
-        { name: 'Combined Dashboard', path: '/dashboard/family', icon: LayoutDashboard },
-        { name: 'Individual Dashboard', path: '/dashboard/individual', icon: User },
-        { name: 'Transactions', path: '/transactions', icon: ArrowRightLeft },
-        { name: 'Categories', path: '/categories', icon: List },
-        { name: 'Labels', path: '/labels', icon: Tag },
-        { name: 'Goals', path: '/goals', icon: Target },
-        { name: 'Reminders', path: '/reminders', icon: Bell },
-        { name: 'Notifications', path: '/notifications', icon: Bell },
-        { name: 'Family', path: '/family', icon: Users },
+        { name: 'Family Dashboard', path: '/dashboard/family', icon: LayoutDashboard, requiresFamily: true },
+        { name: 'My Dashboard', path: '/dashboard/individual', icon: User, requiresFamily: true },
+        { name: 'Transactions', path: '/transactions', icon: ArrowRightLeft, requiresFamily: true },
+        { name: 'Categories', path: '/categories', icon: List, requiresFamily: true },
+        { name: 'Labels', path: '/labels', icon: Tag, requiresFamily: true },
+        { name: 'Goals', path: '/goals', icon: Target, requiresFamily: true },
+        { name: 'Reminders', path: '/reminders', icon: Bell, requiresFamily: true },
+        { name: 'Notifications', path: '/notifications', icon: Bell, requiresFamily: true },
+        { name: 'Family', path: '/family', icon: Users, requiresFamily: true },
         ...(user?.role === 'familyAdmin' ? [{ name: 'Manage Family', path: '/family/manage', icon: Users }] : [])
       ];
 
@@ -65,18 +66,41 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-8 space-y-4 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
+            const isDisabled = item.requiresFamily && (!user?.familyId || user?.familyId == null);
+
+
+              if (isDisabled) {
+                return (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between px-4 py-3 rounded-xl font-medium text-muted opacity-50 cursor-not-allowed"
+                  >
+                    {/* LEFT: icon + name */}
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-5 h-5" />
+                      {item.name}
+                    </div>
+
+                    {/* RIGHT: locked badge */}
+                    <span className="text-[10px] p-2 rounded-lg bg-muted/10">
+                      <LockIcon className="w-4 h-4" />
+                    </span>
+                  </div>
+                );
+              }
             return (
+              
               <Link
                 key={item.name}
                 to={item.path}
                 onClick={() => setIsOpen(false)} // Close on mobile navigation
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                className={`flex items-center gap-3 px-2 py-3 rounded-xl font-medium transition-all ${
                   isActive 
-                    ? 'bg-primary/10 text-primary shadow-sm border border-primary/10' 
+                    ? 'bg-primary/10 text-primary shadow-sm ' 
                     : 'text-muted hover:bg-black/5 dark:hover:bg-white/10 hover:text-text'
                 }`}
               >
