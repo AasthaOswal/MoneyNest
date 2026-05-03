@@ -66,7 +66,7 @@ console.log("Extracted token:", token);
         </button>
 
         <button
-          onClick={() => navigate("/family/onboarding")}
+          onClick={() => navigate("/family/setup")}
           className="w-full text-muted text-sm"
         >
           ← Back

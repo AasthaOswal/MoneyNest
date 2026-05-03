@@ -4,11 +4,11 @@ const isDev = process.env.NODE_ENV !== "production";
 
 
 const maxLimit = {
-  general: isDev ? 2 : 100,
-  read: isDev ? 2 : 200,
-  write: isDev ? 2 : 30,
-  upload: isDev ? 2 : 10,
-  export: isDev ? 2 : 5,
+  general: isDev ? 200 : 100,
+  read: isDev ? 200 : 200,
+  write: isDev ? 200 : 30,
+  upload: isDev ? 200 : 10,
+  export: isDev ? 200 : 5,
 }
 
 // =======================

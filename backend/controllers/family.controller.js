@@ -311,7 +311,7 @@ export const leaveFamily = async (req, res) => {
     }
 
     // ✅ Soft remove user from family
-    // user.familyId = null;
+    user.familyId = null;
     user.role = "member";
     user.isActive = false;
 
@@ -380,7 +380,7 @@ export const removeFamilyMember = async (req, res) => {
     }
 
     // ✅ Soft remove member
-    // member.familyId = null;
+    member.familyId = null;
     member.role = "member";
     member.isActive = false;
 

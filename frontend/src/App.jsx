@@ -51,6 +51,7 @@ import CreateFamily from "./pages/family/CreateFamily";
 import JoinFamily from "./pages/family/JoinFamily";
 import FamilyPage from './pages/family/FamilyPage';
 import ManageFamily from './pages/family/ManageFamily';
+import LeaveFamily from "./pages/family/LeaveFamily";
 
 // Dashboard pages
 import FamilyDashboard from './pages/dashboard/FamilyDashboard.jsx';
@@ -120,9 +121,10 @@ function App() {
 
                   {/* Family Related Pages */}
                   <Route path="/family" element={<FamilyPage />} />
-                  <Route path="/family/onboarding" element={<FamilyOnboarding />} />
+                  <Route path="/family/setup" element={<FamilyOnboarding />} />
                   <Route path="/family/create" element={<CreateFamily />} />
                   <Route path="/family/join" element={<JoinFamily />} />
+                  <Route path="/family/leave" element={<LeaveFamily />} />
 
                   {/* Categories related pages */}
                   <Route path="/categories" element={<CategoriesPage />} />

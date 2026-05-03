@@ -5,7 +5,9 @@ import {
   createFamily,
   getMyFamily,
   generateInvite,
-  joinFamilyWithToken
+  joinFamilyWithToken,
+  removeFamilyMember,
+  leaveFamily
 } from "../controllers/family.controller.js";
 
 import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
@@ -44,6 +46,23 @@ router.get(
   authenticateToken,
   requireFamily,
   getMyFamily
+);
+
+// 🔴 Remove member (familyAdmin only)
+router.patch(
+  "/remove-member/:userId",
+  authenticateToken,
+  requireFamily,
+  authorizeRoles("familyAdmin"),
+  removeFamilyMember
+);
+
+// 🟠 Leave family
+router.patch(
+  "/leave",
+  authenticateToken,
+  requireFamily,
+  leaveFamily
 );
 
 export default router;

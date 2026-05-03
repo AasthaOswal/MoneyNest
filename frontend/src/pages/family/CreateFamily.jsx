@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FamilyService from "../../services/family.service";
-
+import { useAuth } from "../../context/AuthContext";
+import api from "../../axios/axios";
 
 const CreateFamily = () => {
   const [familyName, setFamilyName] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleCreate = async () => {
     if (!familyName.trim()) return;
@@ -19,6 +21,16 @@ const CreateFamily = () => {
       });
 
       if (res.success) {
+       const res = await api.get("/user/me", { skipAuthRefresh: true });
+        const user = res.data.user;
+        console.log(user)
+
+        if(!user){
+          navigate("/login", { replace: true });
+        }
+
+        setUser(user);
+        
         navigate("/family");
       }
     } catch (err) {
@@ -54,7 +66,7 @@ const CreateFamily = () => {
         </button>
 
         <button
-          onClick={() => navigate("/family/onboarding")}
+          onClick={() => navigate("/family/setup")}
           className="w-full text-muted text-sm"
         >
           ← Back

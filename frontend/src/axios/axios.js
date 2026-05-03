@@ -222,9 +222,9 @@ instance.interceptors.response.use(
         isRefreshing = false;
         onRefreshFailed(refreshError);
 
-        // only redirect if you're not already on login
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
+        // only redirect if you're not already on home page
+        if (window.location.pathname !== "/") {
+          window.location.href = "/";
         }
 
         return Promise.reject(refreshError);

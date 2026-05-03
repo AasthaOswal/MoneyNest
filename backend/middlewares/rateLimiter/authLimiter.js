@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV !== "production";
 const maxLimit = {
   signup: isDev ? 2 : 5,
   login: isDev ? 2 : 5,
-  refreshToken: isDev ? 2 : 20,
+  refreshToken: isDev ? 200 : 20,
   forgotPassword: isDev ? 2 : 3,
   resetPassword: isDev ? 2 : 5,
   googleAuth: isDev ? 2 : 10,

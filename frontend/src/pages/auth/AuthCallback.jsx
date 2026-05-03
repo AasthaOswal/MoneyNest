@@ -39,7 +39,7 @@ const AuthCallback = () => {
   if (user.familyId) {
     navigate("/dashboard/family", { replace: true });
   } else {
-    navigate("/family/onboarding", { replace: true });
+    navigate("/family/setup", { replace: true });
   }
 
 } else {

@@ -13,8 +13,18 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (!user) {
     console.log("User is not logged in. From ProtectedRoute.jsx")
     
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
+
+const allowedPaths = [
+  "/family/setup",
+  "/family/create",
+  "/family/join"
+];
+
+if (!user.familyId && !allowedPaths.includes(location.pathname)) {
+  return <Navigate to="/family/setup" replace />;
+}
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     console.log("User is not authorized")

@@ -176,7 +176,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null);
       setLoading(false);
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     }
   };
 
