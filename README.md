@@ -185,6 +185,9 @@ Advanced backend monitoring system including:
 
 * Cloudinary
 * Firebase Cloud Messaging (FCM)
+* Brevo
+* Exceljs
+* Node Cron
 
 ---
 
