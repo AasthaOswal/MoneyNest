@@ -63,6 +63,12 @@ app.use(cookieParser());
 connectDB();
 
 
+// Basic test route
+app.get("/", (req, res) => {
+    res.send("WealthNest API is running...");
+});
+
+
 
 // log everything
 app.use(requestLogger);
@@ -97,10 +103,6 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 
 // startFailedOperationsRetryNew()
 
-// Basic test route
-app.get("/", (req, res) => {
-    res.send("WealthNest API is running...");
-});
 
 const PORT = process.env.PORT || 5000;
 
