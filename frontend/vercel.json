@@ -1,8 +1,15 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://moneynest-kskd.onrender.com/api/:path*"
-    }
-  ]
+    "git": {
+        "deploymentEnabled": true
+    },
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://moneynest-kskd.onrender.com/api/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
 }
