@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import api from "../../axios/axios";
 import { useAuth } from "../../context/AuthContext";
 import { getFCMToken } from "../../utils/createFcmToken";
-import { initSocket } from "../../socket/socket";
+import { initSocket } from "../../socket/socket.js";
 import toast from "react-hot-toast";
+import { setupNotificationListener } from "../../socket/socketNotification.js";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -28,7 +29,9 @@ const AuthCallback = () => {
         initSocket();
 
         setupNotificationListener((data) => {
-          toast.success(data.notification.title);
+          console.log("inside notification listener")
+          console.log(data)
+          toast.success(`${data.notification.title} - ${data.notification.body}`);
         });
 
 
@@ -43,19 +46,20 @@ const AuthCallback = () => {
         }
 
         if (user.role === "admin") {
-  navigate("/admin-dashboard", { replace: true });
+          navigate("/admin-dashboard", { replace: true });
 
-} else if (user.role === "member") {
-  if (user.familyId) {
-    navigate("/dashboard/family", { replace: true });
-  } else {
-    navigate("/family/setup", { replace: true });
-  }
+        } else if (user.role === "member") {
+          if (user.familyId) {
+            navigate("/dashboard/family", { replace: true });
+          } else {
+            navigate("/family/setup", { replace: true });
+          }
 
-} else {
-  navigate("/dashboard/family", { replace: true });
-}
+        } else {
+          navigate("/dashboard/family", { replace: true });
+        }
       } catch (err) {
+        console.log(err)
         navigate("/login", { replace: true });
       }
     };

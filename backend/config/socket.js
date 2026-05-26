@@ -38,7 +38,10 @@ export function initializeSocket(httpServer, app) {
         socket.handshake.headers.cookie || ""
       );
 
-      const token = cookies.token;
+      const token = cookies.accessToken;
+
+      console.log(token)
+      console.log(cookies)
 
       if (!token) {
         return next(new Error("Authentication error"));
@@ -51,6 +54,8 @@ export function initializeSocket(httpServer, app) {
 
       socket.user = decoded;
 
+      console.log(socket.user)
+
       next();
     } catch (error) {
       next(new Error("Authentication error"));
@@ -60,7 +65,7 @@ export function initializeSocket(httpServer, app) {
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
 
-    const userId = socket.user.id;
+    const userId = socket.user.userId;
 
     socket.join(`user:${userId}`);
 

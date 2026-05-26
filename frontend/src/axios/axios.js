@@ -148,10 +148,12 @@
 
 import axios from "axios";
 
-// const API_URL = import.meta.env.VITE_API_URL;
+const ENV=import.meta.env.VITE_ENV;
+
+const API_URL = ENV == "production" ? "/api" :  import.meta.env.VITE_API_URL;
 
 
-const API_URL = "/api";
+// const API_URL = "/api";
 
 const instance = axios.create({
   baseURL: API_URL,
