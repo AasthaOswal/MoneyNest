@@ -1,5 +1,6 @@
 import Notification from "../../models/notification.model.js";
 import { createFailedOperation } from "../failedOperation/failedOperationCreator.js";
+import { getIO } from "../../config/socket.js";
 export const createNotification = async ({
   userId,
   title,
@@ -17,6 +18,15 @@ export const createNotification = async ({
       type,
       data,
     });
+
+    const io = getIO();
+
+
+    // emit to only this user
+    io.to(`user:${userId}`).emit("notification", {
+      notification,
+    });
+
 
     return notification;
 

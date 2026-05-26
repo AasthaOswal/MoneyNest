@@ -121,6 +121,7 @@
 
 import api from "../axios/axios";
 import { getFCMToken } from "../utils/createFcmToken";
+import { disconnectSocket } from "../socket/socket";
 
 // export const handlePostLogin = async () => {
 //   try {
@@ -210,6 +211,8 @@ const loginWithGoogle = async () => {
 
 
 const logout = async () => {
+  disconnectSocket();
+
   await api.post("/auth/logout");
   window.location.href = "/login";
 };

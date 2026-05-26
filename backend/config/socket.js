@@ -1,0 +1,75 @@
+import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
+import cookie from "cookie";
+
+
+let ioInstance = null;
+
+export const getIO = () => {
+  if (!ioInstance) {
+    throw new Error("Socket.io not initialized");
+  }
+
+  return ioInstance;
+};
+
+
+export function initializeSocket(httpServer, app) {
+  const io = new Server(httpServer, {
+    cors: {
+      origin: [
+        "http://localhost:5173",
+        "https://project-money-nest.vercel.app",
+        "https://money-nest-one.vercel.app",
+        process.env.CLIENT_URL,
+      ].filter(Boolean),
+
+      credentials: true,
+    },
+  });
+
+  // save globally
+  ioInstance = io;
+
+  // socket auth middleware
+  io.use((socket, next) => {
+    try {
+      const cookies = cookie.parse(
+        socket.handshake.headers.cookie || ""
+      );
+
+      const token = cookies.token;
+
+      if (!token) {
+        return next(new Error("Authentication error"));
+      }
+
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      );
+
+      socket.user = decoded;
+
+      next();
+    } catch (error) {
+      next(new Error("Authentication error"));
+    }
+  });
+
+  io.on("connection", (socket) => {
+    console.log("Socket connected:", socket.id);
+
+    const userId = socket.user.id;
+
+    socket.join(`user:${userId}`);
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected:", socket.id);
+    });
+  });
+
+  app.set("io", io);
+
+  return io;
+}

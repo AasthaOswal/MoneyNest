@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../../axios/axios";
 import { useAuth } from "../../context/AuthContext";
 import { getFCMToken } from "../../utils/createFcmToken";
+import { initSocket } from "../../socket/socket";
+import toast from "react-hot-toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -21,6 +23,14 @@ const AuthCallback = () => {
         }
 
         setUser(user);
+
+        // initialize authenticated socket
+        initSocket();
+
+        setupNotificationListener((data) => {
+          toast.success(data.notification.title);
+        });
+
 
         const token = await getFCMToken();
         const device = navigator.userAgent;

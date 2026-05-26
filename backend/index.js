@@ -1,10 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
-
+import http from "http";
 // Load environment variables
 dotenv.config();
 
-
+import { initializeSocket } from "./config/socket.js";
 
 import { connectDB } from "./config/db.js";
 import cookieParser from "cookie-parser";
@@ -35,6 +35,8 @@ import { startRequestLogExportCron } from "./services/cron/requestLogExport.js";
 import {startFailedOperationsRetryNew} from "./services/cron/failedOperationNew.cron.js";
 
 const app = express();
+const httpServer = http.createServer(app);
+
 
 app.set("trust proxy", 1);
 
@@ -95,6 +97,11 @@ app.use("/api/admin/error-logs", errorLogRoutes);
 app.use("/api/admin/failed-operations", failedOperationRoutes);
 
 
+// initialize socket after app middlewares are ready
+initializeSocket(httpServer, app);
+
+
+
 // run cron job
 // startGoalTracker();
 // startMonthlyReportJob();
@@ -106,6 +113,6 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
