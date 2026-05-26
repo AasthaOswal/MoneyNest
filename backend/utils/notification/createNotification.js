@@ -6,7 +6,8 @@ export const createNotification = async ({
   title,
   body,
   type = "notification",
-  data = {}
+  data = {},
+  familyId = null,
 }) => {
   try {
     console.log("inside notiifcaiton creator")
@@ -24,6 +25,11 @@ export const createNotification = async ({
 
     // emit to only this user
     io.to(`user:${userId}`).emit("notification", {
+      notification,
+    });
+
+    //emit to family
+    io.to(`family:${familyId}`).emit("notification", {
       notification,
     });
 

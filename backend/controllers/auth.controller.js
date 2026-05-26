@@ -46,15 +46,15 @@ const googleOAuthCookieOptions = {
 }
 
 // 🔐 Generate Tokens
-const generateTokens = (userId) => {
+const generateTokens = (userId,familyId) => {
   const accessToken = jwt.sign(
-    { userId },
+    { userId, familyId },
     process.env.JWT_SECRET,
     { expiresIn: "15m" }
   );
 
   const refreshToken = jwt.sign(
-    { userId },
+    { userId, familyId },
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: "7d" }
   );
@@ -133,7 +133,7 @@ export const signup = async (req, res) => {
         refreshToken: []
         });
 
-        const { accessToken, refreshToken } = generateTokens(user._id);
+        const { accessToken, refreshToken } = generateTokens(user._id, null);
 
         const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
         user.refreshToken.push(hashedRefreshToken);
@@ -194,7 +194,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const { accessToken, refreshToken } = generateTokens(user._id);
+    const { accessToken, refreshToken } = generateTokens(user._id,  user.familyId?._id || null);
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
@@ -290,7 +290,7 @@ for (let rt of user.refreshToken) {
   if (!match) updatedTokens.push(rt);
 }
 
-const { accessToken, refreshToken: newRefreshToken } = generateTokens(user._id);
+const { accessToken, refreshToken: newRefreshToken } = generateTokens(user._id,   user.familyId?._id || null);
 const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
 
 updatedTokens.push(hashedRefreshToken);
@@ -522,7 +522,7 @@ export const googleCallback = async (req, res) => {
     // =========================
     // 🔐 USE YOUR EXISTING JWT SYSTEM
     // =========================
-    const { accessToken, refreshToken } = generateTokens(user._id);
+    const { accessToken, refreshToken } = generateTokens(user._id,  user.familyId?._id || null);
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 

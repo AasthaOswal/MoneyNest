@@ -134,7 +134,7 @@ export const joinFamilyWithToken = async (req, res) => {
     if (user.familyId) {
       return res.status(400).json({
         success : false,
-        message: "Already part of a family."
+        message: "Already part of a family..."
       });
     }
 

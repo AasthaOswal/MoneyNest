@@ -794,6 +794,8 @@ export const startGoalTracker = () => {
           for (const userId of recipients) {
             if (!userSummaryMap.has(userId)) {
               userSummaryMap.set(userId, {
+
+                familyId,
                 totalGoals: 0,
                 achieved: 0,
                 onTrack: 0,
@@ -840,7 +842,8 @@ export const startGoalTracker = () => {
           userId,
           title: "📊 Goals Update",
           body,
-          type: "goal_alert"
+          type: "goal_alert",
+          familyId:summary.familyId
         });
       }
 

@@ -66,8 +66,10 @@ export function initializeSocket(httpServer, app) {
     console.log("Socket connected:", socket.id);
 
     const userId = socket.user.userId;
+    const familyId = socket.user.familyId
 
     socket.join(`user:${userId}`);
+    socket.join(`family:${familyId}`);
 
     socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);
