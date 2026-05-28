@@ -34,14 +34,17 @@ export function initializeSocket(httpServer, app) {
   // socket auth middleware
   io.use((socket, next) => {
     try {
+      console.log("socket.handshake.headers: ", socket.handshake.headers, "\n\n\n");
       const cookies = cookie.parse(
         socket.handshake.headers.cookie || ""
       );
 
+      console.log("cookies: ",cookies, "\n\n\n")
+
       const token = cookies.accessToken;
 
-      console.log(token)
-      console.log(cookies)
+      console.log("token:" ,token, "\n\n\n")
+      console.log("coookies : ",cookies, "\n\n\n")
 
       if (!token) {
         return next(new Error("Authentication error"));
