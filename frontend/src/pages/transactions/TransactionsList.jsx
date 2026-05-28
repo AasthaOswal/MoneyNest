@@ -5,6 +5,10 @@ import CategoryService from "../../services/category.service";
 import FamilyService from "../../services/family.service";
 import { useNavigate } from "react-router-dom";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
+import {
+  setupTransactionListeners,
+  removeTransactionListeners,
+} from "../../socket/socketTransaction";
 
 const TransactionsList = () => {
   const navigate = useNavigate();
@@ -115,6 +119,20 @@ useEffect(() => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+  const handleTransactionChange = () => {
+    console.log("Transactions realtime refresh");
+
+    fetchTransactions(page);
+  };
+
+  setupTransactionListeners(handleTransactionChange);
+
+  return () => {
+    removeTransactionListeners(handleTransactionChange);
+  };
+}, [page, filters]);
 
   const handleSearchClick = () => {
     fetchTransactions(1);

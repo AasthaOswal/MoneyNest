@@ -15,6 +15,8 @@ import {sendEmailBrevo} from "../utils/email/sendEmailBrevo.js";
 import { buildTransactionQuery } from "../services/transaction/buildTransactionQuery.js";
 import {errorLogger} from "../utils/logger/errorLogger.js";
 
+import { getIO } from "../config/socket.js";
+
 // =======================
 // 📁 FILE CONFIG
 // =======================
@@ -88,6 +90,7 @@ const validateCategoryOrLabel = async ({
     throw error;
   }
 };
+
 
 
 // =======================
@@ -165,6 +168,22 @@ export const createTransaction = async (req, res) => {
 
     await transaction.save();
     dbSaved = true;
+
+  
+
+    //emit to family
+    getIO().to(`family:${req.user.familyId}`).emit("transaction:new", {
+      message: "New transaction added."
+    });
+
+
+    getIO().to(`family:${req.user.familyId}`).emit("notification", {
+      type: "success",
+      notification : {
+        title: `Transaction created by a member of your family.`,
+        body: "Please check Trasnactions page to see the updated transactions list."
+      }
+    });
 
     return res.status(201).json({
       success: true,
@@ -300,6 +319,19 @@ export const updateTransaction = async (req, res) => {
     );
 
     dbSaved = true;
+
+    //emit to family
+    getIO().to(`family:${req.user.familyId}`).emit("transaction:update", {
+      message: "Transaction updated."
+    });
+
+    getIO().to(`family:${req.user.familyId}`).emit("notification", {
+      type: "success",
+      notification : {
+        title: `Transaction updated by a member of your family.`,
+        body: "Please check Trasnactions page to see the updated transactions list."
+      }
+    });
 
     // Delete old file after success
     if (oldPublicId) {
@@ -586,6 +618,19 @@ export const deleteTransaction = async (req, res) => {
       await deleteFromCloudinary(transaction.transactionDoc.publicId)
         .catch(err => console.error("Cloudinary delete failed:", err));
     }
+
+    //emit to family
+    getIO().to(`family:${req.user.familyId}`).emit("transaction:delete", {
+      message: "Transaction deleted."
+    });
+
+    getIO().to(`family:${req.user.familyId}`).emit("notification", {
+      type: "success",
+      notification : {
+        title: `Transaction deleted by a member of your family.`,
+        body: "Please check Trasnactions page to see the updated transactions list."
+      }
+    });
 
     return res.status(200).json({
       success: true,

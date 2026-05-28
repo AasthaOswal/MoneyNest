@@ -37,10 +37,12 @@
   --color-investment: rgb(192 132 252);
 }
 
+
+
 @theme {
   /* Base */
   --color-bg: rgb(245 247 250);        /* softer than gray-50 */
-  --color-surface: rgb(255 255 255);
+  --color-surface: rgb(248 250 252); /* slate-50 */
   --color-text: rgb(17 24 39);         /* deeper contrast */
   --color-muted: rgb(100 116 139);     /* slate-500 */
   --color-border: rgb(226 232 240);    /* slate-200 */
@@ -71,6 +73,9 @@
   /* Primary (slightly glowing feel) */
   --color-primary: rgb(129 140 248);   /* indigo-400 */
   --color-primary-hover: rgb(99 102 241);
+
+  --color-primary: rgb(99 102 241); /* indigo-500 */
+--color-primary-hover: rgb(79 70 229); /* indigo-600 */
 
   /* Semantic (more vibrant for dark mode visibility) */
   --color-income: rgb(74 222 128);     /* emerald-400 */

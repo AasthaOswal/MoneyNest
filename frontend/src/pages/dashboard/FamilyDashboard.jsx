@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import DashboardService from "../../services/dashboard.service";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import {
+  setupTransactionListeners,
+  removeTransactionListeners,
+} from "../../socket/socketTransaction";
+import toast from "react-hot-toast";
 
 
 const FamilyDashboard = () => {
@@ -27,6 +32,18 @@ const FamilyDashboard = () => {
 
     useEffect(() => {
         fetchDashboard();
+
+        const handleTransactionChange = () => {
+            console.log("Dashboard realtime refresh");
+            toast.success("Refetching dashboard as change is detected in transactions.");
+            fetchDashboard();
+        };
+
+        setupTransactionListeners(handleTransactionChange);
+
+        return () => {
+            removeTransactionListeners(handleTransactionChange);
+        };
     }, []);
 
     
