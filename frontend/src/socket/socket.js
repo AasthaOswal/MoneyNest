@@ -9,7 +9,6 @@ export const initSocket = () => {
     import.meta.env.VITE_SOCKET_URL || "http://localhost:5000",
     {
       withCredentials: true,
-      transports: ["websocket"],
 
       reconnection: true,
       reconnectionAttempts: 5,
