@@ -145,7 +145,7 @@ export const signup = async (req, res) => {
 
         // return res.status(201).json({ success: true, user: getSafeUser(user), accessToken });
 
-        return res.status(201).json({ success: true, user: getSafeUser(user), });
+        return res.status(201).json({ success: true, user: getSafeUser(user), accessToken});
 
     } catch (err) {
       console.error("Error in signup controller : " , err);
@@ -308,6 +308,7 @@ sendAccessToken(res, accessToken);
 
     return res.json({
       success: true,
+      accessToken
     });
 
   } catch (err) {

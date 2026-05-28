@@ -3,10 +3,7 @@
         "deploymentEnabled": true
     },
     "rewrites": [
-        {
-            "source": "/socket.io/(.*)",
-            "destination": "https://moneynest-kskd.onrender.com/socket.io/$1"
-        },
+
         {
             "source": "/api/:path*",
             "destination": "https://moneynest-kskd.onrender.com/api/:path*"

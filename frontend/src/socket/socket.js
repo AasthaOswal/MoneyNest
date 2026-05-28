@@ -12,10 +12,15 @@ export const initSocket = () => {
     ? "/"
     : "http://localhost:5000";
 
+    const token = localStorage.getItem("accessToken");
 
   socket = io(
     SOCKET_URL,
+    
     {
+      auth: {
+        token
+      },
       withCredentials: true,
 
       reconnection: true,

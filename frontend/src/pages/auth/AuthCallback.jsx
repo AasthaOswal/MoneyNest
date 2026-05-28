@@ -6,6 +6,8 @@ import { getFCMToken } from "../../utils/createFcmToken";
 import { initSocket } from "../../socket/socket.js";
 import toast from "react-hot-toast";
 import { setupNotificationListener } from "../../socket/socketNotification.js";
+import axios from "axios";
+
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -24,6 +26,20 @@ const AuthCallback = () => {
         }
 
         setUser(user);
+
+        const ENV=import.meta.env.VITE_ENV;
+
+        const API_URL = ENV == "production" ? "/api" :  import.meta.env.VITE_API_URL;
+
+
+        const response = await axios.post(
+          `${API_URL}/auth/refresh-token`,
+          {},
+          { withCredentials: true }
+        );
+        console.log(response)
+
+        localStorage.setItem("accessToken", response?.data?.accessToken);
 
         // initialize authenticated socket
         initSocket();
