@@ -54,7 +54,7 @@ export function initializeSocket(httpServer, app) {
       //   token,
       //   process.env.JWT_SECRET
       // );
-
+console.log("socket.handshake.auth.token: ",socket.handshake.auth);
           const token = socket.handshake.auth.token;
 
     console.log("token:", token);

@@ -27,7 +27,7 @@ export const initSocket = () => {
       auth: {
         token
       },
-      withCredentials: true,
+      // withCredentials: true,
 
       reconnection: true,
       reconnectionAttempts: 5,

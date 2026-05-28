@@ -79,7 +79,16 @@ app.use(requestLogger);
 app.use("/api/auth", authRoutes);
 
 // 🔐 auth middleware
-app.use(authenticateToken);
+app.use((req, res, next) => {
+
+  // for scoket to be able to use auth without authenticateToken middleware
+  if (req.path.startsWith("/socket.io")) {
+    return next();
+  }
+
+  authenticateToken(req, res, next);
+
+});
 
 
 // protected routes
