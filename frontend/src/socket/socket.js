@@ -57,7 +57,7 @@ let socket = null;
 export const initSocket = () => {
   if (socket) return socket;
 
-  const SOCKET_URL = import.meta.env.VITE_API_URL; // backend origin only
+  const SOCKET_URL = import.meta.env.VITE_SOCKET_URL; // backend origin only
   const token = localStorage.getItem("accessToken");
 
   socket = io(SOCKET_URL, {
