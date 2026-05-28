@@ -7,9 +7,15 @@ export const initSocket = () => {
 
 
   
+  // const SOCKET_URL =
+  // import.meta.env.VITE_ENV === "production"
+  //   ? "/"
+  //   : "http://localhost:5000";
+
+
   const SOCKET_URL =
   import.meta.env.VITE_ENV === "production"
-    ? "/"
+    ? import.meta.env.VITE_API_URL
     : "http://localhost:5000";
 
     const token = localStorage.getItem("accessToken");
