@@ -4,8 +4,8 @@
     },
     "rewrites": [
         {
-            "source": "/socket.io/:path*",
-            "destination": "https://moneynest-kskd.onrender.com/socket.io/:path*"
+            "source": "/socket.io/(.*)",
+            "destination": "https://moneynest-kskd.onrender.com/socket.io/$1"
         },
         {
             "source": "/api/:path*",
@@ -16,4 +16,5 @@
             "destination": "/index.html"
         }
     ]
+
 }
