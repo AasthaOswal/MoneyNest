@@ -61,8 +61,8 @@ export const initSocket = () => {
   const token = localStorage.getItem("accessToken");
 
   socket = io(SOCKET_URL, {
-    path: "/ws",
-    transports: ["websocket"],
+    // path: "/ws",
+    // transports: ["websocket"],
     auth: { token },
     reconnection: true,
     reconnectionAttempts: 5,

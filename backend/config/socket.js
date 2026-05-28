@@ -17,7 +17,7 @@ export const getIO = () => {
 
 export function initializeSocket(httpServer, app) {
   const io = new Server(httpServer, {
-    path: "/ws",
+    // path: "/ws",
     cors: {
       origin: [
         "http://localhost:5173",
