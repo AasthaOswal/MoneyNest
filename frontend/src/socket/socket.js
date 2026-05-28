@@ -5,8 +5,16 @@ let socket = null;
 export const initSocket = () => {
   if (socket) return socket;
 
+
+  
+  const SOCKET_URL =
+  import.meta.env.VITE_ENV === "production"
+    ? "/"
+    : "http://localhost:5000";
+
+
   socket = io(
-    import.meta.env.VITE_SOCKET_URL || "http://localhost:5000",
+    SOCKET_URL,
     {
       withCredentials: true,
 
@@ -15,6 +23,8 @@ export const initSocket = () => {
       reconnectionDelay: 1000,
     }
   );
+
+
 
   socket.on("connect", () => {
     console.log("Socket connected:", socket.id);
