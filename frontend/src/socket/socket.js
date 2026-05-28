@@ -1,6 +1,6 @@
-// import { io } from "socket.io-client";
+import { io } from "socket.io-client";
 
-// let socket = null;
+let socket = null;
 
 // export const initSocket = () => {
 //   if (socket) return socket;
@@ -52,20 +52,7 @@
 //   return socket;
 // };
 
-// export const getSocket = () => socket;
 
-// export const disconnectSocket = () => {
-//   if (socket) {
-//     socket.disconnect();
-//     socket = null;
-//   }
-// };
-
-
-// frontend/socket/socket.js
-import { io } from "socket.io-client";
-
-let socket = null;
 
 export const initSocket = () => {
   if (socket) return socket;
@@ -97,3 +84,15 @@ export const initSocket = () => {
 
   return socket;
 };
+
+
+export const getSocket = () => socket;
+
+export const disconnectSocket = () => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+};
+
+
