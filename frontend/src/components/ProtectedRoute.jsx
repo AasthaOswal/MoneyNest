@@ -22,7 +22,19 @@ const allowedPaths = [
   "/family/join"
 ];
 
-if (!user.familyId && !allowedPaths.includes(location.pathname)) {
+console.log(
+  "Current Path:",
+  location.pathname,
+  "Role:",
+  user?.role,
+  "Allowed:",
+  allowedRoles
+);
+const needsFamily =
+  ["member", "familyAdmin"].includes(user.role);
+
+
+if ( needsFamily && !user.familyId && !allowedPaths.includes(location.pathname)) {
   return <Navigate to="/family/setup" replace />;
 }
 

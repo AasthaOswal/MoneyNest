@@ -6,7 +6,7 @@ import { requireNoFamily, requireFamily } from "../middlewares/family.middleware
 
 const router = Router();
 
-router.post("/fcm-token", authenticateToken, authorizeRoles("familyAdmin", "member"), saveFcmToken);
+router.post("/fcm-token", authenticateToken, authorizeRoles("familyAdmin", "member", "admin"), saveFcmToken);
 router.get("/me", authenticateToken, authorizeRoles("familyAdmin", "member", "admin"), getMyProfile);
 
 export default router;
