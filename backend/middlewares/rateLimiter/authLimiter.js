@@ -3,13 +3,13 @@ import { makeRateLimitHandler } from "../rateLimiterSecurity/rateLimitLog.handle
 const isDev = process.env.NODE_ENV !== "production";
 //reduced the limits just for testing if rate limiter works
 const maxLimit = {
-  signup: isDev ? 2 : 5,
-  login: isDev ? 2 : 5,
+  signup: isDev ? 200 : 5,
+  login: isDev ? 200 : 5,
   refreshToken: isDev ? 200 : 20,
-  forgotPassword: isDev ? 2 : 3,
-  resetPassword: isDev ? 2 : 5,
-  googleAuth: isDev ? 2 : 10,
-  logout: isDev ? 2 : 30,
+  forgotPassword: isDev ? 200 : 3,
+  resetPassword: isDev ? 200 : 5,
+  googleAuth: isDev ? 200 : 10,
+  logout: isDev ? 200 : 30,
 };
 
 

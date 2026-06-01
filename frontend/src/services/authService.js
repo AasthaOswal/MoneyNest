@@ -59,12 +59,11 @@ const signup = async (userData) => {
 };
 
 const login = async (credentials) => {
-  try{
-    await api.post("/auth/login", credentials);
-    goToAuthCallback();
-  }catch(err){
-    console.error(err)
-  }
+
+  const response = await api.post("/auth/login", credentials);
+  console.log(response)
+  return response.data;
+
 };
 
 const loginWithGoogle = async () => {
@@ -72,32 +71,13 @@ const loginWithGoogle = async () => {
 };
 
 
-// const signup = async (userData) => {
-//   await api.post("/auth/signup", userData);
-//   return await handlePostLogin();
-// };
-
-// const login = async (credentials) => {
-//   await api.post("/auth/login", credentials);
-//   return await handlePostLogin();
-// };
-
-// // --- Added Google Login ---
-// const loginWithGoogle = async () => {
-//   // this axios fails because redirect cannot be done using AJAX(which axios uses)
-//   // await api.get("/auth/google");
-
-//   //instead we should do a full browser level page reload
-//   window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-// };
-
 
 
 
 const logout = async () => {
   disconnectSocket();
 
-  await api.post("/auth/logout");
+  const res = await api.post("/auth/logout");
   window.location.href = "/login";
 };
 

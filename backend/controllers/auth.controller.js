@@ -41,7 +41,7 @@ Your state validation will FAIL
 const googleOAuthCookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax", 
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 5 * 60 * 1000 // 5 min
 }
 
@@ -158,6 +158,7 @@ export const signup = async (req, res) => {
 // =======================
 export const login = async (req, res) => {
   try {
+    console.log("insdie login")
     const { value, error } = loginValidation.validate(req.body);
 
     if (error) {

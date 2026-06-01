@@ -88,7 +88,7 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
-      <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 6000, }}/>
+      <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 4000, }}/>
       <AuthProvider>
           <Routes>
             {/* Public Routes - Landing, Login, Signup */}

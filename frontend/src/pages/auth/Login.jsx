@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthService from "../../services/authService"; 
 import { useAuth } from "../../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
-
+import toast from "react-hot-toast";
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -30,30 +30,20 @@ const Login = () => {
   setError("");
   setLoading(true);
 
+
   try {
-    // const user = await AuthService.login(credentials);
-    // console.log(user)
+    const response = await AuthService.login(credentials);
+    console.log(response)
 
-    // // login(data.user); // 🔥 THIS IS THE MISSING 
-    // await login(user)
+    toast.success("Successful login.");
 
-    await AuthService.login(credentials);
-
-    // if (user.role === "admin") {
-    //   navigate("/admin-dashboard");
-    // } else if (user.role === "member") {
-    //   if(user.familyId != null){
-    //     navigate("/dashboard/family");
-    //   }else{
-    //     navigate("/family/onboarding");
-    //   }
-    // }else {
-    //   navigate("/dashboard/family");
-    // }
+    navigate("/auth/callback");
   } catch (err) {
-    console.log(err);
+    toast.error(
+      err.response?.data?.message || "Something went wrong"
+    );
     setError(err.response?.data?.message || "Invalid email or password");
-  } finally {
+  }finally {
     setLoading(false);
   }
 };

@@ -86,4 +86,62 @@
 --color-investment: rgb(34 211 238);  /* cyan-400 */
 }
 
+@theme {
+  /* Backgrounds */
+  --color-bg: rgb(15 23 42);          /* slate-900 */
+  --color-surface: rgb(30 41 59);     /* slate-800 */
+  --color-surface-2: rgb(51 65 85);   /* slate-700 */
 
+  /* Text */
+  --color-text: rgb(248 250 252);     /* white-ish */
+  --color-text-on-primary: rgb(255 255 255);
+  --color-text-on-secondary: rgb(255 255 255);
+
+  --color-muted: rgb(148 163 184);
+
+  /* Borders */
+  --color-border: rgb(71 85 105);
+  --color-border-hover: rgb(100 116 139);
+
+  /* Primary Action */
+  --color-primary: rgb(124 58 237);   /* violet-600 */
+  --color-primary-hover: rgb(109 40 217);
+
+  /* Secondary Action */
+  --color-secondary: rgb(71 85 105);
+  --color-secondary-hover: rgb(100 116 139);
+
+  /* Finance */
+  --color-income: rgb(34 197 94);
+  --color-expense: rgb(239 68 68);
+
+  /* Investment */
+  --color-investment: rgb(245 158 11);
+
+  /* States */
+  --color-success: rgb(34 197 94);
+  --color-warning: rgb(245 158 11);
+  --color-danger: rgb(239 68 68);
+  --color-info: rgb(59 130 246);
+
+  /* Cards */
+  --color-card: rgb(30 41 59);
+  --color-card-hover: rgb(51 65 85);
+
+  /* Inputs */
+  --color-input-bg: rgb(15 23 42);
+  --color-input-border: rgb(71 85 105);
+  --color-input-focus: rgb(124 58 237);
+
+  /* Charts */
+  --color-chart-1: rgb(124 58 237);
+  --color-chart-2: rgb(34 197 94);
+  --color-chart-3: rgb(245 158 11);
+  --color-chart-4: rgb(59 130 246);
+  --color-chart-5: rgb(239 68 68);
+}
+
+
+html{
+  color:white;
+}

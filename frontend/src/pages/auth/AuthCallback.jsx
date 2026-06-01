@@ -83,7 +83,7 @@ const AuthCallback = () => {
     initAuth();
   }, [navigate, setUser]);
 
-  return <div>Logging you in...</div>;
+  return <div>Logging you in. Please wait.....</div>;
 };
 
 export default AuthCallback;
