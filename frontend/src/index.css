@@ -86,62 +86,134 @@
 --color-investment: rgb(34 211 238);  /* cyan-400 */
 }
 
+
+
+
+/* base theme - finalised - do nnot delete this */
 @theme {
-  /* Backgrounds */
-  --color-bg: rgb(15 23 42);          /* slate-900 */
-  --color-surface: rgb(30 41 59);     /* slate-800 */
-  --color-surface-2: rgb(51 65 85);   /* slate-700 */
+  --color-bg: rgb(13 17 23);
+  --color-surface: rgb(22 27 34);
+  --color-surface-2: rgb(30 36 44);
 
-  /* Text */
-  --color-text: rgb(248 250 252);     /* white-ish */
-  --color-text-on-primary: rgb(255 255 255);
-  --color-text-on-secondary: rgb(255 255 255);
+  --color-text: rgb(230 237 243);
+  --color-muted: rgb(139 148 158);
 
-  --color-muted: rgb(148 163 184);
+  --color-border: rgb(48 54 61);
 
-  /* Borders */
-  --color-border: rgb(71 85 105);
-  --color-border-hover: rgb(100 116 139);
+    /* Actions */
+  --color-primary: rgb(168 85 247);   /* purple-500 */
+  --color-primary-hover: rgb(192 132 252);        /* purple-400 */
 
-  /* Primary Action */
-  --color-primary: rgb(124 58 237);   /* violet-600 */
-  --color-primary-hover: rgb(109 40 217);
 
-  /* Secondary Action */
-  --color-secondary: rgb(71 85 105);
-  --color-secondary-hover: rgb(100 116 139);
 
-  /* Finance */
-  --color-income: rgb(34 197 94);
-  --color-expense: rgb(239 68 68);
+  --color-income: rgb(46 204 113);
+  --color-expense: rgb(231 76 60);
+  --color-investment: rgb(34 211 238); /*cyan*/
 
-  /* Investment */
-  --color-investment: rgb(245 158 11);
+  --color-card: rgb(22 27 34);
+  --color-card-hover: rgb(30 36 44);
 
-  /* States */
-  --color-success: rgb(34 197 94);
-  --color-warning: rgb(245 158 11);
-  --color-danger: rgb(239 68 68);
-  --color-info: rgb(59 130 246);
-
-  /* Cards */
-  --color-card: rgb(30 41 59);
-  --color-card-hover: rgb(51 65 85);
-
-  /* Inputs */
-  --color-input-bg: rgb(15 23 42);
-  --color-input-border: rgb(71 85 105);
-  --color-input-focus: rgb(124 58 237);
-
-  /* Charts */
-  --color-chart-1: rgb(124 58 237);
-  --color-chart-2: rgb(34 197 94);
-  --color-chart-3: rgb(245 158 11);
-  --color-chart-4: rgb(59 130 246);
-  --color-chart-5: rgb(239 68 68);
+  --color-text-on-primary: white;
 }
 
 
-html{
-  color:white;
+
+/* base theme with more variables which can be used in the file */
+@theme {
+  /* =========================
+     BACKGROUNDS
+  ========================= */
+  --color-bg: rgb(13 17 23);                 /* Near Black */
+  --color-surface: rgb(22 27 34);            /* Charcoal */
+  --color-surface-2: rgb(30 36 44);          /* Dark Slate */
+  --color-surface-3: rgb(39 46 56);          /* Slate */
+
+  /* =========================
+     TEXT
+  ========================= */
+  --color-text: rgb(230 237 243);            /* Very Light Gray (≈ Slate-200) */
+  --color-text-secondary: rgb(201 209 217);  /* Light Gray (≈ Slate-300) */
+  --color-muted: rgb(139 148 158);           /* Medium Gray (≈ Slate-500) */
+  --color-placeholder: rgb(110 118 129);     /* Dark Gray (≈ Slate-600) */
+
+  /* =========================
+     BORDERS
+  ========================= */
+  --color-border: rgb(48 54 61);             /* Dark Gray Border */
+  --color-border-hover: rgb(88 96 105);      /* Medium Gray Border */
+  --color-divider: rgb(38 45 52);            /* Divider Gray */
+
+  /* =========================
+     BRAND
+  ========================= */
+  --color-primary: rgb(168 85 247);          /* Purple-500 */
+  --color-primary-hover: rgb(192 132 252);   /* Purple-400 */
+  --color-primary-active: rgb(147 51 234);   /* Purple-600 */
+  --color-primary-subtle: rgba(168, 85, 247, 0.12); /* Purple Tint */
+
+  --color-text-on-primary: rgb(255 255 255); /* White */
+
+  /* =========================
+     STATUS COLORS
+  ========================= */
+  --color-success: rgb(34 197 94);           /* Green-500 */
+  --color-success-bg: rgba(34, 197, 94, 0.15);
+
+  --color-error: rgb(239 68 68);             /* Red-500 */
+  --color-error-bg: rgba(239, 68, 68, 0.15);
+
+  --color-warning: rgb(245 158 11);          /* Amber-500 */
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+
+  --color-info: rgb(59 130 246);             /* Blue-500 */
+  --color-info-bg: rgba(59, 130, 246, 0.15);
+
+  /* =========================
+     FINANCE SPECIFIC
+  ========================= */
+  --color-income: rgb(34 197 94);            /* Green-500 */
+  --color-income-bg: rgba(34, 197, 94, 0.15);
+
+  --color-expense: rgb(239 68 68);           /* Red-500 */
+  --color-expense-bg: rgba(239, 68, 68, 0.15);
+
+  --color-investment: rgb(34 211 238);       /* Cyan-400 */
+  --color-investment-bg: rgba(34, 211, 238, 0.15);
+
+  /* =========================
+     CARDS
+  ========================= */
+  --color-card: rgb(22 27 34);               /* Charcoal */
+  --color-card-hover: rgb(30 36 44);         /* Dark Slate */
+  --color-card-selected: rgb(42 49 60);      /* Slate Gray */
+
+  /* =========================
+     INPUTS
+  ========================= */
+  --color-input-bg: rgb(13 17 23);           /* Near Black */
+  --color-input-border: rgb(48 54 61);       /* Dark Gray Border */
+  --color-input-focus: rgb(168 85 247);      /* Purple-500 */
+
+  /* =========================
+     SIDEBAR
+  ========================= */
+  --color-sidebar: rgb(9 14 20);             /* Rich Black */
+  --color-sidebar-hover: rgb(30 36 44);      /* Dark Slate */
+  --color-sidebar-active: rgb(168 85 247);   /* Purple-500 */
+
+  /* =========================
+     CHARTS
+  ========================= */
+  --chart-income: rgb(34 197 94);            /* Green-500 */
+  --chart-expense: rgb(239 68 68);           /* Red-500 */
+  --chart-investment: rgb(34 211 238);       /* Cyan-400 */
+  --chart-savings: rgb(168 85 247);          /* Purple-500 */
+  --chart-neutral: rgb(139 148 158);         /* Slate-500 */
+
+  /* =========================
+     SHADOWS
+  ========================= */
+  --shadow-card:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.25);
 }

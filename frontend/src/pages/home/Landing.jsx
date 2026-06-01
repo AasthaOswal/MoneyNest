@@ -30,7 +30,7 @@ const Landing = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               to="/signup"
-              className="px-8 py-4 bg-primary hover:bg-primary-hover text-white rounded-xl text-lg font-semibold flex items-center justify-center gap-2 shadow-lg transition-all"
+              className="px-8 py-4 bg-primary hover:bg-primary-hover text-text-on-primary rounded-xl text-lg font-semibold flex items-center justify-center gap-2 shadow-lg transition-all"
             >
               Get Started <ArrowRight size={18} />
             </Link>
