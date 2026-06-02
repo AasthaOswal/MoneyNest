@@ -1,47 +1,75 @@
 import RequestLog from "../models/admin/requestLog.model.js";
 import { v4 as uuidv4 } from "uuid";
+import UAParser from "ua-parser-js";
 
 export const requestLogger = (req, res, next) => {
-  const start = Date.now();
+	const start = Date.now();
 
-  // ✅ generate requestId
-  req.requestId = uuidv4();
+	req.requestId = uuidv4();
 
-  // const shouldLog =
-  // process.env.NODE_ENV === "development" ||
-  // res.statusCode >= 400 ||
-  // responseTimeMs > 500;
+	res.on("finish", async () => {
+		try {
+		const responseTimeMs = Date.now() - start;
+
+		const parser = new UAParser(req.headers["user-agent"]);
+		const result = parser.getResult();
+
+		// response size
+		const responseSizeKb = Number(((Number(res.getHeader("content-length")) || 0) / 1024).toFixed(2));
+
+		// origin
+		const origin =
+			req.headers.origin ||
+			req.headers.referer ||
+			"unknown";
+
+		const originType =
+			origin.includes("localhost")
+			? "localhost"
+			: "production";
+
+		await RequestLog.create({
+			requestId: req.requestId,
+
+			userId: req.user?._id || null,
+			userEmail: req.user?.email || null,
+			userRole: req.user?.role || null,
+
+			ip: req.ip,
+
+			method: req.method,
+			path: req.originalUrl,
+
+			statusCode: res.statusCode,
+			responseTimeMs,
+			responseSizeKb,
+
+			userAgent: req.headers["user-agent"],
 
 
+			browser: result.browser.name || "Unknown",
+			browserVersion: result.browser.version || null,
 
-  res.on("finish", async () => {
-    try {
-      const responseTimeMs = Date.now() - start;
-    
-        await RequestLog.create({
-        requestId: req.requestId,
-        userId: req.user?._id || null,
-        userEmail: req.user?.email || null,
-        userRole: req.user?.role || null,
-        ip: req.ip,                    // ALWAYS store
+			os: result.os.name || "Unknown",
+			osVersion: result.os.version || null,
 
-        method: req.method,
-        path: req.originalUrl,
+			deviceType:
+			result.device.type ||
+			"desktop",
 
-        statusCode: res.statusCode,
-        responseTimeMs,
+			origin,
+			originType,
 
-        userAgent: req.headers["user-agent"],
+			referer: req.headers.referer || null,
 
-        actorType: req.user ? "authenticated" : "anonymous",
+			actorType: req.user
+			? "authenticated"
+			: "anonymous",
+		});
+		} catch (err) {
+			console.error("RequestLog failed", err);
+		}
+	});
 
-        
-      });
-      
-    } catch (err) {
-      console.error("RequestLog failed", err);
-    }
-  });
-
-  next();
+	next();
 };

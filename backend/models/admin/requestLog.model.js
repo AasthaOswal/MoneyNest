@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
 
+/*
+Note sshow all these details onceadmin clicks on the single request
+when showing all requests together - hide them its fine
+userAgent
+origin
+referer
+ip
+requestId
+*/
+
 const requestLogSchema = new mongoose.Schema(
   {
     requestId: {
@@ -51,11 +61,37 @@ const requestLogSchema = new mongoose.Schema(
     },
 
 
+    responseSizeKb: {
+      type: Number,
+      default: 0,
+    },
+
+    browser: String,
+    browserVersion: String,
+
+    os: String,
+    osVersion: String,
+
+    deviceType: {
+      type: String,
+      default: "desktop",
+    },
+
+    origin: String,
+
+    originType: {
+      type: String,
+      enum: ["localhost", "production"],
+    },
+
+    referer: String,
+
+
   },
   { timestamps: true }
 );
 
-// 🔍 Indexes (VERY IMPORTANT)
+// Indexes (VERY IMPORTANT)
 requestLogSchema.index({ createdAt: -1 });
 requestLogSchema.index({ statusCode: 1, createdAt: -1 });
 requestLogSchema.index({ userId: 1, createdAt: -1 });
