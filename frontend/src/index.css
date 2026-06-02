@@ -217,3 +217,107 @@
     0 1px 3px rgba(0, 0, 0, 0.3),
     0 8px 24px rgba(0, 0, 0, 0.25);
 }
+
+
+/* WealthNest Dark Theme - Purple 400 Primary */
+@theme {
+  /* =========================
+     BACKGROUNDS
+  ========================= */
+  --color-bg: rgb(13 17 23);                 /* Near Black */
+  --color-surface: rgb(22 27 34);            /* Charcoal */
+  --color-surface-2: rgb(30 36 44);          /* Dark Slate */
+  --color-surface-3: rgb(39 46 56);          /* Slate */
+
+  /* =========================
+     TEXT
+  ========================= */
+  --color-text: rgb(230 237 243);            /* Slate-100 */
+  --color-text-secondary: rgb(148 163 184); /* Slate-400 */
+  --color-muted: rgb(110 118 129);           /* Slate-500 */
+  --color-placeholder: rgb(100 116 139);     /* Slate-500 */
+
+  /* =========================
+     BORDERS
+  ========================= */
+  --color-border: rgb(48 54 61);
+  --color-border-hover: rgb(88 96 105);
+  --color-divider: rgb(38 45 52);
+
+  /* =========================
+     BRAND
+  ========================= */
+  --color-primary: rgb(192 132 252);         /* Purple-400 */
+  --color-primary-hover: rgb(216 180 254);   /* Purple-300 */
+  --color-primary-active: rgb(168 85 247);   /* Purple-500 */
+  --color-primary-subtle: rgba(192, 132, 252, 0.15);
+
+  /* Dark text gives excellent contrast on Purple-400 */
+  --color-text-on-primary: rgb(13 17 23);
+
+  /* =========================
+     STATUS COLORS
+  ========================= */
+  --color-success: rgb(74 222 128);          /* Green-400 */
+  --color-success-bg: rgba(74, 222, 128, 0.15);
+
+  --color-error: rgb(248 113 113);           /* Red-400 */
+  --color-error-bg: rgba(248, 113, 113, 0.15);
+
+  --color-warning: rgb(251 191 36);          /* Amber-400 */
+  --color-warning-bg: rgba(251, 191, 36, 0.15);
+
+  --color-info: rgb(96 165 250);             /* Blue-400 */
+  --color-info-bg: rgba(96, 165, 250, 0.15);
+
+  /* =========================
+     FINANCE SPECIFIC
+  ========================= */
+  --color-income: rgb(74 222 128);           /* Green-400 */
+  --color-income-bg: rgba(74, 222, 128, 0.15);
+
+  --color-expense: rgb(248 113 113);         /* Red-400 */
+  --color-expense-bg: rgba(248, 113, 113, 0.15);
+
+  --color-investment: rgb(125 211 252);      /* Sky-300 */
+  --color-investment-bg: rgba(125, 211, 252, 0.15);
+
+  /* =========================
+     CARDS
+  ========================= */
+  --color-card: rgb(22 27 34);
+  --color-card-hover: rgb(30 36 44);
+  --color-card-selected: rgb(53 41 68);      /* Purple tinted selection */
+
+  /* =========================
+     INPUTS
+  ========================= */
+  --color-input-bg: rgb(13 17 23);
+  --color-input-border: rgb(48 54 61);
+  --color-input-focus: rgb(192 132 252);
+
+  /* =========================
+     SIDEBAR
+  ========================= */
+  --color-sidebar: rgb(9 14 20);
+  --color-sidebar-hover: rgb(30 36 44);
+  --color-sidebar-active: rgb(192 132 252);
+
+  /* =========================
+     CHARTS
+  ========================= */
+  --chart-income: rgb(74 222 128);           /* Green-400 */
+  --chart-expense: rgb(248 113 113);         /* Red-400 */
+  --chart-investment: rgb(125 211 252);      /* Sky-300 */
+  --chart-savings: rgb(192 132 252);         /* Purple-400 */
+  --chart-neutral: rgb(148 163 184);         /* Slate-400 */
+
+  /* =========================
+     SHADOWS
+  ========================= */
+  --shadow-card:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+
