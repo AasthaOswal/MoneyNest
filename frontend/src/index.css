@@ -146,12 +146,12 @@
   /* =========================
      BRAND
   ========================= */
-  --color-primary: rgb(168 85 247);          /* Purple-500 */
-  --color-primary-hover: rgb(192 132 252);   /* Purple-400 */
+  --color-primary: rgb(192 132 252);   /* Purple-400 */
+  --color-primary-hover: rgb(168 85 247);          /* Purple-500 */
   --color-primary-active: rgb(147 51 234);   /* Purple-600 */
   --color-primary-subtle: rgba(168, 85, 247, 0.12); /* Purple Tint */
 
-  --color-text-on-primary: rgb(255 255 255); /* White */
+  --color-text-on-primary: rgb(13 17 23); /* White */
 
   /* =========================
      STATUS COLORS
