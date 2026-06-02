@@ -530,6 +530,7 @@ transactions.forEach(t => {
 // =======================
 export const getTransactionById = async (req, res) => {
   try {
+    throw new Error("Error generated on purpose");
     const { transactionId } = req.params;
 
     // ✅ Validate ID

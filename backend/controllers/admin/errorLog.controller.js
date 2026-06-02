@@ -165,3 +165,66 @@ export const deleteErrorLogs = async (req, res) => {
     });
   }
 };
+
+
+
+export const resolveError = async (req, res) => {
+  try {
+    const { errorId } = req.params;
+
+    const existingError = await ErrorLog.findById(errorId).select("isResolved");
+
+    if (!existingError) {
+      return res.status(404).json({
+        success: false,
+        message: "Error not found",
+      });
+    }
+
+    if (existingError.isResolved) {
+      return res.status(400).json({
+        success: false,
+        message: "Error is already resolved",
+      });
+    }
+
+    const error = await ErrorLog.findByIdAndUpdate(
+      errorId,
+      {
+        isResolved: true,
+
+        resolvedAt: new Date(),
+        resolvedBy: req.user._id,
+
+        $push: {
+          resolutionHistory: {
+            resolvedAt: new Date(),
+            resolvedBy: req.user._id,
+          },
+        },
+      },
+      {
+        returnDocument: "after",
+      }
+    );
+
+    if (!error) {
+      return res.status(404).json({
+        success: false,
+        message: "Error not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Error marked as resolved",
+      error,
+    });
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};

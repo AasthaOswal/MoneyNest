@@ -8,30 +8,55 @@ export const errorLogger = async ({
   severity = "low",
   requestId = null,
 }) => {
-  try {
-    const allowedSeverities = ["low", "medium", "high", "critical"];
+	try {
+		const fingerprint = `${error.name}:${req?.method}:${req?.originalUrl}:${error.message}`;
+		const allowedSeverities = ["low", "medium", "high", "critical"];
 
-    const safeSeverity = allowedSeverities.includes(severity)
-      ? severity
-      : "low";
-      
-    await ErrorLog.create({
-      errorName: error.name || "Error",
-      message: error.message || "Unknown error",
-      stack: error.stack,
+		const safeSeverity = allowedSeverities.includes(severity) ? severity : "low";
 
-      requestId: requestId || req?.requestId,
+		await ErrorLog.findOneAndUpdate(
+			{
+				errorFingerprint: fingerprint,
+			},
 
-      method: req?.method,
-      path: req?.originalUrl || req?.path,
-      ip: req?.ip,
+			{
+				$inc: {
+					occurrenceCount: 1,
+				},
 
-      userId: req?.user?._id || null,
+				$set: {
+					lastOccurredAt: new Date(),
+					isResolved: false,
+				},
 
-      severity: safeSeverity,
-      environment: process.env.NODE_ENV || "development",
-    });
-  } catch (logErr) {
-    console.error("❌ Failed to log error:", logErr.message);
-  }
+				$setOnInsert: {
+					errorFingerprint: fingerprint,
+
+					firstOccurredAt: new Date(),
+
+					errorName: error.name || "Error",
+					message: error.message || "Unknown error",
+					stack: error.stack,
+
+					requestId: requestId || req?.requestId,
+
+					method: req?.method,
+					path: req?.originalUrl || req?.path,
+					ip: req?.ip,
+
+					userId: req?.user?._id || null,
+
+					severity: safeSeverity,
+					environment: process.env.NODE_ENV || "development",
+				},
+			},
+
+			{
+				upsert: true,
+				new: true,
+			}
+		);
+	} catch (logErr) {
+		console.error("Failed to log error:", logErr);
+	}
 };

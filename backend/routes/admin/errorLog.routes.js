@@ -7,29 +7,33 @@ import {
   getErrorsByRequestId,
   deleteErrorLog,
   deleteErrorLogs,
+  resolveError
 } from "../../controllers/admin/errorLog.controller.js";
 
 const router = express.Router();
 
-// 🔹 1️⃣ Get all errors (filters: severity, date range, search)
+// Get all errors (filters: severity, date range, search)
 router.get("/", getAllErrors);
 
-// 🔹 2️⃣ Get error stats (top recurring errors)
+// Get error stats (top recurring errors)
 router.get("/stats", getErrorStats);
 
-// 🔹 3️⃣ Get critical errors (dashboard)
+// Get critical errors (dashboard)
 router.get("/critical", getCriticalErrors);
 
-// 🔹 4️⃣ Get errors by requestId (trace debugging)
+// Get errors by requestId (trace debugging)
 router.get("/request/:requestId", getErrorsByRequestId);
 
-// 🔹 5️⃣ Get single error by ID
+// Get single error by ID
 router.get("/:id", getErrorById);
 
-// 🔹 6️⃣ Delete single error log
+// Delete single error log
 router.delete("/:id", deleteErrorLog);
 
-// 🔹 7️⃣ Delete multiple logs (optional date filter)
+// Delete multiple logs (optional date filter)
 router.delete("/", deleteErrorLogs);
+
+// resolve error manually by admin
+router.patch( "/:errorId/resolve", resolveError );
 
 export default router;
