@@ -27,7 +27,7 @@ export const getRequestLogs = async (req, res) => {
 
     if (method) filter.method = method;
     if (statusCode) filter.statusCode = Number(statusCode);
-    if (userId) filter.user = userId;
+    if (userId) filter.userId = userId;
 
     if (search) {
       filter.$or = [
@@ -56,7 +56,7 @@ export const getRequestLogs = async (req, res) => {
 
 export const getRequestById = async (req, res) => {
   try {
-    const log = await RequestLog.findById(req.params.id).populate("user");
+    const log = await RequestLog.findById(req.params.id).populate("userId");
 
     if (!log) {
       return res.status(404).json({

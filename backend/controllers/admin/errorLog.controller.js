@@ -2,7 +2,7 @@ import ErrorLog from "../../models/admin/errorLog.model.js";
 import mongoose from "mongoose";
 
 
-// 1️⃣ Get all errors with filters
+// 1️⃣ Get all errors with filters --add search filter pagination to this
 export const getAllErrors = async (req, res) => {
   try {
     const { severity, startDate, endDate, search } = req.query;
@@ -45,7 +45,9 @@ export const getErrorById = async (req, res) => {
       return res.status(400).json({ message: "Invalid ID" });
     }
 
-    const data = await ErrorLog.findById(id);
+    const data = await ErrorLog.findById(id)
+    .populate("resolvedBy", "name email")
+    .populate("resolutionHistory.resolvedBy", "name email");
 
     if (!data) {
       return res.status(404).json({ message: "Error not found" });
@@ -171,6 +173,13 @@ export const deleteErrorLogs = async (req, res) => {
 export const resolveError = async (req, res) => {
   try {
     const { errorId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(errorId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid error ID",
+      });
+    }
 
     const existingError = await ErrorLog.findById(errorId).select("isResolved");
 
