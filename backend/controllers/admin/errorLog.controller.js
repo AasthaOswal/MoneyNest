@@ -1,40 +1,145 @@
 import ErrorLog from "../../models/admin/errorLog.model.js";
 import mongoose from "mongoose";
+import { getAllErrorsValidation } from "../../validators/admin/errorLog.validation.js";
 
 
 // 1️⃣ Get all errors with filters --add search filter pagination to this
 export const getAllErrors = async (req, res) => {
   try {
-    const { severity, startDate, endDate, search } = req.query;
+    const { error, value } = getAllErrorsValidation.validate(req.query);
 
-    let filter = {};
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map((err) => err.message),
+      });
+    }
 
-    if (severity) filter.severity = severity;
+    const {
+      startDate,
+      endDate,
+      search,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    } = value;
 
+    const filter = {};
+
+    // Date Range
     if (startDate || endDate) {
       filter.createdAt = {};
-      if (startDate) filter.createdAt.$gte = new Date(startDate);
-      if (endDate) filter.createdAt.$lte = new Date(endDate);
+
+      if (startDate) {
+        filter.createdAt.$gte = new Date(startDate);
+      }
+
+      if (endDate) {
+        filter.createdAt.$lte = new Date(endDate);
+      }
     }
 
+    // Global Search
     if (search) {
+      const escapedSearch = search.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+
+      const regex = new RegExp(escapedSearch, "i");
+
+      const numericSearch = Number(search);
+
       filter.$or = [
-        { message: { $regex: search, $options: "i" } },
-        { errorName: { $regex: search, $options: "i" } },
-        { path: { $regex: search, $options: "i" } },
+        { errorName: regex },
+        { message: regex },
+
+        { requestId: regex },
+
+        { method: regex },
+        { path: regex },
+
+        { ip: regex },
+
+        { severity: regex },
+        { environment: regex },
+
+        { errorFingerprint: regex },
       ];
+
+      if (!Number.isNaN(numericSearch)) {
+        filter.$or.push({
+          occurrenceCount: numericSearch,
+        });
+      }
     }
 
-    const data = await ErrorLog.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(100);
+    const skip = (page - 1) * limit;
 
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const sort = {
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    };
+
+    const [errors, totalRecords] = await Promise.all([
+      ErrorLog.find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .select(`
+          errorName
+          message
+          requestId
+          method
+          path
+          severity
+          environment
+          occurrenceCount
+          isResolved
+          firstOccurredAt
+          lastOccurredAt
+          createdAt
+        `),
+
+      ErrorLog.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return res.status(200).json({
+      success: true,
+
+      data: errors,
+
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalRecords,
+        limit,
+
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+
+        nextPage:
+          page < totalPages
+            ? page + 1
+            : null,
+
+        previousPage:
+          page > 1
+            ? page - 1
+            : null,
+      },
+    });
+  } catch (error) {
+    console.error("Get Errors Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch error logs",
+    });
   }
 };
-
 
 // 2️⃣ Get single error (detail view)
 export const getErrorById = async (req, res) => {

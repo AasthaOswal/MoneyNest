@@ -1,58 +1,154 @@
 import RequestLog from "../../models/admin/requestLog.model.js";
 import { exportRequestLogsAndEmail } from "../../services/admin/requestLogExport.service.js";
+import { getRequestLogsValidation } from "../../validators/admin/requestLog.validation.js";
 
-
-// ✅ 1. GET LOGS (unchanged but improved)
+// GET LOGS (unchanged but improved)
 export const getRequestLogs = async (req, res) => {
   try {
+    const { error, value } = getRequestLogsValidation.validate( req.query);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map((err) => err.message),
+      });
+    }
+
     const {
       startDate,
       endDate,
-      method,
-      statusCode,
       search,
-      userId,
-      page = 1,
-      limit = 100,
-    } = req.query;
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    } = value;
 
     const filter = {};
 
-    if (startDate && endDate) {
-      filter.createdAt = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
-      };
+    // Date Range
+    if (startDate || endDate) {
+      filter.createdAt = {};
+
+      if (startDate) {
+        filter.createdAt.$gte = new Date(startDate);
+      }
+
+      if (endDate) {
+        filter.createdAt.$lte = new Date(endDate);
+      }
     }
 
-    if (method) filter.method = method;
-    if (statusCode) filter.statusCode = Number(statusCode);
-    if (userId) filter.userId = userId;
-
+    // Global Search
     if (search) {
+      const escapedSearch = search.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+
+      const regex = new RegExp(escapedSearch, "i");
+
+      const numericSearch = Number(search);
+
       filter.$or = [
-        { path: new RegExp(search, "i") },
-        { method: new RegExp(search, "i") },
-        { ip: new RegExp(search, "i") },
+        { requestId: regex },
+
+        { userEmail: regex },
+        { userRole: regex },
+
+        { method: regex },
+        { path: regex },
+
+        { ip: regex },
+        { userAgent: regex },
+
+        { browser: regex },
+        { browserVersion: regex },
+
+        { os: regex },
+        { osVersion: regex },
+
+        { deviceType: regex },
+
+        { origin: regex },
+        { originType: regex },
+
+        { referer: regex },
+
+        { actorType: regex },
       ];
+
+      if (!Number.isNaN(numericSearch)) {
+        filter.$or.push(
+          { statusCode: numericSearch },
+          { responseTimeMs: numericSearch },
+          { responseSizeKb: numericSearch }
+        );
+      }
     }
 
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const sort = {
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    };
+
+    const [logs, totalRecords] = await Promise.all([
       RequestLog.find(filter)
-        .sort({ createdAt: -1 })
+        .sort(sort)
         .skip(skip)
-        .limit(Number(limit)),
+        .limit(limit)
+        .select(
+          `
+          requestId
+          userEmail
+          userRole
+          method
+          path
+          statusCode
+          responseTimeMs
+          responseSizeKb
+          actorType
+          browser
+          os
+          deviceType
+          originType
+          createdAt
+        `
+        ),
+
       RequestLog.countDocuments(filter),
     ]);
 
-    res.json({ success: true, total, page, limit, data });
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return res.status(200).json({
+      success: true,
+
+      data: logs,
+
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalRecords,
+        limit,
+
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+
+        nextPage: page < totalPages ? page + 1 : null,
+        previousPage: page > 1 ? page - 1 : null,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Get Request Logs Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch request logs",
+    });
   }
 };
-
 
 export const getRequestById = async (req, res) => {
   try {
