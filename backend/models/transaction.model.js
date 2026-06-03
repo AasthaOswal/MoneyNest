@@ -28,12 +28,11 @@ const transactionSchema = new mongoose.Schema({
 		min: 0
 	},
 
-	// we should support multiple categories here because what if we have just paid a food bill, then 2 categories Food and Bills should come here right?
-	category: [{
+	category: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Category",
 		required: true,
-	}],
+	},
 
 
 	labels: [{

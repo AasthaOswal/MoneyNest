@@ -20,8 +20,9 @@ export const createTransactionSchema = Joi.object({
   type: Joi.string().valid("income", "expense", "investment").required(),
   title: Joi.string().trim().min(1).max(100).required(),
   amount: Joi.number().min(0).required(),
-  // Validating as an array of ObjectIds based on your model note
-  category: Joi.array().items(Joi.string().custom(objectId)).min(1).required(),
+  //single category
+  category: Joi.string().custom(objectId).required(),
+  //multiple labels
   labels: Joi.array().items(Joi.string().custom(objectId)).min(1).required(),
   description: Joi.string().allow("", null).max(500),
   note: Joi.string().allow("", null).max(500),
@@ -33,7 +34,9 @@ export const updateTransactionSchema = Joi.object({
   type: Joi.string().valid("income", "expense", "investment"),
   title: Joi.string().trim().min(1).max(100),
   amount: Joi.number().min(0),
-  category: Joi.array().items(Joi.string().custom(objectId)).min(1),
+  //single category
+  category: Joi.string().custom(objectId),
+  //multiple labels
   labels: Joi.array().items(Joi.string().custom(objectId)).min(1),
   description: Joi.string().allow("", null).max(500),
   note: Joi.string().allow("", null).max(500),

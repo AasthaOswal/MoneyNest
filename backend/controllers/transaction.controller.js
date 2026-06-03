@@ -56,7 +56,6 @@ const validateCategoryOrLabel2 = async ({
   }
 };
 
-
 const validateCategoryOrLabel = async ({
   model,
   ids,
@@ -91,6 +90,62 @@ const validateCategoryOrLabel = async ({
   }
 };
 
+const validateCategory = async ({
+  categoryId,
+  familyId,
+  transactionType,
+  isActive = true
+}) => {
+  const category = await Category.findOne({
+    _id: categoryId,
+    family: familyId,
+    isActive
+  }).select("_id categoryType");
+
+  if (!category) {
+    const error = new Error("Invalid category");
+    error.name = "InvalidCategory";
+    throw error;
+  }
+  if (category.categoryType !== transactionType) {
+    const error = new Error(
+      `Category belongs to ${category.categoryType} but transaction type is ${transactionType}`
+    );
+    error.name = "CategoryTypeMismatch";
+    throw error;
+  }
+};
+
+const validateLabels = async ({
+  labelIds,
+  familyId,
+  isActive = true
+}) => {
+  if (!labelIds?.length) return;
+
+  const labels = await Label.find({
+    _id: { $in: labelIds },
+    family: familyId,
+    isActive
+  }).select("_id");
+
+  const validIds = new Set(
+    labels.map(label => label._id.toString())
+  );
+
+  const invalidIds = labelIds.filter(
+    id => !validIds.has(id.toString())
+  );
+
+  if (invalidIds.length > 0) {
+    const error = new Error(
+      `Invalid labels: ${invalidIds.join(", ")}`
+    );
+    error.name = "InvalidLabel";
+    throw error;
+  }
+};
+
 
 
 // =======================
@@ -103,12 +158,6 @@ export const createTransaction = async (req, res) => {
   try {
     const userId = req.user._id;
     const familyId = req.user.familyId;
-
-
-    // Normalize category
-    if (typeof req.body.category === "string") {
-      req.body.category = [req.body.category];
-    }
 
     // Normalize labels
     if (typeof req.body.labels === "string") {
@@ -133,19 +182,17 @@ export const createTransaction = async (req, res) => {
     }
 
     await Promise.all([
-      validateCategoryOrLabel({
-        model: Category,
-        ids: value.category,
+      validateCategory({
+        categoryId: value.category,
         familyId: req.user.familyId,
-        isActive:true,
-        fieldName: "category"
+        transactionType: value.type,
+        isActive:true
       }),
-      validateCategoryOrLabel({
-        model: Label,
-        ids: value.labels,
+
+      validateLabels({
+        labelIds: value.labels,
         familyId: req.user.familyId,
-        isActive:true,
-        fieldName: "label"
+        isActive:true
       })
     ]);
 
@@ -199,8 +246,12 @@ export const createTransaction = async (req, res) => {
       await deleteMultipleFiles(publicIds);
     }
 
-    if(err.name === "InvalidCategoryOrLabel"){
-      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels."})
+    if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels that are active(not deleted)."});
+    }
+
+    if( err.name === "CategoryTypeMismatch"){
+      return res.status(400).json({success:false, message: "Transaction type and category type must be same"});
     }
 
     return res.status(500).json({
@@ -245,11 +296,6 @@ export const updateTransaction = async (req, res) => {
       });
     }
 
-    // Normalize category
-    if (req.body.category && typeof req.body.category === "string") {
-      req.body.category = [req.body.category];
-    }
-
     // Normalize labels
     if (req.body.labels && typeof req.body.labels === "string") {
       req.body.labels = [req.body.labels];
@@ -272,22 +318,34 @@ export const updateTransaction = async (req, res) => {
       });
     }
 
-      await Promise.all([
-        validateCategoryOrLabel({
-          model: Category,
-          ids: value.category,
+    const finalType = value.type || existingTransaction.type;
+
+    const finalCategory = value.category || existingTransaction.category;
+
+    const validations = [];
+
+    if (value.category) {
+      validations.push(
+        validateCategory({
+          categoryId: finalCategory,
           familyId: req.user.familyId,
-          isActive:true,
-          fieldName: "category"
-        }),
-        validateCategoryOrLabel({
-          model: Label,
-          ids: value.labels,
-          familyId: req.user.familyId,
-          isActive:true,
-          fieldName: "label"
+          transactionType: finalType,
+          isActive: true
         })
-      ]);
+      );
+    }
+
+    if (value.labels) {
+      validations.push(
+        validateLabels({
+          labelIds: value.labels,
+          familyId: req.user.familyId,
+          isActive: true
+        })
+      );
+    }
+
+    await Promise.all(validations);
 
     let oldPublicId = null;
 
@@ -354,8 +412,12 @@ export const updateTransaction = async (req, res) => {
       await deleteMultipleFiles(publicIds);
     }
 
-    if(err.name === "InvalidCategoryOrLabel"){
-      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels."})
+    if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels that are active(not deleted)."})
+    }
+
+    if( err.name === "CategoryTypeMismatch"){
+      return res.status(400).json({success:false, message: "Transaction type and category type must be same"});
     }
 
     return res.status(500).json({
@@ -365,9 +427,7 @@ export const updateTransaction = async (req, res) => {
   }
 };
 
-// =======================
-// 📋 GET TRANSACTIONS
-// =======================
+// GET TRANSACTIONS --filtering can support multiple categories
 export const getTransactions = async (req, res) => {
   try {
     const {
@@ -476,7 +536,7 @@ export const getTransactions = async (req, res) => {
       ];
     }
 
-    const [transactions, total] = await Promise.all([
+    const [transactions, total, summaryResult] = await Promise.all([
       Transaction.find(query)
         .populate("category labels")
         .populate("user", "name")
@@ -485,37 +545,75 @@ export const getTransactions = async (req, res) => {
         .limit(limitNum)
         .lean(),
 
-      Transaction.countDocuments(query)
+      Transaction.countDocuments(query),
+
+      Transaction.aggregate([
+        {
+          $match: query
+        },
+        {
+          $group: {
+            _id: "$type",
+            total: {
+              $sum: "$amount"
+            }
+          }
+        }
+      ])
     ]);
 
     const groupedTransactions = {
-  income: { transactions: [], total: 0 },
-  expense: { transactions: [], total: 0 },
-  investment: { transactions: [], total: 0 }
-};
+      income: { transactions: [], total: 0 },
+      expense: { transactions: [], total: 0 },
+      investment: { transactions: [], total: 0 }
+    };
 
-transactions.forEach(t => {
-  const type = t.type;
+    transactions.forEach(t => {
+      const type = t.type;
 
-  if (!groupedTransactions[type]) return;
+      if (!groupedTransactions[type]) return;
 
-  groupedTransactions[type].transactions.push(t);
-  groupedTransactions[type].total += t.amount || 0;
-});
+      groupedTransactions[type].transactions.push(t);
+      groupedTransactions[type].total += t.amount || 0;
+    });
+
+    const summary = {
+      incomeTotal: 0,
+      expenseTotal: 0,
+      investmentTotal: 0,
+      netBalance: 0
+    };
+
+    summaryResult.forEach(item => {
+      if (item._id === "income") {
+        summary.incomeTotal = item.total;
+      }
+
+      if (item._id === "expense") {
+        summary.expenseTotal = item.total;
+      }
+
+      if (item._id === "investment") {
+        summary.investmentTotal = item.total;
+      }
+    });
+
+    summary.netBalance = summary.incomeTotal - summary.expenseTotal - summary.investmentTotal;
 
     return res.status(200).json({
       success: true,
       data: groupedTransactions,
-      total,
+      total, 
       page: pageNum,
-      totalPages: Math.ceil(total / limitNum)
+      totalPages: Math.ceil(total / limitNum),
+      summary
     });
 
   } catch (err) {
     console.error("Error in getTransactions:", err);
 
-    if(err.name === "InvalidCategoryOrLabel"){
-      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels."})
+    if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels that are active(not deleted)."})
     }
 
     return res.status(500).json({
