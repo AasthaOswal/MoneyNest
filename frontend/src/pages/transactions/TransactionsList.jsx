@@ -5,6 +5,8 @@ import CategoryService from "../../services/category.service";
 import FamilyService from "../../services/family.service";
 import { useNavigate } from "react-router-dom";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
+import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
+
 import {
   setupTransactionListeners,
   removeTransactionListeners,
@@ -25,75 +27,71 @@ const TransactionsList = () => {
     maxAmount: "",
     startDate: "",
     endDate: "",
-    // NEW
-    category: [],
+    category: null,
     label: [],
     user: []
   });
 
   const applyQuickFilter = (type) => {
-  const now = new Date();
-  let start;
+    const now = new Date();
+    let start;
 
-  if (type === "1m") {
-    start = new Date();
-    start.setMonth(now.getMonth() - 1);
-  }
-
-  if (type === "3m") {
-    start = new Date();
-    start.setMonth(now.getMonth() - 3);
-  }
-
-  setFilters({
-    ...filters,
-    startDate: start.toISOString().split("T")[0],
-    endDate: now.toISOString().split("T")[0]
-  });
-};
-
-  const [categories, setCategories] = useState([]);
-const [labels, setLabels] = useState([]);
-const [users, setUsers] = useState([]);
-
-useEffect(() => {
-  const fetchMeta = async () => {
-    try {
-      const [catRes, labelRes, userRes] = await Promise.all([
-        CategoryService.getCategories(),
-        LabelService.getLabels(),
-        FamilyService.getMyFamily()
-      ]);
-
-      console.log(catRes)
-      console.log(labelRes)
-      console.log(userRes)
-
-      const catData = catRes?.data || [];
-      const userData = userRes.data.members || [];
-      const labelData = labelRes.data || [];
-      console.log("API categories:", catData);
-      console.log("API users:", userData);
-      console.log("API labels:", labelData);
-
-      setCategories(catData);
-      setLabels(labelData);
-      setUsers(userData);
-    } catch (err) {
-      console.error("Failed to load filter data", err);
+    if (type === "1m") {
+      start = new Date();
+      start.setMonth(now.getMonth() - 1);
     }
+
+    if (type === "3m") {
+      start = new Date();
+      start.setMonth(now.getMonth() - 3);
+    }
+
+    setFilters({
+      ...filters,
+      startDate: start.toISOString().split("T")[0],
+      endDate: now.toISOString().split("T")[0]
+    });
   };
 
-  fetchMeta();
-}, []);
+  const [categories, setCategories] = useState([]);
+  const [labels, setLabels] = useState([]);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchMeta = async () => {
+      try {
+        const [catRes, labelRes, userRes] = await Promise.all([
+          CategoryService.getCategories(),
+          LabelService.getLabels(),
+          FamilyService.getMyFamily()
+        ]);
+
+        console.log(catRes)
+        console.log(labelRes)
+        console.log(userRes)
+
+        const catData = catRes?.data || [];
+        const userData = userRes.data.members || [];
+        const labelData = labelRes.data || [];
+        console.log("API categories:", catData);
+        console.log("API users:", userData);
+        console.log("API labels:", labelData);
+
+        setCategories(catData);
+        setLabels(labelData);
+        setUsers(userData);
+      } catch (err) {
+        console.error("Failed to load filter data", err);
+      }
+    };
+
+    fetchMeta();
+  }, []);
 
   const fetchTransactions = async (pageToFetch = 1) => {
     setLoading(true);
     try {
       const activeFilters = {};
-      // Object.keys(filters).forEach(k => {
-      //   if (filters[k]) activeFilters[k] = filters[k];
-      // });
 
       Object.keys(filters).forEach(k => {
         const value = filters[k];
@@ -110,6 +108,7 @@ useEffect(() => {
       console.log(activeFilters)
 
       const res = await TransactionService.getTransactions({ ...activeFilters, page: pageToFetch });
+      console.log(res);
       setTransactions(res.data);
       setTotalPages(res.totalPages || 1);
       setPage(res.page || 1);
@@ -146,7 +145,7 @@ useEffect(() => {
     maxAmount: "",
     startDate: "",
     endDate: "",
-    category: [],
+    category: null,
     label: [],
     user: []
   });
@@ -250,14 +249,20 @@ useEffect(() => {
               />
             </div>
 
-            <MultiSelectSheet
+            <SingleSelectSheet
               label="Category"
-              title="Select Categories"
+              title="Select Category"
               options={categories}
-              selectedIds={filters.category}
-              onChange={(ids) => setFilters({ ...filters, category: ids })}
-              placeholder="Select categories"
+              selectedId={filters.category}
+              onChange={(id) =>
+                setFilters(prev => ({
+                  ...prev,
+                  category: id
+                }))
+              }
+              placeholder="Select category"
             />
+
             <MultiSelectSheet
               label="Label"
               title="Select Labels"
@@ -434,11 +439,13 @@ useEffect(() => {
 
             <td className="p-4">
               <div className="flex flex-wrap gap-1">
-                {t.category?.map(c => (
-                  <span key={c._id || c} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md">
-                    {c.name || "N/A"}
+                {t.category ? (
+                  <span className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md">
+                    {t.category.name}
                   </span>
-                ))}
+                ) : (
+                  "N/A"
+                )}
               </div>
             </td>
 

@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import TransactionService from "../../services/transaction.service";
 import api from "../../axios/axios";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
+import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
+
 
 const UpdateTransaction = () => {
   const { id } = useParams();
@@ -12,7 +14,7 @@ const UpdateTransaction = () => {
     type: "expense",
     title: "",
     amount: "",
-    category: [],
+    category: null,
     labels: [],
     description: "",
     note: "",
@@ -36,7 +38,7 @@ const UpdateTransaction = () => {
         type: txn.type,
         title: txn.title,
         amount: txn.amount,
-        category: txn.category.map((c) => c._id || c),
+        category: txn.category?._id || txn.category || null,
         labels: txn.labels.map((l) => l._id || l),
         description: txn.description || "",
         note: txn.note || "",
@@ -85,7 +87,7 @@ const UpdateTransaction = () => {
     setForm((prev) => ({
       ...prev,
       type,
-      category: [],
+      category: null,
       labels: [],
     }));
   };
@@ -108,6 +110,7 @@ const UpdateTransaction = () => {
         ...form,
         transactionDoc: file,
       });
+      console.log(response)
 
       navigate(`/transactions/${response.data._id}`);
     } catch (err) {
@@ -280,12 +283,14 @@ const UpdateTransaction = () => {
 
           {/* Category + Labels */}
           <div className="space-y-5 border-t border-border pt-6">
-            <MultiSelectSheet
-              label="Categories"
-              title="Select Categories"
+            <SingleSelectSheet
+              label="Category"
+              title="Select Category"
               options={categories}
-              selectedIds={form.category}
+              selectedId={form.category}
               onChange={handleCategoryChange}
+              placeholder={`Select category for ${form.type}`}
+              emptyText={`No categories found for ${form.type}.`}
             />
 
             <MultiSelectSheet

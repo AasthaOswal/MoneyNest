@@ -34,6 +34,8 @@ import { startFailedOperationsRetry } from "./services/cron/failedOperationRetry
 import { startRequestLogExportCron } from "./services/cron/requestLogExport.js";
 import {startFailedOperationsRetryNew} from "./services/cron/failedOperationNew.cron.js";
 
+import {globalErrorHandler} from "./middlewares/error.middleware.js";
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -109,6 +111,7 @@ initializeSocket(httpServer, app);
 
 // startFailedOperationsRetryNew()
 
+app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5000;
 

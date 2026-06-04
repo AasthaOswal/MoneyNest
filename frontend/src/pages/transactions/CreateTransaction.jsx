@@ -3,6 +3,7 @@ import TransactionService from "../../services/transaction.service";
 import api from "../../axios/axios";
 import { useNavigate } from "react-router-dom";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
+import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
 
 const CreateTransaction = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const CreateTransaction = () => {
     type: "expense",
     title: "",
     amount: "",
-    category: [],
+    category: null,
     labels: [],
     description: "",
     note: "",
@@ -51,13 +52,13 @@ const CreateTransaction = () => {
     setForm((prev) => ({
       ...prev,
       type,
-      category: [],
+      category: null,
       labels: [],
     }));
   };
 
-  const handleCategoryChange = (values) => {
-    setForm((prev) => ({ ...prev, category: values }));
+  const handleCategoryChange = (value) => {
+    setForm((prev) => ({ ...prev, category: value }));
   };
 
   const handleLabelChange = (values) => {
@@ -70,8 +71,8 @@ const CreateTransaction = () => {
     setErrorMsg("");
 
     try {
-      if (form.category.length === 0) {
-        throw new Error("Please select at least one category.");
+      if (!form.category) {
+        throw new Error("Please select a category.");
       }
 
       if (form.labels.length === 0) {
@@ -82,6 +83,8 @@ const CreateTransaction = () => {
         ...form,
         transactionDoc: file,
       });
+
+      console.log(response);
 
       navigate(`/transactions/${response.data._id}`);
     } catch (err) {
@@ -239,13 +242,14 @@ const CreateTransaction = () => {
           </div>
 
           <div className="space-y-5 border-t border-border pt-6">
-            <MultiSelectSheet
-              label="Categories"
-              title="Select Categories"
+            
+            <SingleSelectSheet
+              label="Category"
+              title="Select Category"
               options={categories}
-              selectedIds={form.category}
+              selectedId={form.category}
               onChange={handleCategoryChange}
-              placeholder={`Select categories for ${form.type}`}
+              placeholder={`Select category for ${form.type}`}
               emptyText={`No categories found for ${form.type}.`}
             />
 

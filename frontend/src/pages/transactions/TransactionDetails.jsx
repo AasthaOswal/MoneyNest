@@ -91,24 +91,15 @@ const TransactionDetails = () => {
           </div>
         )}
 
-        {/* CATEGORIES */}
-        {transaction.category?.length > 0 && (
+        {/* CATEGORY */}
+        {transaction.category && (
           <div className="mb-4">
-            <p className="text-sm text-muted mb-2">Categories</p>
-            <div className="flex flex-wrap gap-2">
-              {transaction.category.map((cat) => (
-                <span
-                  key={cat._id}
-                  className="px-3 py-1 text-sm rounded-full 
-                             border border-primary text-primary"
-                >
-                  {cat.name}
-                </span>
-              ))}
-            </div>
+            <p className="text-sm text-muted mb-1">Category</p>
+            <p className="text-text">{transaction.category.name}</p>
           </div>
         )}
 
+        
         {/* LABELS */}
         {transaction.labels?.length > 0 && (
           <div className="mb-4">
