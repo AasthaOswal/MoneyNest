@@ -9,7 +9,7 @@ import { validateAndUploadFiles } from "../utils/cloudinary/validateAndUploadFil
 import { deleteFromCloudinary } from "../utils/cloudinary/deleteFromCloudinary.js";
 import { deleteMultipleFiles } from "../utils/cloudinary/deleteMultipleFiles.js";
 
-import { generateTransactionsExcel } from "../utils/excel/generateExcel.js";
+import { generateTransactionsExcel } from "../services/transaction/generateExcel.js";
 import {sendEmailBrevo} from "../utils/email/sendEmailBrevo.js";
 
 import { buildTransactionQuery } from "../services/transaction/buildTransactionQuery.js";
@@ -17,9 +17,8 @@ import {errorLogger} from "../utils/logger/errorLogger.js";
 
 import { getIO } from "../config/socket.js";
 
-// =======================
-// 📁 FILE CONFIG
-// =======================
+
+// FILE CONFIG
 const fileConfigs = [
   {
     fieldName: "transactionDoc",
@@ -466,27 +465,9 @@ export const getTransactions = async (req, res) => {
     const limitNum = value.limit;
     const skip = (pageNum - 1) * limitNum;
 
-    const query = {
-      family: req.user.familyId
-    };
-
-    // ✅ type
-    if (value.type) {
-      query.type = value.type;
-    }
-
-    // ✅ user
-    if (value.user?.length) {
-      query.user = {
-        $in: value.user.map(id => new mongoose.Types.ObjectId(id))
-      };
-    }
-
-    // ✅ category (ARRAY)
+    // category (ARRAY)
     if (value.category?.length) {
-      query.category = {
-        $in: value.category.map(id => new mongoose.Types.ObjectId(id))
-      };
+
       await validateCategoryOrLabel({
         model: Category,
         ids: value.category.map(id => new mongoose.Types.ObjectId(id)),
@@ -496,7 +477,7 @@ export const getTransactions = async (req, res) => {
       
     }
 
-    // ✅ labels (ARRAY)
+    // labels (ARRAY)
     if (value.label?.length) {
       
       await validateCategoryOrLabel({
@@ -505,36 +486,10 @@ export const getTransactions = async (req, res) => {
         familyId: req.user.familyId,
         fieldName: "label"
       })
-
-      query.labels = {
-        $in: value.label.map(id => new mongoose.Types.ObjectId(id))
-      };
     }
 
-    // ✅ amount range
-    if (value.minAmount || value.maxAmount) {
-      query.amount = {};
-      if (value.minAmount) query.amount.$gte = value.minAmount;
-      if (value.maxAmount) query.amount.$lte = value.maxAmount;
-    }
 
-    // ✅ date range
-    if (value.startDate || value.endDate) {
-      query.date = {};
-      if (value.startDate) query.date.$gte = new Date(value.startDate);
-      if (value.endDate) query.date.$lte = new Date(value.endDate);
-    }
-
-    // ✅ search
-    if (value.search) {
-      const safeSearch = value.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-      query.$or = [
-        { title: { $regex: safeSearch, $options: "i" } },
-        { description: { $regex: safeSearch, $options: "i" } },
-        { note: { $regex: safeSearch, $options: "i" } }
-      ];
-    }
+    const query = buildTransactionQuery( value, req.user );
 
     const [transactions, total, summaryResult] = await Promise.all([
       Transaction.find(query)
@@ -757,7 +712,30 @@ export const downloadTransactionsExcel = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid filters" });
     }
 
-    // 🔥 REMOVE pagination fields
+    // category (ARRAY)
+    if (value.category?.length) {
+
+      await validateCategoryOrLabel({
+        model: Category,
+        ids: value.category.map(id => new mongoose.Types.ObjectId(id)),
+        familyId: req.user.familyId,
+        fieldName: "category"
+      })
+      
+    }
+
+    // labels (ARRAY)
+    if (value.label?.length) {
+      
+      await validateCategoryOrLabel({
+        model: Label,
+        ids: value.label.map(id => new mongoose.Types.ObjectId(id)),
+        familyId: req.user.familyId,
+        fieldName: "label"
+      })
+    }
+
+    // REMOVE pagination fields
     const { page, limit, ...filters } = value;
 
     const query = await buildTransactionQuery(filters, req.user);
@@ -785,6 +763,11 @@ export const downloadTransactionsExcel = async (req, res) => {
 
   } catch (err) {
     console.error("Excel Download Error:", err);
+
+    if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels that are active(not deleted)."})
+    }
+
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -803,8 +786,31 @@ export const emailTransactionsExcel = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid filters" });
     }
 
+    // category (ARRAY)
+    if (value.category?.length) {
 
-    // 🔥 REMOVE pagination fields
+      await validateCategoryOrLabel({
+        model: Category,
+        ids: value.category.map(id => new mongoose.Types.ObjectId(id)),
+        familyId: req.user.familyId,
+        fieldName: "category"
+      })
+      
+    }
+
+    // labels (ARRAY)
+    if (value.label?.length) {
+      
+      await validateCategoryOrLabel({
+        model: Label,
+        ids: value.label.map(id => new mongoose.Types.ObjectId(id)),
+        familyId: req.user.familyId,
+        fieldName: "label"
+      })
+    }
+
+
+    // REMOVE pagination fields
     const { page, limit, ...filters } = value;
 
     const query = await buildTransactionQuery(filters, req.user);
@@ -837,6 +843,11 @@ export const emailTransactionsExcel = async (req, res) => {
 
   } catch (err) {
     console.error("Email Excel Error:", err);
+
+    if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
+      return res.status(400).json({success:false, message: "You can use only your own family's categories and labels that are active(not deleted)."})
+    }
+
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
