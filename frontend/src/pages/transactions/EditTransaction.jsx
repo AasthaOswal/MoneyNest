@@ -291,6 +291,7 @@ const UpdateTransaction = () => {
               onChange={handleCategoryChange}
               placeholder={`Select category for ${form.type}`}
               emptyText={`No categories found for ${form.type}.`}
+              required={true}
             />
 
             <MultiSelectSheet
@@ -299,6 +300,7 @@ const UpdateTransaction = () => {
               options={labels}
               selectedIds={form.labels}
               onChange={handleLabelChange}
+              required={true}
             />
           </div>
 

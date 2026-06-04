@@ -8,6 +8,7 @@ const MultiSelectSheet = ({
   onChange,
   placeholder = "Select items",
   emptyText = "No items found.",
+  required = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -72,7 +73,8 @@ const MultiSelectSheet = ({
   return (
     <div>
       <label className="mb-2 block text-sm font-medium text-text">
-        {label} <span className="text-expense">*</span>
+        {label}
+        {required && <span className="text-expense"> *</span>}
       </label>
 
       <button

@@ -66,16 +66,9 @@ const TransactionsList = () => {
           FamilyService.getMyFamily()
         ]);
 
-        console.log(catRes)
-        console.log(labelRes)
-        console.log(userRes)
-
         const catData = catRes?.data || [];
         const userData = userRes.data.members || [];
         const labelData = labelRes.data || [];
-        console.log("API categories:", catData);
-        console.log("API users:", userData);
-        console.log("API labels:", labelData);
 
         setCategories(catData);
         setLabels(labelData);
@@ -105,10 +98,7 @@ const TransactionsList = () => {
         }
       });
 
-      console.log(activeFilters)
-
       const res = await TransactionService.getTransactions({ ...activeFilters, page: pageToFetch });
-      console.log(res);
       setTransactions(res.data);
       setTotalPages(res.totalPages || 1);
       setPage(res.page || 1);
@@ -119,75 +109,134 @@ const TransactionsList = () => {
     }
   };
 
+  const getActiveFilters = () => {
+    const activeFilters = {};
+
+    Object.keys(filters).forEach((k) => {
+      const value = filters[k];
+
+      if (
+        value !== "" &&
+        value !== null &&
+        !(Array.isArray(value) && value.length === 0)
+      ) {
+        activeFilters[k] = value;
+      }
+    });
+
+    return activeFilters;
+  };
+
+
+  const handleDownloadExcel = async () => {
+    try {
+      const activeFilters = getActiveFilters();
+
+      const blob =
+        await TransactionService.downloadTransactionsExcel(
+          activeFilters
+        );
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "transactions.xlsx";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to download Excel");
+    }
+  };
+
+  const handleEmailExcel = async () => {
+    try {
+      const activeFilters = getActiveFilters();
+
+      const res =
+        await TransactionService.emailTransactionsExcel(
+          activeFilters
+        );
+
+      alert(res.message || "Email sent successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send email");
+    }
+  };
+
   useEffect(() => {
-  const handleTransactionChange = () => {
-    console.log("Transactions realtime refresh");
+    const handleTransactionChange = () => {
+      fetchTransactions(page);
+    };
 
-    fetchTransactions(page);
-  };
+    setupTransactionListeners(handleTransactionChange);
 
-  setupTransactionListeners(handleTransactionChange);
-
-  return () => {
-    removeTransactionListeners(handleTransactionChange);
-  };
-}, [page, filters]);
+    return () => {
+      removeTransactionListeners(handleTransactionChange);
+    };
+  }, [page, filters]);
 
   const handleSearchClick = () => {
     fetchTransactions(1);
   };
 
- const clearFilters = () => {
-  setFilters({
-    search: "",
-    type: "",
-    minAmount: "",
-    maxAmount: "",
-    startDate: "",
-    endDate: "",
-    category: null,
-    label: [],
-    user: []
-  });
-};
-
-  const getTypeColor = (type) => {
-    if (type === "income") return "text-income bg-green-50 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
-    if (type === "expense") return "text-expense bg-red-50 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
-    return "text-investment bg-purple-50 px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
+  const clearFilters = () => {
+    setFilters({
+      search: "",
+      type: "",
+      minAmount: "",
+      maxAmount: "",
+      startDate: "",
+      endDate: "",
+      category: null,
+      label: [],
+      user: []
+    });
   };
 
-
-
+  const getTypeColor = (type) => {
+    if (type === "income") return "text-income bg-income-bg px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
+    if (type === "expense") return "text-expense bg-expense-bg px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
+    return "text-investment bg-investment-bg px-2 py-1 rounded-md text-xs font-semibold uppercase tracking-wider";
+  };
 
   return (
     <div className="bg-bg min-h-[calc(100vh-64px)] p-0 sm:p-4 md:p-8 flex flex-col items-center">
       <div className="w-full max-w-6xl space-y-6">
 
         {/* Top Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface p-6 rounded-2xl shadow-sm border border-border">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface p-6 rounded-2xl shadow-card border border-border">
           <div>
             <h2 className="text-2xl font-bold text-text">Transactions</h2>
             <p className="text-muted text-sm mt-1">Manage and filter your transaction history.</p>
           </div>
           <button
             onClick={() => navigate("/transactions/create")}
-            className="bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary-hover font-medium shadow-sm transition-colors duration-200"
+            className="bg-primary text-text-on-primary px-5 py-2.5 rounded-xl hover:bg-primary-hover font-medium shadow-card transition-colors duration-200"
           >
             + Add Transaction
           </button>
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-surface p-6 rounded-2xl shadow-card border border-border">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="lg:col-span-2">
               <label className="block text-xs font-medium text-muted mb-1">Search</label>
               <input
-                placeholder="Title, description...  "
+                placeholder="Title, description..."
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
+                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
               />
             </div>
             
@@ -196,7 +245,7 @@ const TransactionsList = () => {
               <select
                 value={filters.type}
                 onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
+                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
               >
                 <option value="">All Types</option>
                 <option value="income">Income</option>
@@ -213,7 +262,7 @@ const TransactionsList = () => {
                 placeholder="0.00"
                 value={filters.minAmount}
                 onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
-                className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
+                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
               />
             </div>
 
@@ -225,7 +274,7 @@ const TransactionsList = () => {
                 placeholder="99999"
                 value={filters.maxAmount}
                 onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
-                className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
+                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
               />
             </div>
 
@@ -235,7 +284,7 @@ const TransactionsList = () => {
                 type="date"
                 value={filters.startDate}
                 onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
+                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
               />
             </div>
 
@@ -245,7 +294,7 @@ const TransactionsList = () => {
                 type="date"
                 value={filters.endDate}
                 onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                className="w-full p-2.5 border border-border rounded-xl bg-bg text-text focus:outline-none focus:border-primary transition-colors text-sm"
+                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
               />
             </div>
 
@@ -280,43 +329,56 @@ const TransactionsList = () => {
               placeholder="Select users"
             />
 
-            {/* Past Month and Past 3 moonths filter */}
             <div className="flex gap-2">
               <button
                 onClick={() => applyQuickFilter("1m")}
-                className="px-3 py-1 bg-bg border rounded-lg text-sm"
+                className="px-3 py-1 bg-surface-2 border border-border rounded-lg text-sm text-text hover:bg-surface-3 transition-colors"
               >
                 Past Month
               </button>
 
               <button
                 onClick={() => applyQuickFilter("3m")}
-                className="px-3 py-1 bg-bg border rounded-lg text-sm"
+                className="px-3 py-1 bg-surface-2 border border-border rounded-lg text-sm text-text hover:bg-surface-3 transition-colors"
               >
                 Past 3 Months
               </button>
             </div>
           </div>
           
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
+          <div className="flex flex-wrap md:justify-end gap-3 mt-6 pt-4 border-t border-divider">
             <button
               onClick={clearFilters}
-              className="px-4 py-2 border border-border text-muted rounded-xl hover:bg-bg transition-colors duration-200 text-sm font-medium"
+              className="px-4 py-2 border border-border text-muted rounded-xl hover:bg-surface-2 transition-colors duration-200 text-sm font-medium grow shrink"
             >
               Clear
             </button>
             <button
               onClick={handleSearchClick}
               disabled={loading}
-              className="px-6 py-2 bg-text text-surface rounded-xl hover:opacity-90 transition-colors duration-200 text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2 text-center bg-text text-surface rounded-xl hover:opacity-90 transition-colors duration-200 text-sm font-medium disabled:opacity-50 flex items-center gap-2 justify-center grow shrink"
             >
               {loading ? "Searching..." : "Show Transactions"}
+            </button>
+
+            <button
+              onClick={handleDownloadExcel}
+              className="px-4 py-2 border border-border text-text rounded-xl hover:bg-surface-2 transition-colors duration-200 text-sm font-medium grow shrink"
+            >
+              📥 Download Excel
+            </button>
+
+            <button
+              onClick={handleEmailExcel}
+              className="px-4 py-2 border border-border text-text rounded-xl hover:bg-surface-2 transition-colors duration-200 text-sm font-medium grow shrink"
+            >
+              📧 Email Excel
             </button>
           </div>
         </div>
 
         {/* Results Section */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-card border border-border overflow-hidden">
           {transactions === null && !loading && (
              <div className="p-12 text-center">
                <div className="w-16 h-16 bg-bg text-muted rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
@@ -324,7 +386,7 @@ const TransactionsList = () => {
                </div>
                <h3 className="text-lg font-semibold text-text mb-1">Search Transactions</h3>
                <p className="text-sm text-muted">Adjust the filters above and click Show Transactions. </p>
-               <p className="text-sm text-primary">For full details click on the trasnaction yoou want to see full details for</p>
+               <p className="text-sm text-primary">For full details click on the transaction you want to see.</p>
              </div>
           )}
 
@@ -335,19 +397,19 @@ const TransactionsList = () => {
           )}
 
           {transactions !== null &&
-  Object.values(transactions).every(group => group.transactions.length === 0) &&
-  !loading && (
-    <div className="p-12 text-center">
-      <h3 className="text-lg font-semibold text-text mb-1">No transactions found</h3>
-      <p className="text-sm text-muted">Try adjusting your filters.</p>
-    </div>
-)}
+            Object.values(transactions).every(group => group.transactions.length === 0) &&
+            !loading && (
+              <div className="p-12 text-center">
+                <h3 className="text-lg font-semibold text-text mb-1">No transactions found</h3>
+                <p className="text-sm text-muted">Try adjusting your filters.</p>
+              </div>
+          )}
 
           {transactions !== null  && (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-bg border-b border-border">
+                  <tr className="bg-bg border-b border-divider">
                     <th className="p-4 text-sm font-medium text-muted">Title</th>
                     <th className="p-4 text-sm font-medium text-muted">Type</th>
                     <th className="p-4 text-sm font-medium text-muted">Categories</th>
@@ -357,150 +419,106 @@ const TransactionsList = () => {
                     <th className="p-4 text-sm font-medium text-muted text-right">Amount</th>
                   </tr>
                 </thead>
-                {/* <tbody className="divide-y divide-border">
-                  {transactions.map(t => (
-                    <tr 
-                      key={t._id} 
-                      onClick={() => navigate(`/transactions/${t._id}`)}
-                      className="hover:bg-bg cursor-pointer transition-colors duration-150 group"
-                    >
-                      <td className="p-4">
-                        <div className="font-medium text-text group-hover:text-primary transition-colors">{t.title}</div>
-                        {t.description && <div className="text-xs text-muted truncate max-w-xs">{t.description}</div>}
-                      </td>
-                      <td className="p-4">
-                         <span className={getTypeColor(t.type)}>{t.type}</span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex flex-wrap gap-1">
-                          {t.category?.map(c => (
-                            <span key={c._id || c} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md text-text">
-                              {c.name || "N/A"}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex flex-wrap gap-1">
-                          {t.labels?.map(l => (
-                            <span key={l._id || l} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md text-text">
-                              {l.name || "N/A"}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="p-4 text-sm text-muted">
-                        {t.date ? new Date(t.date).toLocaleDateString() : "N/A"}
-                      </td>
-                      <td className="p-4 text-sm text-muted">
-                        {t.user?.name || "N/A"}
-                      </td>
-                      <td className={`p-4 text-right font-semibold ${t.type === 'expense' ? 'text-expense' : t.type === 'income' ? 'text-income' : 'text-investment'}`}>
-                        ₹{t.amount?.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody> */}
-                <tbody className="divide-y divide-border">
-  {["income", "expense", "investment"].map(type => {
-    const group = transactions[type];
-    if (!group || group.transactions.length === 0) return null;
+                <tbody className="divide-y divide-divider">
+                  {["income", "expense", "investment"].map(type => {
+                    const group = transactions[type];
+                    if (!group || group.transactions.length === 0) return null;
 
-    return (
-      <React.Fragment key={type}>
-        {/* SECTION HEADER */}
-        <tr className="bg-bg">
-          <td colSpan="7" className="p-4 font-bold uppercase text-sm text-muted">
-            {type}
-          </td>
-        </tr>
+                    return (
+                      <React.Fragment key={type}>
+                        {/* SECTION HEADER */}
+                        <tr className="bg-bg">
+                          <td colSpan="7" className="p-4 font-bold uppercase text-sm text-muted">
+                            {type}
+                          </td>
+                        </tr>
 
-        {/* ROWS */}
-        {group.transactions.map(t => (
-          <tr
-            key={t._id}
-            onClick={() => navigate(`/transactions/${t._id}`)}
-            className="hover:bg-bg cursor-pointer transition-colors duration-150 group"
-          >
-            <td className="p-4">
-              <div className="font-medium text-text group-hover:text-primary">
-                {t.title}
-              </div>
-              {t.description && (
-                <div className="text-xs text-muted truncate max-w-xs">
-                  {t.description}
-                </div>
-              )}
-            </td>
+                        {/* ROWS */}
+                        {group.transactions.map(t => (
+                          <tr
+                            key={t._id}
+                            onClick={() => navigate(`/transactions/${t._id}`)}
+                            className="hover:bg-card-hover cursor-pointer transition-colors duration-150 group"
+                          >
+                            <td className="p-4">
+                              <div className="font-medium text-text group-hover:text-primary">
+                                {t.title}
+                              </div>
+                              {t.description && (
+                                <div className="text-xs text-muted truncate max-w-xs">
+                                  {t.description}
+                                </div>
+                              )}
+                            </td>
 
-            <td className="p-4">
-              <span className={getTypeColor(t.type)}>{t.type}</span>
-            </td>
+                            <td className="p-4">
+                              <span className={getTypeColor(t.type)}>{t.type}</span>
+                            </td>
 
-            <td className="p-4">
-              <div className="flex flex-wrap gap-1">
-                {t.category ? (
-                  <span className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md">
-                    {t.category.name}
-                  </span>
-                ) : (
-                  "N/A"
-                )}
-              </div>
-            </td>
+                            <td className="p-4">
+                              <div className="flex flex-wrap gap-1">
+                                {t.category ? (
+                                  <span className="text-xs px-2 py-0.5 bg-surface-2 border border-border rounded-md text-text">
+                                    {t.category.name}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted text-xs">N/A</span>
+                                )}
+                              </div>
+                            </td>
 
-            <td className="p-4">
-              <div className="flex flex-wrap gap-1">
-                {t.labels?.map(l => (
-                  <span key={l._id || l} className="text-xs px-2 py-0.5 bg-bg border border-border rounded-md">
-                    {l.name || "N/A"}
-                  </span>
-                ))}
-              </div>
-            </td>
+                            <td className="p-4">
+                              <div className="flex flex-wrap gap-1">
+                                {t.labels?.map(l => (
+                                  <span key={l._id || l} className="text-xs px-2 py-0.5 bg-surface-2 border border-border rounded-md text-text">
+                                    {l.name || "N/A"}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
 
-            <td className="p-4 text-sm text-muted">
-              {t.date ? new Date(t.date).toLocaleDateString() : "N/A"}
-            </td>
+                            <td className="p-4 text-sm text-text-secondary">
+                              {t.date ? new Date(t.date).toLocaleDateString() : "N/A"}
+                            </td>
 
-            <td className="p-4 text-sm text-muted">
-              {t.user?.name || "N/A"}
-            </td>
+                            <td className="p-4 text-sm text-text-secondary">
+                              {t.user?.name || "N/A"}
+                            </td>
 
-            <td className={`p-4 text-right font-semibold ${
-              t.type === 'expense'
-                ? 'text-expense'
-                : t.type === 'income'
-                ? 'text-income'
-                : 'text-investment'
-            }`}>
-              ₹{t.amount?.toLocaleString()}
-            </td>
-          </tr>
-        ))}
+                            <td className={`p-4 text-right font-semibold ${
+                              t.type === 'expense'
+                                ? 'text-expense'
+                                : t.type === 'income'
+                                ? 'text-income'
+                                : 'text-investment'
+                            }`}>
+                              ₹{t.amount?.toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
 
-        {/* TOTAL ROW */}
-        <tr className="bg-bg border-t">
-          <td colSpan="6" className="p-4 text-right font-semibold text-text">
-            Total {type}
-          </td>
-          <td className="p-4 text-right font-bold">
-            ₹{group.total.toLocaleString()}
-          </td>
-        </tr>
-      </React.Fragment>
-    );
-  })}
-</tbody>
+                        {/* TOTAL ROW */}
+                        <tr className="bg-surface-2 border-t border-divider">
+                          <td colSpan="6" className="p-4 text-right font-semibold text-text">
+                            Total {type}
+                          </td>
+                          <td className="p-4 text-right font-bold text-text">
+                            ₹{group.total.toLocaleString()}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
               </table>
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-between items-center p-4 border-t border-border bg-bg">
+                <div className="flex justify-between items-center p-4 border-t border-divider bg-bg">
                   <button
                     disabled={page <= 1 || loading}
                     onClick={() => fetchTransactions(page - 1)}
-                    className="px-4 py-2 bg-surface border border-border text-text rounded-xl hover:bg-bg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-surface border border-border text-text rounded-xl hover:bg-surface-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                   >
                     Previous
                   </button>
@@ -510,7 +528,7 @@ const TransactionsList = () => {
                   <button
                     disabled={page >= totalPages || loading}
                     onClick={() => fetchTransactions(page + 1)}
-                    className="px-4 py-2 bg-surface border border-border text-text rounded-xl hover:bg-bg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-surface border border-border text-text rounded-xl hover:bg-surface-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                   >
                     Next
                   </button>

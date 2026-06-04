@@ -136,12 +136,64 @@ const deleteTransaction = async (id) => {
   }
 };
 
+
+/**
+ * Download transactions Excel
+ */
+const downloadTransactionsExcel = async (params = {}) => {
+  try {
+    const response = await api.get(
+      "/transactions/export/excel",
+      {
+        params,
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" }),
+        responseType: "blob"
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Download Excel Error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+/**
+ * Email transactions Excel
+ */
+const emailTransactionsExcel = async (params = {}) => {
+  try {
+    const response = await api.post(
+      "/transactions/export/email",
+      {},
+      {
+        params,
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" })
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Email Excel Error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 const TransactionService = {
   createTransaction,
   getTransactions,
   getTransactionById,
   updateTransaction,
   deleteTransaction,
+  downloadTransactionsExcel,
+  emailTransactionsExcel
 };
-
 export default TransactionService;

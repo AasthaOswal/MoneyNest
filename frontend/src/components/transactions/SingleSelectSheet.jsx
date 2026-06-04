@@ -8,6 +8,7 @@ const SingleSelectSheet = ({
   onChange,
   placeholder = "Select item",
   emptyText = "No items found.",
+  required = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -58,12 +59,20 @@ const SingleSelectSheet = ({
     onChange(null);
   };
 
+  console.log("selectedId", selectedId);
+
+console.log(
+  "selectedItem",
+  options.find(item => item._id === selectedId)
+);
+
   const buttonText = selectedItem?.name || placeholder;
 
   return (
     <div>
       <label className="mb-2 block text-sm font-medium text-text">
-        {label} <span className="text-expense">*</span>
+        {label}
+        {required && <span className="text-expense"> *</span>}
       </label>
 
       <button
