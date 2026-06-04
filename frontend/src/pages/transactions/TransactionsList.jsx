@@ -12,6 +12,16 @@ import {
   removeTransactionListeners,
 } from "../../socket/socketTransaction";
 
+import {
+  Plus,
+  Search,
+  RotateCcw,
+  Download,
+  Mail,
+  CalendarDays,
+  Receipt,
+} from "lucide-react";
+
 const TransactionsList = () => {
   const navigate = useNavigate();
 
@@ -221,9 +231,9 @@ const TransactionsList = () => {
           </div>
           <button
             onClick={() => navigate("/transactions/create")}
-            className="bg-primary text-text-on-primary px-5 py-2.5 rounded-xl hover:bg-primary-hover font-medium shadow-card transition-colors duration-200"
-          >
-            + Add Transaction
+            className="inline-flex items-center gap-2 bg-primary text-text-on-primary px-5 py-2.5 rounded-xl hover:bg-primary-hover  font-medium transition-colors hover:cursor-pointer">
+            <Plus size={18} />
+            Add Transaction
           </button>
         </div>
 
@@ -231,7 +241,7 @@ const TransactionsList = () => {
         <div className="bg-surface p-6 rounded-2xl shadow-card border border-border">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="lg:col-span-2">
-              <label className="block text-xs font-medium text-muted mb-1">Search</label>
+              <label className="block text-md font-semibold text-muted mb-1">Search</label>
               <input
                 placeholder="Title, description..."
                 value={filters.search}
@@ -241,7 +251,7 @@ const TransactionsList = () => {
             </div>
             
             <div className="lg:col-span-1">
-              <label className="block text-xs font-medium text-muted mb-1">Type</label>
+              <label className="block text-md font-semibold text-muted mb-1">Type</label>
               <select
                 value={filters.type}
                 onChange={(e) => setFilters({ ...filters, type: e.target.value })}
@@ -254,8 +264,10 @@ const TransactionsList = () => {
               </select>
             </div>
 
+            
+
             <div className="lg:col-span-1">
-              <label className="block text-xs font-medium text-muted mb-1">Min Amount</label>
+              <label className="block text-md font-semibold text-muted mb-1">Min Amount</label>
               <input
                 type="number"
                 min="0"
@@ -267,7 +279,7 @@ const TransactionsList = () => {
             </div>
 
             <div className="lg:col-span-1">
-              <label className="block text-xs font-medium text-muted mb-1">Max Amount</label>
+              <label className="block text-md font-semibold text-muted mb-1">Max Amount</label>
               <input
                 type="number"
                 min="0"
@@ -279,7 +291,7 @@ const TransactionsList = () => {
             </div>
 
              <div className="lg:col-span-1">
-              <label className="block text-xs font-medium text-muted mb-1">Start Date</label>
+              <label className="block text-md font-semibold text-muted mb-1">Start Date</label>
               <input
                 type="date"
                 value={filters.startDate}
@@ -289,7 +301,7 @@ const TransactionsList = () => {
             </div>
 
             <div className="lg:col-span-1">
-              <label className="block text-xs font-medium text-muted mb-1">End Date</label>
+              <label className="block text-md font-semibold text-muted mb-1">End Date</label>
               <input
                 type="date"
                 value={filters.endDate}
@@ -329,65 +341,96 @@ const TransactionsList = () => {
               placeholder="Select users"
             />
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => applyQuickFilter("1m")}
-                className="px-3 py-1 bg-surface-2 border border-border rounded-lg text-sm text-text hover:bg-surface-3 transition-colors"
-              >
-                Past Month
-              </button>
+            {/* Quick Filters */}
+            <div className="lg:col-span-3">
+              <label className="block text-md font-semibold text-muted mb-2">
+                Quick Date Filters
+              </label>
 
-              <button
-                onClick={() => applyQuickFilter("3m")}
-                className="px-3 py-1 bg-surface-2 border border-border rounded-lg text-sm text-text hover:bg-surface-3 transition-colors"
-              >
-                Past 3 Months
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => applyQuickFilter("1m")}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-2  border border-border text-text-secondary  hover:bg-surface-3 hover:text-text transition-colors hover:cursor-pointer">
+                  <CalendarDays size={16} />
+                  Past Month
+                </button>
+
+                <button
+                  onClick={() => applyQuickFilter("3m")}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-2 border border-border text-text-secondary  hover:bg-surface-3  hover:text-text  transition-colors hover:cursor-pointer">
+                  <CalendarDays size={16} />
+                  Past 3 Months
+                </button>
+              </div>
             </div>
           </div>
           
-          <div className="flex flex-wrap md:justify-end gap-3 mt-6 pt-4 border-t border-divider">
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 border border-border text-muted rounded-xl hover:bg-surface-2 transition-colors duration-200 text-sm font-medium grow shrink"
-            >
-              Clear
-            </button>
-            <button
-              onClick={handleSearchClick}
-              disabled={loading}
-              className="px-6 py-2 text-center bg-text text-surface rounded-xl hover:opacity-90 transition-colors duration-200 text-sm font-medium disabled:opacity-50 flex items-center gap-2 justify-center grow shrink"
-            >
-              {loading ? "Searching..." : "Show Transactions"}
-            </button>
+          {/* Action Bar */}
+          <div className="mt-8 pt-6 border-t border-divider">
 
-            <button
-              onClick={handleDownloadExcel}
-              className="px-4 py-2 border border-border text-text rounded-xl hover:bg-surface-2 transition-colors duration-200 text-sm font-medium grow shrink"
-            >
-              📥 Download Excel
-            </button>
+            <div className="flex flex-wrap gap-3 justify-between">
 
-            <button
-              onClick={handleEmailExcel}
-              className="px-4 py-2 border border-border text-text rounded-xl hover:bg-surface-2 transition-colors duration-200 text-sm font-medium grow shrink"
-            >
-              📧 Email Excel
-            </button>
+              <div className="flex flex-wrap gap-3">
+
+                <button
+                  onClick={handleDownloadExcel}
+                  className="inline-flex items-center gap-2  px-4  py-2.5  rounded-xl border  border-border bg-surface-2  text-text  hover:bg-surface-3  transition-colors hover:cursor-pointer">
+                  <Download size={16} />
+                  Download Excel
+                </button>
+
+                <button
+                  onClick={handleEmailExcel}
+                  className="inline-flex items-center gap-2  px-4  py-2.5  rounded-xl border  border-border bg-surface-2  text-text  hover:bg-surface-3  transition-colors hover:cursor-pointer">
+                  <Mail size={16} />
+                  Email Excel
+                </button>
+
+              </div>
+
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-2  px-4  py-2.5  rounded-xl  bg-surface-2  border  border-border  text-text-secondary  hover:bg-surface-3  hover:text-text transition-colors hover:cursor-pointer" >
+                  <RotateCcw size={16} />
+                  Clear Filters
+                </button>
+
+                <button
+                  onClick={handleSearchClick}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2  px-4  py-2.5  rounded-xl bg-primary text-text-on-primary  hover:bg-primary-hover  disabled:opacity-50  transition-colors  font-medium">
+                  <Search size={16} />
+                  {loading ? "Loading........" : "Show Transactions"}
+                </button>
+              </div>
+
+            </div>
+
           </div>
         </div>
 
         {/* Results Section */}
         <div className="bg-surface rounded-2xl shadow-card border border-border overflow-hidden">
           {transactions === null && !loading && (
+  
+
              <div className="p-12 text-center">
-               <div className="w-16 h-16 bg-bg text-muted rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                 🔍
-               </div>
-               <h3 className="text-lg font-semibold text-text mb-1">Search Transactions</h3>
-               <p className="text-sm text-muted">Adjust the filters above and click Show Transactions. </p>
-               <p className="text-sm text-primary">For full details click on the transaction you want to see.</p>
-             </div>
+                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-surface-2 border border-border flex items-center justify-center">
+                  <Receipt size={38} className="text-primary" />
+                </div>
+
+                <h5 className="text-xl font-semibold text-text mb-2">
+                  Use the filters above to find transactions.
+                </h5>
+
+                <p className="text-text-secondary max-w-lg mx-auto mb-5">
+                  Click on show transactions button above to show transactions list.
+                </p>
+
+
+              </div>
           )}
 
           {loading && transactions === null && (
@@ -400,8 +443,17 @@ const TransactionsList = () => {
             Object.values(transactions).every(group => group.transactions.length === 0) &&
             !loading && (
               <div className="p-12 text-center">
-                <h3 className="text-lg font-semibold text-text mb-1">No transactions found</h3>
-                <p className="text-sm text-muted">Try adjusting your filters.</p>
+                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-surface-2 border border-border flex items-center justify-center">
+                  <Search size={36} className="text-muted" />
+                </div>
+
+                <h3 className="text-xl font-semibold text-text mb-2">
+                  No Transactions Found
+                </h3>
+
+                <p className="text-text-secondary max-w-md mx-auto">
+                  We couldn't find any transactions matching your current filters.
+                </p>
               </div>
           )}
 

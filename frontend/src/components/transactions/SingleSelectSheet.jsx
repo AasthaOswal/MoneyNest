@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 const SingleSelectSheet = ({
   label,
@@ -70,7 +71,7 @@ console.log(
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-text">
+      <label className="block text-md font-semibold text-muted mb-1">
         {label}
         {required && <span className="text-expense"> *</span>}
       </label>
@@ -78,15 +79,13 @@ console.log(
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-bg px-4 py-3 text-left text-sm text-text shadow-sm transition-all hover:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        className="flex w-full items-center justify-between gap-x-6 gap-y-3  rounded-xl border border-border bg-input-bg p-2.5 text-left text-sm text-text shadow-sm transition-all hover:border-primary focus:outline-none focus:ring-1 focus:ring-primary hover:cursor-pointer "
       >
         <span className={!selectedItem ? "text-muted" : "text-text"}>
           {buttonText}
         </span>
 
-        <span className="text-xs text-muted">
-          {selectedItem ? "Selected" : "Select"}
-        </span>
+        <ChevronDown size={16} className="text-muted shrink-0" />
       </button>
 
       {selectedItem && (
@@ -106,7 +105,7 @@ console.log(
         </div>
       )}
 
-      <p className="mt-2 text-xs text-muted">{placeholder}</p>
+      {/* <p className="mt-2 text-xs text-muted">{placeholder}</p> */}
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/50">

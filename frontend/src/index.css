@@ -455,3 +455,19 @@
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-hover) var(--color-surface);
 }
+
+
+select {
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  border-color: var(--color-input-border);
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
