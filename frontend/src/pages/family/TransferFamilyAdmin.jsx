@@ -37,17 +37,19 @@ const TransferFamilyAdmin = () => {
 
     if (!confirmTransfer) return;
 
+    const toastId = toast.loading("Please wait while we transfer familyAdmin role...");
+
     try {
       setTransferring(true);
 
       const res = await FamilyService.transferFamilyAdmin(memberId);
 
       if (res.success) {
-        toast.success("Family Admin role transferred successfully");
+        toast.success("Family Admin role transferred successfully", {id:toastId});
         navigate("/family");
       }
     } catch (err) {
-      toast.error(err?.message || "Failed to transfer admin role");
+      toast.error(err?.message || "Failed to transfer admin role", {id:toastId});
     } finally {
       setTransferring(false);
     }

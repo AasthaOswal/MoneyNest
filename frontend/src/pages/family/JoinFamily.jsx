@@ -5,11 +5,15 @@ import { useAuth } from "../../context/AuthContext";
 import api from "../../axios/axios";
 import toast from "react-hot-toast";
 
+import { Users } from "lucide-react";
+
 const JoinFamily = () => {
   const [tokenInput, setTokenInput] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { setUser } = useAuth();
+
   const extractToken = (input) => {
     try {
       const url = new URL(input);
@@ -18,72 +22,156 @@ const JoinFamily = () => {
       return input;
     }
   };
-  
 
   const handleJoin = async () => {
-    if (!tokenInput.trim()) return;
+    if (!tokenInput.trim()) {
+      toast.error("Please enter an invite link or token");
+      return;
+    }
+
+    const toastId = toast.loading("Joining family...");
 
     try {
       setLoading(true);
 
       const token = extractToken(tokenInput);
 
-      const res = await FamilyService.joinFamilyWithToken({
+      const response = await FamilyService.joinFamilyWithToken({
         token,
       });
 
-      if (res.success) {
-        toast.success("Family joined successfully");
-       const res = await api.get("/user/me", { skipAuthRefresh: true });
-        const user = res.data.user;
-        console.log(user)
+      if (response.success) {
+        const userResponse = await api.get("/user/me", {
+          skipAuthRefresh: true,
+        });
 
-        if(!user){
+        const user = userResponse.data.user;
+
+        if (!user) {
+          toast.error("Session expired", {
+            id: toastId,
+          });
           navigate("/login", { replace: true });
+          return;
         }
 
         setUser(user);
-        
+
+        toast.success("Successfully joined family!", {
+          id: toastId,
+        });
+
         navigate("/family");
       }
     } catch (err) {
       console.log(err);
-      toast.error(err.message || "Failed to join family");
+
+      toast.error(
+        err?.message || "Failed to join family",
+        {
+          id: toastId,
+        }
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg text-text flex items-center justify-center p-6">
-      <div className="bg-surface border border-border rounded-2xl p-8 w-full max-w-md space-y-6">
+    <div className="min-h-[80vh] h-auto bg-bg flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
+        <div className="bg-card border border-border rounded-3xl shadow-card overflow-hidden">
 
-        <h2 className="text-xl font-semibold text-center">
-          Join Family
-        </h2>
+          {/* Header */}
+          <div className="p-8 border-b border-divider">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-primary-subtle flex items-center justify-center mb-5">
+            <Users className="w-8 h-8 text-primary" />
+          </div>
 
-        <input
-          type="text"
-          placeholder="Paste invite link or token"
-          value={tokenInput}
-          onChange={(e) => setTokenInput(e.target.value)}
-          className="w-full border border-border bg-bg rounded-lg p-3"
-        />
+            <h1 className="text-2xl font-bold text-text text-center">
+              Join Family
+            </h1>
 
-        <button
-          onClick={handleJoin}
-          disabled={loading}
-          className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-lg"
-        >
-          {loading ? "Joining..." : "Join Family"}
-        </button>
+            <p className="text-text-secondary text-sm text-center mt-2">
+              Paste your invite link or family token to join an existing family.
+            </p>
+          </div>
 
-        <button
-          onClick={() => navigate("/family/setup")}
-          className="w-full text-muted text-sm"
-        >
-          ← Back
-        </button>
+          {/* Form */}
+          <div className="p-8 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">
+                Invite Link or Token
+              </label>
+
+              <input
+                type="text"
+                placeholder="Paste it here"
+                value={tokenInput}
+                onChange={(e) => setTokenInput(e.target.value)}
+                className="
+                  w-full
+                  bg-input-bg
+                  border
+                  border-input-border
+                  rounded-xl
+                  px-4
+                  py-3
+                  text-text
+                  placeholder:text-placeholder
+                  outline-none
+                  transition-all
+                  focus:border-input-focus
+                  focus:ring-2
+                  focus:ring-primary-subtle
+                "
+              />
+
+              <p className="text-xs text-muted mt-2">
+                You can paste either the full invite link or just the token.
+              </p>
+            </div>
+
+            <button
+              onClick={handleJoin}
+              disabled={loading}
+              className="
+                w-full
+                bg-primary
+                hover:bg-primary-hover
+                active:bg-primary-active
+                text-text-on-primary
+                font-semibold
+                py-3.5
+                rounded-xl
+                transition-all
+                disabled:opacity-60
+                disabled:cursor-not-allowed
+              "
+            >
+              {loading ? "Joining Family..." : "Join Family"}
+            </button>
+
+            <button
+              onClick={() => navigate("/family/setup")}
+              disabled={loading}
+              className="
+                w-full
+                border
+                border-border
+                hover:border-border-hover
+                bg-surface
+                hover:bg-surface-2
+                text-text-secondary
+                py-3
+                rounded-xl
+                transition-all
+              "
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

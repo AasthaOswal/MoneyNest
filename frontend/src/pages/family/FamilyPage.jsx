@@ -168,113 +168,7 @@ const FamilyPage = () => {
   return (
     <div className="min-h-screen bg-bg text-text">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* ========================= */}
-        {/* NO FAMILY */}
-        {/* ========================= */}
-        {!family && (
-          <>
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-card">
-              <h2 className="text-2xl font-semibold mb-2">
-                Create a Family
-              </h2>
 
-              <p className="text-text-secondary mb-6">
-                Create a family and start managing
-                expenses together.
-              </p>
-
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Enter family name"
-                  value={familyName}
-                  onChange={(e) =>
-                    setFamilyName(e.target.value)
-                  }
-                  className="
-                    w-full
-                    bg-input-bg
-                    border border-input-border
-                    rounded-xl
-                    px-4 py-3
-                    outline-none
-                    focus:border-input-focus
-                  "
-                />
-
-                <button
-                  onClick={handleCreateFamily}
-                  disabled={
-                    loading || !familyName.trim()
-                  }
-                  className="
-                    w-full
-                    bg-primary
-                    text-text-on-primary
-                    py-3
-                    rounded-xl
-                    font-medium
-                    hover:bg-primary-hover
-                    disabled:opacity-50
-                    transition-colors
-                  "
-                >
-                  Create Family
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-card">
-              <h2 className="text-2xl font-semibold mb-2">
-                Join a Family
-              </h2>
-
-              <p className="text-text-secondary mb-6">
-                Paste an invite link or token.
-              </p>
-
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Paste invite link or token"
-                  value={joinToken}
-                  onChange={(e) =>
-                    setJoinToken(e.target.value)
-                  }
-                  className="
-                    w-full
-                    bg-input-bg
-                    border border-input-border
-                    rounded-xl
-                    px-4 py-3
-                    outline-none
-                    focus:border-input-focus
-                  "
-                />
-
-                <button
-                  onClick={handleJoinFamily}
-                  disabled={
-                    loading || !joinToken.trim()
-                  }
-                  className="
-                    w-full
-                    bg-primary
-                    text-text-on-primary
-                    py-3
-                    rounded-xl
-                    font-medium
-                    hover:bg-primary-hover
-                    disabled:opacity-50
-                    transition-colors
-                  "
-                >
-                  Join Family
-                </button>
-              </div>
-            </div>
-          </>
-        )}
 
         {/* ========================= */}
         {/* FAMILY DETAILS */}
@@ -425,6 +319,13 @@ const FamilyPage = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ========================= */}
+        {/* NO FAMILY */}
+        {/* ========================= */}
+        {!family && (
+          <><div>Please join a family</div></>
         )}
       </div>
     </div>
