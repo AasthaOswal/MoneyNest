@@ -63,6 +63,7 @@ import NotificationDetailsPage from './pages/notifications/NotificationDetailsPa
 import PushNotificationSettings from './pages/notifications/PushNotificationSettings';
 
 import AuthCallback from './pages/auth/AuthCallback.jsx';
+import Profile from './pages/auth/Profile.jsx';
 
 function App() {
 
@@ -106,6 +107,7 @@ function App() {
 
               {/* Dashboard Layout Wrapper */}
               <Route element={<DashboardLayout />}>
+                <Route path="/profile" element= {<Profile/>} />
 
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>

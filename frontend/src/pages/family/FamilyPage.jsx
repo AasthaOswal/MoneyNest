@@ -108,19 +108,6 @@ const handleJoinFamily = async () => {
   }
 };
 
-  // =========================
-  // 🔴 LEAVE FAMILY
-  // =========================
-  const handleLeaveFamily = async () => {
-    try {
-      setLoading(true);
-      navigate("/family/leave")
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
 
@@ -207,16 +194,6 @@ const handleCopy = async () => {
             </div>
 
 
-
-            {/* Button to leave family if the user is not the only member */}
-            {members.length > 1 && (
-              <button
-                onClick={handleLeaveFamily}
-                className="bg-error hover:bg-error-hover text-white px-4 py-2 rounded-lg"
-              >
-                Leave Family
-              </button>
-            )}
           </div>
         )}
       </div>

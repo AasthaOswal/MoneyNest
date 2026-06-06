@@ -18,12 +18,10 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
 
-  const handleLogout = () => {
-    logout();
-  };
+
 
   const navItems = user?.role === 'admin' 
     ? [
@@ -36,7 +34,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Categories', path: '/categories', icon: List, requiresFamily: true },
         { name: 'Labels', path: '/labels', icon: Tag, requiresFamily: true },
         { name: 'Goals', path: '/goals', icon: Target, requiresFamily: true },
-        { name: 'Reminders', path: '/reminders', icon: Bell, requiresFamily: true },
         { name: 'Notifications', path: '/notifications', icon: Bell, requiresFamily: true },
         { name: 'Family', path: '/family', icon: Users, requiresFamily: true },
         ...(user?.role === 'familyAdmin' ? [{ name: 'Manage Family', path: '/family/manage', icon: Users }] : [])
@@ -110,16 +107,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             );
           })}
         </nav>
-
-        <div className="p-4 border-t border-border mt-auto">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 text-red-500 font-medium rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
-        </div>
       </aside>
     </>
   );

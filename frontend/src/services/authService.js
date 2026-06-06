@@ -78,7 +78,7 @@ const logout = async () => {
   disconnectSocket();
 
   const res = await api.post("/auth/logout");
-  window.location.href = "/login";
+  return res.data;
 };
 
 // =======================
