@@ -6,6 +6,7 @@ import FamilyService from "../../services/family.service";
 import { useNavigate } from "react-router-dom";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
 import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
+import TypeSelect from "../../components/transactions/TypeSelect";
 import toast from "react-hot-toast";
 import {
   setupTransactionListeners,
@@ -267,17 +268,15 @@ const TransactionsList = () => {
             </div>
             
             <div className="lg:col-span-1">
-              <label className="block text-md font-semibold text-muted mb-1">Type</label>
-              <select
+              <TypeSelect
                 value={filters.type}
-                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
-              >
-                <option value="">All Types</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-                <option value="investment">Investment</option>
-              </select>
+                onChange={(value) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    type: value,
+                  }))
+                }
+              />
             </div>
 
             
