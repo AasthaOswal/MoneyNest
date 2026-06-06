@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-
-@import "tailwindcss";
-
 @theme {
   /* This automatically creates classes like bg-bg, text-primary, etc. */
   --color-bg: rgb(249 250 251);
