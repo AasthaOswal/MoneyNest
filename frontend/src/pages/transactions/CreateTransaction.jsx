@@ -4,7 +4,7 @@ import api from "../../axios/axios";
 import { useNavigate } from "react-router-dom";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
 import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
-
+import toast from "react-hot-toast";
 const CreateTransaction = () => {
   const navigate = useNavigate();
 
@@ -84,10 +84,13 @@ const CreateTransaction = () => {
         transactionDoc: file,
       });
 
-      console.log(response);
+      toast.succes(response.message);
 
       navigate(`/transactions/${response.data._id}`);
     } catch (err) {
+      
+      console.log(err.response)
+    toast.error(err.response.data.message)
       setErrorMsg(
         err.response?.data?.message || err.message || "Something went wrong."
       );

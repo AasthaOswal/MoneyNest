@@ -67,7 +67,7 @@ const Header = ({ setIsOpen }) => {
 
 
 {/* in dropdown we will add links to routes of - profile page, push notificaion permission and management page, logout button - and each link will have icon or atleast logout button will have icon , and the userinfo section of header also we will add here it self like atleast in smaller devices - on largger devices it can star as it is*/}
-        {/* DROPDOWN */} ,
+        {/* DROPDOWN */} 
         <Menu as="div" className="relative inline-block">
           <MenuButton className="flex items-center gap-1 focus:outline-none">
             <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-white shadow-sm">
@@ -76,7 +76,7 @@ const Header = ({ setIsOpen }) => {
 
             <ChevronDownIcon
               aria-hidden="true"
-              className="w-4 h-4 text-gray-500"
+              className="w-6 h-6 text-gray-500"
             />
           </MenuButton>
 

@@ -6,7 +6,7 @@ import FamilyService from "../../services/family.service";
 import { useNavigate } from "react-router-dom";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
 import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
-
+import toast from "react-hot-toast";
 import {
   setupTransactionListeners,
   removeTransactionListeners,
@@ -29,6 +29,7 @@ const TransactionsList = () => {
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
+  const [summary, setSummary] = useState(null);
 
   const [filters, setFilters] = useState({
     search: "",
@@ -93,6 +94,7 @@ const TransactionsList = () => {
 
   const fetchTransactions = async (pageToFetch = 1) => {
     setLoading(true);
+    const toastId = toast.loading("Fetching Transactions.....")
     try {
       const activeFilters = {};
 
@@ -110,10 +112,13 @@ const TransactionsList = () => {
 
       const res = await TransactionService.getTransactions({ ...activeFilters, page: pageToFetch });
       setTransactions(res.data);
+      setSummary(res.summary);
       setTotalPages(res.totalPages || 1);
       setPage(res.page || 1);
+      toast.success("Transactions fetched successfully", {id: toastId});
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
+      toast.error(err.response.data.message, { id: toastId,});
     } finally {
       setLoading(false);
     }
@@ -139,6 +144,7 @@ const TransactionsList = () => {
 
 
   const handleDownloadExcel = async () => {
+    const toastId = toast.loading("Please wait....We are preparing excel");
     try {
       const activeFilters = getActiveFilters();
 
@@ -161,13 +167,15 @@ const TransactionsList = () => {
       link.remove();
 
       window.URL.revokeObjectURL(url);
+      toast.success("Excel downloaded successfully", {id:toastId});
     } catch (err) {
       console.error(err);
-      alert("Failed to download Excel");
+      toast.error(err.response.data.message || "Failed to download excel.", {id:toastId});
     }
   };
 
   const handleEmailExcel = async () => {
+    const toastId = toast.loading("Please wait while we send email....");
     try {
       const activeFilters = getActiveFilters();
 
@@ -176,10 +184,10 @@ const TransactionsList = () => {
           activeFilters
         );
 
-      alert(res.message || "Email sent successfully");
+      toast.success(res.message || "Email sent successfully...!", {id:toastId});
     } catch (err) {
       console.error(err);
-      alert("Failed to send email");
+      toaast.error( err.response.data.message  || "Failed to send email", {id:toastId});
     }
   };
 
@@ -226,8 +234,16 @@ const TransactionsList = () => {
         {/* Top Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface p-6 rounded-2xl shadow-card border border-border">
           <div>
-            <h2 className="text-2xl font-bold text-text">Transactions</h2>
-            <p className="text-muted text-sm mt-1">Manage and filter your transaction history.</p>
+            <h2 className="text-2xl font-bold text-text">
+              Transactions
+            </h2>
+
+
+            <p className="mt-3 text-sm text-text-secondary max-w-xl">
+              Apply filters to narrow down results, then click
+              <span className="font-medium text-text"> Show Transactions </span>
+              to view matching records.
+            </p>
           </div>
           <button
             onClick={() => navigate("/transactions/create")}
@@ -374,14 +390,16 @@ const TransactionsList = () => {
 
                 <button
                   onClick={handleDownloadExcel}
-                  className="inline-flex items-center gap-2  px-4  py-2.5  rounded-xl border  border-border bg-surface-2  text-text  hover:bg-surface-3  transition-colors hover:cursor-pointer">
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-primary/30 bg-primary/10 text-primary hover:bg-primary/15 hover:border-primary/50 transition-colors hover:cursor-pointer font-medium"
+                >
                   <Download size={16} />
                   Download Excel
                 </button>
 
                 <button
                   onClick={handleEmailExcel}
-                  className="inline-flex items-center gap-2  px-4  py-2.5  rounded-xl border  border-border bg-surface-2  text-text  hover:bg-surface-3  transition-colors hover:cursor-pointer">
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-primary/30 bg-primary/10 text-primary hover:bg-primary/15 hover:border-primary/50 transition-colors hover:cursor-pointer font-medium"
+                >
                   <Mail size={16} />
                   Email Excel
                 </button>
@@ -411,27 +429,66 @@ const TransactionsList = () => {
           </div>
         </div>
 
+        {/* Summary Section */}
+        {summary && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            {/* Income */}
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-card">
+              <p className="text-sm text-muted mb-2">
+                Total Income
+              </p>
+
+              <h3 className="text-2xl font-bold text-income">
+                ₹{summary.incomeTotal.toLocaleString()}
+              </h3>
+            </div>
+
+            {/* Expense */}
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-card">
+              <p className="text-sm text-muted mb-2">
+                Total Expense
+              </p>
+
+              <h3 className="text-2xl font-bold text-expense">
+                ₹{summary.expenseTotal.toLocaleString()}
+              </h3>
+            </div>
+
+            {/* Investment */}
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-card">
+              <p className="text-sm text-muted mb-2">
+                Total Investment
+              </p>
+
+              <h3 className="text-2xl font-bold text-investment">
+                ₹{summary.investmentTotal.toLocaleString()}
+              </h3>
+            </div>
+
+            {/* Net Balance */}
+            <div className="bg-surface border border-border rounded-2xl p-5 shadow-card">
+              <p className="text-sm text-muted mb-2">
+                Net Balance
+              </p>
+
+              <h3
+                className={`text-2xl font-bold ${
+                  summary.netBalance >= 0
+                    ? "text-income"
+                    : "text-expense"
+                }`}
+              >
+                ₹{summary.netBalance.toLocaleString()}
+              </h3>
+            </div>
+
+          </div>
+        )}
+
         {/* Results Section */}
         <div className="bg-surface rounded-2xl shadow-card border border-border overflow-hidden">
-          {transactions === null && !loading && (
-  
 
-             <div className="p-12 text-center">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-surface-2 border border-border flex items-center justify-center">
-                  <Receipt size={38} className="text-primary" />
-                </div>
-
-                <h5 className="text-xl font-semibold text-text mb-2">
-                  Use the filters above to find transactions.
-                </h5>
-
-                <p className="text-text-secondary max-w-lg mx-auto mb-5">
-                  Click on show transactions button above to show transactions list.
-                </p>
-
-
-              </div>
-          )}
 
           {loading && transactions === null && (
             <div className="p-12 text-center text-muted animate-pulse">
@@ -552,7 +609,7 @@ const TransactionsList = () => {
                         {/* TOTAL ROW */}
                         <tr className="bg-surface-2 border-t border-divider">
                           <td colSpan="6" className="p-4 text-right font-semibold text-text">
-                            Total {type}
+                            Subtotal {type}
                           </td>
                           <td className="p-4 text-right font-bold text-text">
                             ₹{group.total.toLocaleString()}
