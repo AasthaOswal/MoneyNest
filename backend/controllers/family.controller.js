@@ -288,7 +288,7 @@ export const editFamily = async (req, res) => {
 };
 
 
-
+// if a member leaves then send notification toall other members of the famiyl
 export const leaveFamily = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -330,7 +330,7 @@ export const leaveFamily = async (req, res) => {
   }
 };
 
-
+// we should also send them notification that familyAdmin has removed  them - so aadd this notificaiton thingy
 export const removeFamilyMember = async (req, res) => {
   try {
     const adminId = req.user._id;
