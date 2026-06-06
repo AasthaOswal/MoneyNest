@@ -199,6 +199,25 @@ const ManageFamily = () => {
                             Remove
                           </button>
                         )}
+
+                        {currentUser?.role ===
+                        "familyAdmin" &&
+                        user?._id !== m._id && (
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/family/transfer-admin/${m._id}`, {state:{
+                                  member:m
+                                }}
+                              )
+                            }
+                            className="px-3 py-1.5 rounded-lg bg-error-bg text-error hover:border-border-hover border border-transparent transition-all text-sm hover:cursor-pointer"
+                          >
+                            Transfer FamilyAdmin Role
+                          </button>
+                        )}
+
+                      
                     </div>
                   </div>
                 ))}

@@ -87,6 +87,23 @@ const getFamilyMember = async (userId)=>{
   }
 };
 
+const transferFamilyAdmin = async (userId) => {
+  try {
+    const response = await api.patch(
+      `/family/transfer-admin/${userId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error transferring family admin:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+};
+
+
 const FamilyService = {
   createFamily,
   generateInvite,
@@ -94,7 +111,8 @@ const FamilyService = {
   getMyFamily,
   leaveFamily,
   removeFamilyMember,
-  getFamilyMember
+  getFamilyMember,
+  transferFamilyAdmin
 };
 
 export default FamilyService;

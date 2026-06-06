@@ -8,7 +8,8 @@ import {
   joinFamilyWithToken,
   removeFamilyMember,
   leaveFamily,
-  getFamilyMember
+  getFamilyMember,
+  transferFamilyAdmin
 } from "../controllers/family.controller.js";
 
 import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
@@ -16,7 +17,7 @@ import { requireNoFamily, requireFamily } from "../middlewares/family.middleware
 
 const router = express.Router();
 
-// 🟢 Create family
+// Create family
 router.post(
   "/create",
   authenticateToken,
@@ -24,7 +25,7 @@ router.post(
   createFamily
 );
 
-// 🔐 Generate invite (admin only)
+// Generate invite (admin only)
 router.post(
   "/invite",
   authenticateToken,
@@ -33,7 +34,7 @@ router.post(
   generateInvite
 );
 
-// 🟡 Join via token
+// Join via token
 router.post(
   "/join",
   authenticateToken,
@@ -41,7 +42,7 @@ router.post(
   joinFamilyWithToken
 );
 
-// 🔵 Get my family
+// Get my family
 router.get(
   "/me",
   authenticateToken,
@@ -51,7 +52,7 @@ router.get(
 
 router.get("/member/:memberId", authenticateToken, requireFamily, authorizeRoles("familyAdmin"), getFamilyMember);
 
-// 🔴 Remove member (familyAdmin only)
+// Remove member (familyAdmin only)
 router.patch(
   "/remove/:memberId",
   authenticateToken,
@@ -60,12 +61,22 @@ router.patch(
   removeFamilyMember
 );
 
-// 🟠 Leave family
+// Leave family
 router.patch(
   "/leave",
   authenticateToken,
   requireFamily,
   leaveFamily
+);
+
+
+// ransfer family admin
+router.patch(
+  "/transfer-admin/:newAdminId",
+  authenticateToken,
+  requireFamily,
+  authorizeRoles("familyAdmin"),
+  transferFamilyAdmin
 );
 
 export default router;

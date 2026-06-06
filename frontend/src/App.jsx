@@ -52,6 +52,8 @@ import JoinFamily from "./pages/family/JoinFamily";
 import FamilyPage from './pages/family/FamilyPage';
 import ManageFamily from './pages/family/ManageFamily';
 import LeaveFamily from "./pages/family/LeaveFamily";
+import RemoveFamilyMember from './pages/family/RemoveFamilyMember.jsx';
+import TransferFamilyAdmin from './pages/family/TransferFamilyAdmin.jsx';
 
 // Dashboard pages
 import FamilyDashboard from './pages/dashboard/FamilyDashboard.jsx';
@@ -64,7 +66,6 @@ import PushNotificationSettings from './pages/notifications/PushNotificationSett
 
 import AuthCallback from './pages/auth/AuthCallback.jsx';
 import Profile from './pages/auth/Profile.jsx';
-import RemoveFamilyMember from './pages/family/RemoveFamilyMember.jsx';
 
 function App() {
 
@@ -157,6 +158,7 @@ function App() {
                 <Route element={<ProtectedRoute allowedRoles={['familyAdmin']} />}>
                   <Route path="/family/manage" element={<ManageFamily />}  />
                   <Route path="/family/remove/:memberId" element={<RemoveFamilyMember />} />
+                  <Route path="/family/transfer-admin/:memberId" element={<TransferFamilyAdmin />} />
                 </Route>
 
                 {/* Admin */}
