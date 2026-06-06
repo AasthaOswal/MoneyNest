@@ -7,7 +7,8 @@ export const userSchema = new mongoose.Schema({
 
     familyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Family"
+        ref: "Family",
+        default : null
     },
 
     role: {
@@ -57,6 +58,15 @@ export const userSchema = new mongoose.Schema({
         type: Date
     },
 
+    /*
+        Future usecases
+        User deletes account
+        Admin bans user
+        User temporarily disables account
+        etc.
+        for such use cases we haave isActive flag
+        whether user is a  part of family  or not, that we are determining using familyId == null or not
+    */
     isActive:{
         type:Boolean,
         default:true

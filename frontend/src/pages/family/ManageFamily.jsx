@@ -40,40 +40,6 @@ const ManageFamily = () => {
     fetchFamily();
   }, []);
 
-  // =========================
-  // CREATE FAMILY
-  // =========================
-  const handleCreateFamily = async () => {
-    const toastId = toast.loading("Creating family...");
-
-    try {
-      setLoading(true);
-
-      const res = await api.post("/family/create", {
-        familyName,
-      });
-
-      if (res.data.success) {
-        await fetchFamily();
-
-        toast.success("Family created successfully!", {
-          id: toastId,
-        });
-
-        setFamilyName("");
-      }
-    } catch (err) {
-      toast.error(
-        err?.response?.data?.message ||
-          "Failed to create family",
-        {
-          id: toastId,
-        }
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // =========================
   // GENERATE INVITE
@@ -116,41 +82,7 @@ const ManageFamily = () => {
     }
   };
 
-  const handleJoinFamily = async () => {
-    const toastId = toast.loading(
-      "Joining family..."
-    );
 
-    try {
-      setLoading(true);
-
-      const cleanToken = extractToken(joinToken);
-
-      const res = await api.post(
-        `/family/join?token=${cleanToken}`
-      );
-
-      if (res.data.success) {
-        await fetchFamily();
-
-        toast.success("Joined family successfully!", {
-          id: toastId,
-        });
-
-        setJoinToken("");
-      }
-    } catch (err) {
-      toast.error(
-        err?.response?.data?.message ||
-          "Failed to join family",
-        {
-          id: toastId,
-        }
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // =========================
   // COPY LINK
@@ -165,80 +97,14 @@ const ManageFamily = () => {
     }
   };
 
+  const handleRemoveMember = async ()=>{
+
+  };
+
   return (
     <div className="min-h-screen bg-bg text-text">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* ========================= */}
-        {/* NO FAMILY */}
-        {/* ========================= */}
-        {!family && (
-          <>
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-card">
-              <h2 className="text-2xl font-semibold mb-2">
-                Create a Family
-              </h2>
 
-              <p className="text-text-secondary mb-6">
-                Create a family and start managing
-                expenses together.
-              </p>
-
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Enter family name"
-                  value={familyName}
-                  onChange={(e) =>
-                    setFamilyName(e.target.value)
-                  }
-                  className="w-full bg-input-bg border border-input-border rounded-xl px-4 py-3 outline-none focus:border-input-focus"
-                />
-
-                <button
-                  onClick={handleCreateFamily}
-                  disabled={
-                    loading || !familyName.trim()
-                  }
-                  className="w-full bg-primary text-text-on-primary py-3 rounded-xl font-medium hover:bg-primary-hover disabled:opacity-50 transition-colors"
-                >
-                  Create Family
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-card">
-              <h2 className="text-2xl font-semibold mb-2">
-                Join a Family
-              </h2>
-
-              <p className="text-text-secondary mb-6">
-                Paste an invite link or token.
-              </p>
-
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Paste invite link or token"
-                  value={joinToken}
-                  onChange={(e) =>
-                    setJoinToken(e.target.value)
-                  }
-                  className="w-full bg-input-bg border border-input-border rounded-xl px-4 py-3 outline-none focus:border-input-focus"
-                />
-
-                <button
-                  onClick={handleJoinFamily}
-                  disabled={
-                    loading || !joinToken.trim()
-                  }
-                  className="w-full bg-primary text-text-on-primary py-3 rounded-xl font-medium hover:bg-primary-hover disabled:opacity-50 transition-colors"
-                >
-                  Join Family
-                </button>
-              </div>
-            </div>
-          </>
-        )}
 
         {/* ========================= */}
         {/* FAMILY DETAILS */}
@@ -323,10 +189,12 @@ const ManageFamily = () => {
                           <button
                             onClick={() =>
                               navigate(
-                                `/family/remove/${m._id}`
+                                `/family/remove/${m._id}`, {state:{
+                                  member:m
+                                }}
                               )
                             }
-                            className="px-3 py-1.5 rounded-lg bg-error-bg text-error hover:border-border-hover border border-transparent transition-all text-sm"
+                            className="px-3 py-1.5 rounded-lg bg-error-bg text-error hover:border-border-hover border border-transparent transition-all text-sm hover:cursor-pointer"
                           >
                             Remove
                           </button>
@@ -337,6 +205,16 @@ const ManageFamily = () => {
               </div>
             </div>
           </div>
+        )}
+
+
+        {/* ========================= */}
+        {/* NO FAMILY */}
+        {/* ========================= */}
+        {!family && (
+          <>
+          <div>Please join a family first</div>
+          </>
         )}
       </div>
     </div>

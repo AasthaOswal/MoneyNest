@@ -302,7 +302,7 @@ export const leaveFamily = async (req, res) => {
       });
     }
 
-    // ❗ Prevent admin from leaving (optional but recommended)
+    // Prevent admin from leaving 
     if (user.role === "familyAdmin") {
       return res.status(400).json({
         success: false,
@@ -310,10 +310,9 @@ export const leaveFamily = async (req, res) => {
       });
     }
 
-    // ✅ Soft remove user from family
+    // Soft remove user from family
     user.familyId = null;
     user.role = "member";
-    user.isActive = false;
 
     await user.save();
 
@@ -338,7 +337,7 @@ export const removeFamilyMember = async (req, res) => {
 
     const admin = await User.findById(adminId);
 
-    // ✅ Only family admin allowed
+    // Only family admin allowed
     if (admin.role !== "familyAdmin") {
       return res.status(403).json({
         success: false,
@@ -355,7 +354,7 @@ export const removeFamilyMember = async (req, res) => {
       });
     }
 
-    // ✅ Ensure same family (ownership check 🔥)
+    // Ensure same family (ownership check)
     if (!member.familyId || member.familyId.toString() !== admin.familyId.toString()) {
       return res.status(403).json({
         success: false,
@@ -363,7 +362,7 @@ export const removeFamilyMember = async (req, res) => {
       });
     }
 
-    // ❗ Prevent admin removing themselves
+    // Prevent admin removing themselves
     if (member._id.toString() === adminId.toString()) {
       return res.status(400).json({
         success: false,
@@ -371,18 +370,9 @@ export const removeFamilyMember = async (req, res) => {
       });
     }
 
-    // ❗ Prevent removing another admin (future safety)
-    if (member.role === "familyAdmin") {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot remove another admin"
-      });
-    }
-
-    // ✅ Soft remove member
+    // Soft remove member
     member.familyId = null;
     member.role = "member";
-    member.isActive = false;
 
     await member.save();
 
@@ -404,7 +394,7 @@ export const transferFamilyAdmin = async (req, res) => {
     const currentAdminId = req.user._id;
     const { newAdminId } = req.params;
 
-    // ✅ Validate ID
+    // Validate ID
     if (!newAdminId || !mongoose.Types.ObjectId.isValid(newAdminId)) {
       return res.status(400).json({
         success: false,
@@ -414,7 +404,7 @@ export const transferFamilyAdmin = async (req, res) => {
 
     const currentAdmin = await User.findById(currentAdminId);
 
-    // ✅ Only current admin can transfer
+    // Only current admin can transfer
     if (currentAdmin.role !== "familyAdmin") {
       return res.status(403).json({
         success: false,
@@ -431,10 +421,8 @@ export const transferFamilyAdmin = async (req, res) => {
       });
     }
 
-    // ✅ Same family check
-    if (
-      !newAdmin.familyId ||
-      newAdmin.familyId.toString() !== currentAdmin.familyId.toString()
+    // Same family check
+    if ( !newAdmin.familyId || newAdmin.familyId.toString() !== currentAdmin.familyId.toString()
     ) {
       return res.status(403).json({
         success: false,
@@ -442,7 +430,7 @@ export const transferFamilyAdmin = async (req, res) => {
       });
     }
 
-    // ❗ Prevent transferring to inactive user
+    // Prevent transferring to inactive user
     if (!newAdmin.isActive) {
       return res.status(400).json({
         success: false,
@@ -450,7 +438,7 @@ export const transferFamilyAdmin = async (req, res) => {
       });
     }
 
-    // ❗ Prevent self-transfer (optional)
+    // Prevent self-transfer
     if (newAdminId.toString() === currentAdminId.toString()) {
       return res.status(400).json({
         success: false,
@@ -458,7 +446,7 @@ export const transferFamilyAdmin = async (req, res) => {
       });
     }
 
-    // ✅ TRANSACTION (important for consistency)
+    // TRANSACTION (important for consistency)
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -506,77 +494,52 @@ export const transferFamilyAdmin = async (req, res) => {
   }
 };
 
-// export const leaveFamily = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user._id);
 
-//     if (!user.familyId) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "You are not part of any family"
-//       });
-//     }
+export const getFamilyMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
 
-//     if (user.role === "familyAdmin") {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Admin cannot leave. Delete family instead."
-//       });
-//     }
+    const currentUser = await User.findById(req.user._id);
 
-//     user.familyId = null;
-//     user.role = "member";
-//     await user.save();
+    if (!currentUser.familyId) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not part of any family",
+      });
+    }
 
-//     res.json({
-//       success: true,
-//       message: "Left family successfully"
-//     });
+    const member = await User.findById(memberId)
+      .select("name email role familyId");
 
-//   } catch (err) {
-//     res.status(500).json({ success: false, message: "Error leaving family" });
-//   }
-// };
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found",
+      });
+    }
 
-// export const removeMember = async (req, res) => {
-//   try {
-//     const admin = await User.findById(req.user._id);
-//     const { memberId } = req.params;
+    // Security check
+    if (
+      !member.familyId ||
+      member.familyId.toString() !== currentUser.familyId.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "This member does not belong to your family",
+      });
+    }
 
-//     if (admin.role !== "familyAdmin") {
-//       return res.status(403).json({
-//         success: false,
-//         message: "Only admin can remove members"
-//       });
-//     }
+    return res.status(200).json({
+      success: true,
+      data: member,
+    });
 
-//     if (admin._id.toString() === memberId) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Admin cannot remove themselves"
-//       });
-//     }
+  } catch (err) {
+    console.error(err);
 
-//     const member = await User.findById(memberId);
-
-//     if (!member || member.familyId.toString() !== admin.familyId.toString()) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Member not found in your family"
-//       });
-//     }
-
-//     member.familyId = null;
-//     member.role = "member";
-//     await member.save();
-
-//     res.json({
-//       success: true,
-//       message: "Member removed successfully"
-//     });
-
-//   } catch (err) {
-//     res.status(500).json({ success: false, message: "Error removing member" });
-//   }
-// };
-
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching member",
+    });
+  }
+};

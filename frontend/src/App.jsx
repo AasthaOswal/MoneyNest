@@ -64,6 +64,7 @@ import PushNotificationSettings from './pages/notifications/PushNotificationSett
 
 import AuthCallback from './pages/auth/AuthCallback.jsx';
 import Profile from './pages/auth/Profile.jsx';
+import RemoveFamilyMember from './pages/family/RemoveFamilyMember.jsx';
 
 function App() {
 
@@ -155,6 +156,7 @@ function App() {
                 {/* Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['familyAdmin']} />}>
                   <Route path="/family/manage" element={<ManageFamily />}  />
+                  <Route path="/family/remove/:memberId" element={<RemoveFamilyMember />} />
                 </Route>
 
                 {/* Admin */}

@@ -66,7 +66,19 @@ const leaveFamily = async ()=>{
 
 const removeFamilyMember = async (userId)=>{
   try{
-    const response = await api.patch(`/family/remove-member/${userId}`);
+    const response = await api.patch(`/family/remove/${userId}`);
+    return response.data;
+
+  }catch(error){
+    console.error("Error removing family member:", error.response?.data || error.message);
+    throw error.response?.data || error.message;
+  }
+};
+
+
+const getFamilyMember = async (userId)=>{
+  try{
+    const response = await api.get(`/family/member/${userId}`);
     return response.data;
 
   }catch(error){
@@ -81,7 +93,8 @@ const FamilyService = {
   joinFamilyWithToken,
   getMyFamily,
   leaveFamily,
-  removeFamilyMember
+  removeFamilyMember,
+  getFamilyMember
 };
 
 export default FamilyService;
