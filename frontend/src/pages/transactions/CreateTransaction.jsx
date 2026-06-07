@@ -265,6 +265,20 @@ const CreateTransaction = () => {
               required={true}
             />
 
+            <div className="space-y-5 border-b border-border pb-6">
+              <span className="mt-2 text-sm text-text-secondary">
+                Please select a category. If no active categories are available, create one first. &nbsp;
+              </span>
+
+              <button
+                type="button"
+                onClick={() => navigate("/categories/create")}
+                className="mt-2 text-sm font-medium text-primary hover:text-primary-hover hover:cursor-pointer"
+              >
+                Create Category
+              </button>
+            </div>
+
             <MultiSelectSheet
               label="Labels"
               title="Select Labels"
@@ -275,6 +289,20 @@ const CreateTransaction = () => {
               emptyText="No labels found."
               required={true}
             />
+
+            <div className="space-y-5 border-b border-border pb-6">
+              <span className="mt-2 text-sm text-text-secondary">
+                  Please select at least one label. If no active labels are available, create one first. &nbsp;
+              </span>
+
+              <button
+                type="button"
+                onClick={() => navigate("/labels/create")}
+                className="mt-2 text-sm font-medium text-primary hover:text-primary-hover hover:cursor-pointer"
+              >
+                Create Label
+              </button>
+            </div>
           </div>
 
           <div className="pt-2">

@@ -132,10 +132,7 @@ export const getCategories = async (req, res) => {
       query.isActive = false;
     } else if (isActive !== undefined) {
       query.isActive = isActive === "true";
-    } else {
-      // Default = show only active categories
-      query.isActive = true;
-    }
+    } 
 
     const categories = await Category.find(query)
       .sort({ createdAt: -1 });
@@ -220,7 +217,7 @@ export const deleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: "Category not found"
+        message: "You can only delete a category which is  craeted by yourself and it not deleted already."
       });
     }
 

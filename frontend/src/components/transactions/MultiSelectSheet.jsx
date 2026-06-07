@@ -228,6 +228,11 @@ const MultiSelectSheet = ({
                           }`}
                         >
                           {item.name}
+                          {item.isActive === false && (
+                            <span className="ml-1  text-error">
+                              (deleted)
+                            </span>
+                          )}
                         </span>
                       </label>
                     );

@@ -54,7 +54,13 @@ const CategoryDetails = () => {
       }
     } catch (err) {
       console.log(err);
-      toast.error(err.message || "Some error occured.", {id:toastId});
+
+      toast.error(
+        err.response?.data?.message || 
+        err.message || 
+        "Some error occurred.",
+        { id: toastId }
+      );
     }
   };
 
