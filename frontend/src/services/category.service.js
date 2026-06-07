@@ -1,48 +1,54 @@
 import api from "../axios/axios";
 
-/**
- * Create a new category.
- * Expects: { name: "Groceries", color: "#FF5733", icon: "basket" }
- */
 const createCategory = async (categoryData) => {
-  const response = await api.post("/categories", categoryData);
-
-  console.log(response)
-  return response.data;
+  try {
+    const response = await api.post("/categories", categoryData);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
 };
 
-/**
- * Retrieve all categories for the user's family.
- * Supports optional search/filter queries.
- */
 const getCategories = async (params = {}) => {
-  const response = await api.get("/categories", { params });
-  return response.data;
+  try {
+    const response = await api.get("/categories", { params });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
 };
 
-/**
- * Get a specific category by its ID.
- */
 const getCategoryById = async (id) => {
-  const response = await api.get(`/categories/${id}`);
-  return response.data;
+  try {
+    const response = await api.get(`/categories/${id}`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
 };
 
-/**
- * Update a category (typically the name or visual style).
- * Expects: { name: "Updated Name" }
- */
 const updateCategory = async (id, updateData) => {
-  const response = await api.patch(`/categories/${id}`, updateData);
-  return response.data;
+  try {
+    const response = await api.patch(
+      `/categories/${id}`,
+      updateData
+    );
+
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
 };
 
-/**
- * Delete a category by ID.
- */
+
+
 const deleteCategory = async (id) => {
-  const response = await api.delete(`/categories/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(`/categories/${id}`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const CategoryService = {

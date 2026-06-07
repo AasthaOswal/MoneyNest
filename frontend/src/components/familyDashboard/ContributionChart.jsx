@@ -61,7 +61,7 @@ const ContributionChart = ({contributionChartData, COLORS}) => {
                 <div className="  grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
                     {/* Income */}
-                    <div className="  bg-card border border-border rounded-2xl p-5 min-h-[420px]">
+                    <div className="  bg-card border border-border rounded-2xl p-5 min-h-105">
                         <h3 className="font-semibold mb-2 text-income">
                             Income Distribution
                         </h3>
@@ -88,7 +88,7 @@ const ContributionChart = ({contributionChartData, COLORS}) => {
                     </div>
 
                     {/* Expense */}
-                    <div className="bg-card border border-border rounded-2xl p-5 min-h-[420px]">
+                    <div className="bg-card border border-border rounded-2xl p-5 min-h-105">
                         <h3 className="font-semibold mb-2 text-expense">
                             Expense Distribution
                         </h3>
@@ -115,7 +115,7 @@ const ContributionChart = ({contributionChartData, COLORS}) => {
                     </div>
 
                     {/* Investment */}
-                    <div className=" bg-card border border-border rounded-2xl p-5 min-h-[420px]">
+                    <div className=" bg-card border border-border rounded-2xl p-5 min-h-105">
                         <h3 className="font-semibold mb-2 text-investment">
                             Investment Distribution
                         </h3>

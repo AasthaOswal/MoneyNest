@@ -18,7 +18,7 @@ import Landing from './pages/home/Landing';
 import CategoriesPage from './pages/categories/CategoriesPage';
 import CreateCategory from './pages/categories/CreateCategory';
 import CategoryDetails from './pages/categories/CategoryDetails';
-
+import EditCategory from './pages/categories/EditCategory.jsx'
 
 //Label related pages
 import LabelsPage from './pages/labels/LabelsPage';
@@ -186,6 +186,7 @@ function App() {
                   <Route path="/categories" element={<CategoriesPage />} />
                   <Route path="/categories/create" element={<CreateCategory />} />
                   <Route path="/categories/:id" element={<CategoryDetails />} />
+                  <Route path="/categories/:id/edit" element={<EditCategory />}/>
 
                   {/* Labels related pages */}
                   <Route path="/labels" element={<LabelsPage />} />

@@ -73,13 +73,13 @@ export const updateCategory = async (req, res) => {
     const category = await Category.findOneAndUpdate(
       { _id: id, family: req.user.familyId, createdBy: req.user._id, isActive:true },
       { name },
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     );
 
     if (!category) {
       return res.status(404).json({
         success: false,
-        message: "Category not found"
+        message: "You can only edit category that's active and created by yourself."
       });
     }
 
@@ -108,36 +108,51 @@ export const updateCategory = async (req, res) => {
 // =======================
 export const getCategories = async (req, res) => {
   try {
-    const { search, type } = req.query;
+    const { search, type, isActive, showDeleted } = req.query;
 
     let query = {
-      family: req.user.familyId
+      family: req.user.familyId,
     };
 
+    // Category Type Filter
     if (type) {
       query.categoryType = type;
     }
 
+    // Search Filter
     if (search) {
-      query.name = { $regex: search, $options: "i" };
+      query.name = {
+        $regex: search,
+        $options: "i",
+      };
     }
 
-    const categories = await Category.find(query).sort({ createdAt: -1 });
+    // Active / Deleted Filter
+    if (showDeleted === "true") {
+      query.isActive = false;
+    } else if (isActive !== undefined) {
+      query.isActive = isActive === "true";
+    } else {
+      // Default = show only active categories
+      query.isActive = true;
+    }
+
+    const categories = await Category.find(query)
+      .sort({ createdAt: -1 });
 
     return res.json({
       success: true,
       count: categories.length,
-      data: categories
+      data: categories,
     });
 
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: "Error fetching categories"
+      message: "Error fetching categories",
     });
   }
 };
-
 
 // =======================
 // 🔍 GET CATEGORY BY ID
@@ -149,7 +164,7 @@ export const getCategoryById = async (req, res) => {
     const category = await Category.findOne({
       _id: id,
       family: req.user.familyId
-    });
+    }).populate("createdBy");
 
     if (!category) {
       return res.status(404).json({

@@ -42,7 +42,9 @@ export default function TypeSelect({ value, onChange }) {
             anchor="bottom"
             transition
             className="
-              z-50 mt-1 w-fit
+              min-w-(--button-width)
+              w-(--button-width)
+              z-50 mt-1 
               overflow-auto rounded-xl
               border border-border
               bg-surface shadow-lg
@@ -50,6 +52,9 @@ export default function TypeSelect({ value, onChange }) {
               transition duration-150 ease-out
               data-closed:scale-95
               data-closed:opacity-0
+              focus:outline-none
+              focus:ring-0
+              focus-visible:outline-none
             "
           >
             {TYPES.map((type) => (
