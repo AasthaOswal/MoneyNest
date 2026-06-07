@@ -3,7 +3,7 @@ import Joi from "joi";
 export const createLabelSchema = Joi.object({
   name: Joi.string()
     .trim()
-    .pattern(/^[a-z0-9\s\-&]+$/)
+    .pattern(/^[A-Za-z0-9\s\-&]+$/)
     .lowercase()
     .min(2)
     .max(50)
@@ -25,7 +25,7 @@ export const createLabelSchema = Joi.object({
 export const updateLabelSchema = Joi.object({
   name: Joi.string()
     .trim()
-    .pattern(/^[a-z0-9\s\-&]+$/)
+    .pattern(/^[A-Za-z0-9\s\-&]+$/)
     .lowercase()
     .min(2)
     .max(50)
@@ -52,9 +52,17 @@ export const getLabelsSchema = Joi.object({
     .trim()
     .lowercase()
     .max(20)
+    .allow("")
     .messages({
       "string.base": "Search must be a string",
       "string.max": "Search query cannot exceed 20 characters"
+    })
+    .optional(),
+    isActive: Joi.string()
+    .trim()
+    .lowercase()
+    .messages({
+      "string.base": "isActive must be either true or false"
     })
     .optional()
 }).options({

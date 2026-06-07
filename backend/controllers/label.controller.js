@@ -14,9 +14,7 @@ const escapeRegex = (text) => {
 };
 
 
-// =======================
-// ➕ CREATE LABEL
-// =======================
+
 export const createLabel = async (req, res) => {
   try {
     const { value, error } = createLabelSchema.validate(req.body);
@@ -58,9 +56,7 @@ export const createLabel = async (req, res) => {
 
 
 
-// =======================
-// ✏️ UPDATE LABEL
-// =======================
+
 export const updateLabel = async (req, res) => {
   try {
     const { id } = req.params;
@@ -92,11 +88,11 @@ export const updateLabel = async (req, res) => {
       {
         _id: id,
         family: req.user.familyId,
-        createdBy: req.user._id,   // ✅ ownership check
+        createdBy: req.user._id,   // ownership check
         isActive:true
       },
       value,
-      { new: true, runValidators: true }
+      {returnDocument: "after", runValidators: true }
     );
 
     if (!label) {
@@ -127,9 +123,7 @@ export const updateLabel = async (req, res) => {
 };
 
 
-// =======================
-// 📋 GET ALL LABELS
-// =======================
+
 export const getLabels = async (req, res) => {
   try {
     const { value, error } = getLabelsSchema.validate(req.query);
@@ -141,7 +135,7 @@ export const getLabels = async (req, res) => {
       });
     }
 
-    const { search } = value;
+    const { search, isActive } = value;
 
     let query = {
       family: req.user.familyId
@@ -152,6 +146,9 @@ export const getLabels = async (req, res) => {
       query.name = { $regex: escapedSearch, $options: "i" };
     }
 
+    if(isActive){
+      query.isActive = isActive;
+    }
     const labels = await Label.find(query).sort({ createdAt: -1 });
 
     return res.json({
@@ -169,9 +166,7 @@ export const getLabels = async (req, res) => {
 };
 
 
-// =======================
-// 🔍 GET LABEL BY ID
-// =======================
+
 export const getLabelById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -208,10 +203,6 @@ export const getLabelById = async (req, res) => {
   }
 };
 
-
-// =======================
-// ❌ DELETE LABEL
-// =======================
 
 export const deleteLabel = async (req, res) => {
   try {

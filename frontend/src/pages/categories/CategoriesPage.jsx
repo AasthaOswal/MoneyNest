@@ -93,8 +93,7 @@ const STATUS_OPTIONS = [
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
         <h1
-          className="text-2xl font-semibold"
-          style={{ color: "var(--color-text)" }}
+          className="text-2xl font-semibold text-text"
         >
           Categories
         </h1>
@@ -114,12 +113,7 @@ const STATUS_OPTIONS = [
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 px-4 py-2 rounded-xl border outline-none"
-          style={{
-            backgroundColor: "var(--color-input-bg)",
-            borderColor: "var(--color-input-border)",
-            color: "var(--color-text)",
-          }}
+          className="flex-1 px-4 py-2 rounded-xl border outline-none bg-input-bg border-input-border text-text"
         />
 
         <FilterSelect
@@ -160,12 +154,7 @@ const STATUS_OPTIONS = [
       {/* Empty State */}
       {categories.length === 0 ? (
         <div
-          className="rounded-2xl border p-8 text-center"
-          style={{
-            backgroundColor: "var(--color-surface)",
-            borderColor: "var(--color-border)",
-            color: "var(--color-text-secondary)",
-          }}
+          className="rounded-2xl border p-8 text-center bg-surface border-border text-text-secondary"
         >
           No categories found.
         </div>
@@ -188,11 +177,7 @@ const STATUS_OPTIONS = [
 
                 {!cat.isActive && (
                   <span
-                    className="text-xs px-2 py-1 rounded-full"
-                    style={{
-                      backgroundColor: "var(--color-error-bg)",
-                      color: "var(--color-error)",
-                    }}
+                    className="text-xs px-2 py-1 rounded-full bg-error-bg text-error"
                   >
                     Deleted
                   </span>
@@ -219,8 +204,7 @@ const STATUS_OPTIONS = [
 
               {/* Created Date */}
               <div
-                className="mt-4 text-xs"
-                style={{ color: "var(--color-text-secondary)" }}
+                className="mt-4 text-xs text-text-secondary"
               >
                 Created:{" "}
                 {new Date(cat.createdAt).toLocaleDateString()}

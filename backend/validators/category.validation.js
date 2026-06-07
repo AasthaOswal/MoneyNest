@@ -20,7 +20,7 @@ random injection strings
 export const createCategorySchema = Joi.object({
   name: Joi.string()
     .trim()
-    .pattern(/^[a-z0-9\s\-&]+$/)
+    .pattern(/^[A-Za-z0-9\s\-&]+$/)
     .min(2)
     .max(50)
     .required()
@@ -48,7 +48,7 @@ export const createCategorySchema = Joi.object({
 export const updateCategorySchema = Joi.object({
   name: Joi.string()
     .trim()
-    .pattern(/^[a-z0-9\s\-&]+$/)
+    .pattern(/^[A-Za-z0-9\s\-&]+$/)
     .min(2)
     .max(50)
     .messages({

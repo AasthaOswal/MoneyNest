@@ -24,6 +24,7 @@ import EditCategory from './pages/categories/EditCategory.jsx'
 import LabelsPage from './pages/labels/LabelsPage';
 import CreateLabel from './pages/labels/CreateLabel';
 import LabelDetails from './pages/labels/LabelDetails';
+import EditLabel from './pages/labels/EditLabel.jsx';
 
 
 // Transactions pages
@@ -192,6 +193,7 @@ function App() {
                   <Route path="/labels" element={<LabelsPage />} />
                   <Route path="/labels/create" element={<CreateLabel />} />
                   <Route path="/labels/:id" element={<LabelDetails />} />
+                  <Route path="/labels/:id/edit" element={<EditLabel/>}/>
 
                   {/* Goals related pages */}
                   <Route path="/goals" element={<GoalsPage />} />

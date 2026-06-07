@@ -1,46 +1,66 @@
 import api from "../axios/axios";
 
 /**
- * ➕ Create a new label
- * Expects: { name: "Important" }
+ * ➕ Create Label
  */
 const createLabel = async (labelData) => {
-  const response = await api.post("/labels", labelData);
-  return response.data;
+  try {
+    const response = await api.post("/labels", labelData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
 };
 
 /**
- * 📋 Get all labels (with optional search)
- * Example: { search: "imp" }
+ * 📋 Get Labels
  */
 const getLabels = async (params = {}) => {
-  const response = await api.get("/labels", { params });
-  return response.data;
+  try {
+    const response = await api.get("/labels", {
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
 };
 
 /**
- * 🔍 Get label by ID
+ * 🔍 Get Label By Id
  */
 const getLabelById = async (id) => {
-  const response = await api.get(`/labels/${id}`);
-  return response.data;
+  try {
+    const response = await api.get(`/labels/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
 };
 
 /**
- * ✏️ Update label
- * Expects: { name: "Updated Name" }
+ * ✏️ Update Label
  */
 const updateLabel = async (id, updateData) => {
-  const response = await api.patch(`/labels/${id}`, updateData);
-  return response.data;
+  try {
+    const response = await api.patch(`/labels/${id}`, updateData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
 };
 
 /**
- * ❌ Delete label
+ * ❌ Delete Label
  */
 const deleteLabel = async (id) => {
-  const response = await api.delete(`/labels/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(`/labels/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
 };
 
 const LabelService = {

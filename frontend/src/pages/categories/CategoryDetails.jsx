@@ -70,18 +70,10 @@ const CategoryDetails = () => {
         {/* Top Section */}
         <div className="p-6 border-b border-divider">
 
-          {editMode ? (
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-input-bg border border-input-border text-text focus:outline-none focus:border-input-focus"
-            />
-          ) : (
             <h1 className="text-3xl font-bold text-text">
               {category.name}
             </h1>
-          )}
-
+          
           <div className="flex flex-wrap gap-3 mt-4">
 
             <span
