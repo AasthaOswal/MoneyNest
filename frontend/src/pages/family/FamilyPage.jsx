@@ -290,29 +290,7 @@ const FamilyPage = () => {
                         {m.role}
                       </span>
 
-                      {currentUser?.role ===
-                        "familyAdmin" &&
-                        user?._id !== m._id && (
-                          <button
-                            onClick={() =>
-                              navigate(
-                                `/family/remove/${m._id}`
-                              )
-                            }
-                            className="
-                              px-3 py-1.5
-                              rounded-lg
-                              bg-error-bg
-                              text-error
-                              hover:border-border-hover
-                              border border-transparent
-                              transition-all
-                              text-sm
-                            "
-                          >
-                            Remove
-                          </button>
-                        )}
+                
                     </div>
                   </div>
                 ))}

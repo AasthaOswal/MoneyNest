@@ -51,8 +51,7 @@ const AuthCallback = () => {
         });
 
 
-        const token = await getFCMToken();
-        const device = navigator.userAgent;
+
 
         // if (token) {
         //   await api.post("/user/fcm-token", {
@@ -62,17 +61,18 @@ const AuthCallback = () => {
         // }
 
         try {
-  const token = await getFCMToken();
+          const token = await getFCMToken();
+          const device = navigator.userAgent;
 
-  if (token) {
-    await api.post("/user/fcm-token", {
-      fcmToken: token,
-      device,
-    });
-  }
-} catch (err) {
-  console.error("FCM registration failed", err);
-}
+          if (token) {
+            await api.post("/user/fcm-token", {
+              fcmToken: token,
+              device,
+            });
+          }
+        } catch (err) {
+          console.error("FCM registration failed", err);
+        }
 
         if (user.role === "admin") {
           navigate("/admin-dashboard", { replace: true });

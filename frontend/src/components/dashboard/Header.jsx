@@ -2,7 +2,7 @@ import React from 'react';
 import { Menu as LucideMenu } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import NotificationButton from '../buttons/NotificationButton';
+// import NotificationButton from '../buttons/NotificationButton';
 import { useNavigate } from 'react-router-dom';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
@@ -16,8 +16,6 @@ import {
 const Header = ({ setIsOpen }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
-
-  console.log(user)
 
   const navigate=useNavigate();
   return (

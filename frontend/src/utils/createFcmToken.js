@@ -13,7 +13,8 @@ export const getFCMToken = async () => {
         console.log("Permission:", permission);
 
         if (Notification.permission === "denied") {
-            toast("🔔 Notifications are blocked. Please enable them from browser settings (🔒 icon → Allow)");
+            toast("Notifications are blocked. Please enable them from browser settings in order to receive push notifications.");
+            console.log("Notification from createFcmTOken.js  file");
             return null;
         }
 
