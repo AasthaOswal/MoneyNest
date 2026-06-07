@@ -468,3 +468,10 @@ select option {
   background-color: var(--color-surface);
   color: var(--color-text);
 }
+
+
+.recharts-wrapper *,
+.recharts-wrapper svg,
+.recharts-wrapper svg * {
+  outline: none !important;
+}

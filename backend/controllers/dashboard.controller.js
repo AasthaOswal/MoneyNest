@@ -624,3 +624,403 @@ export const getTrendsSummary = async (req, res) => {
     });
   }
 };
+
+export const getYearlyTrends = async (req, res) => {
+  try {
+    const { familyId } = req.user;
+
+    const year = Number(req.query.year) || new Date().getFullYear();
+
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year + 1, 0, 1);
+
+    const trends = await Transaction.aggregate([
+      {
+        $match: {
+          family: familyId,
+          date: {
+            $gte: startDate,
+            $lt: endDate
+          }
+        }
+      },
+
+      {
+        $group: {
+          _id: {
+            month: { $month: "$date" },
+            type: "$type"
+          },
+          total: {
+            $sum: "$amount"
+          }
+        }
+      }
+    ]);
+
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
+
+    const formatted = months.map((month, index) => ({
+      month,
+      income: 0,
+      expense: 0,
+      investment: 0
+    }));
+
+    trends.forEach((item) => {
+      const monthIndex = item._id.month - 1;
+
+      formatted[monthIndex][item._id.type] = item.total;
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: formatted
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch trends"
+    });
+  }
+};
+
+
+export const getMonthlyAnalytics = async (req, res) => {
+  try {
+    const { familyId } = req.user;
+
+    const month = Number(req.query.month);
+    const year = Number(req.query.year);
+
+    if (!month || !year) {
+      return res.status(400).json({
+        success: false,
+        message: "Month and year required",
+      });
+    }
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 1);
+
+    const matchStage = {
+      family: familyId,
+      date: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+    };
+
+    // ==========================
+    // SUMMARY
+    // ==========================
+
+    const summaryResult = await Transaction.aggregate([
+      {
+        $match: matchStage,
+      },
+      {
+        $group: {
+          _id: "$type",
+          total: {
+            $sum: "$amount",
+          },
+        },
+      },
+    ]);
+
+    const summary = {
+      income: 0,
+      expense: 0,
+      investment: 0,
+    };
+
+    summaryResult.forEach((item) => {
+      summary[item._id] = item.total;
+    });
+
+    // ==========================
+    // CATEGORY DISTRIBUTION
+    // ==========================
+
+    const categoryResult = await Transaction.aggregate([
+      {
+        $match: matchStage,
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: "$category",
+      },
+      {
+        $group: {
+          _id: {
+            type: "$type",
+            category: "$category.name",
+          },
+          total: {
+            $sum: "$amount",
+          },
+        },
+      },
+      {
+        $sort: {
+          total: -1,
+        },
+      },
+    ]);
+
+    const categoryDistribution = {
+      income: [],
+      expense: [],
+      investment: [],
+    };
+
+    categoryResult.forEach((item) => {
+      const type = item._id.type;
+
+      if (categoryDistribution[type]) {
+        categoryDistribution[type].push({
+          name: item._id.category,
+          amount: item.total,
+        });
+      }
+    });
+
+    // ==========================
+    // USER DISTRIBUTION
+    // ==========================
+
+    const userResult = await Transaction.aggregate([
+      {
+        $match: matchStage,
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $group: {
+          _id: {
+            type: "$type",
+            user: "$user.name",
+          },
+          total: {
+            $sum: "$amount",
+          },
+        },
+      },
+      {
+        $sort: {
+          total: -1,
+        },
+      },
+    ]);
+
+    const userDistribution = {
+      income: [],
+      expense: [],
+      investment: [],
+    };
+
+    userResult.forEach((item) => {
+      const type = item._id.type;
+
+      if (userDistribution[type]) {
+        userDistribution[type].push({
+          name: item._id.user,
+          amount: item.total,
+        });
+      }
+    });
+
+    // ==========================
+    // RESPONSE
+    // ==========================
+
+    return res.status(200).json({
+      success: true,
+      summary,
+      categoryDistribution,
+      userDistribution,
+    });
+  } catch (error) {
+    console.error("Monthly Analytics Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch analytics",
+    });
+  }
+};
+
+// export const getMonthlyAnalytics = async (req, res) => {
+//   try {
+//     const { familyId } = req.user;
+
+//     const month = Number(req.query.month);
+//     const year = Number(req.query.year);
+
+//     if (!month || !year) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Month and year required"
+//       });
+//     }
+
+//     const startDate = new Date(year, month - 1, 1);
+
+//     const endDate = new Date(year, month, 1);
+
+//     // ==========================
+//     // SUMMARY
+//     // ==========================
+
+//     const summary = await Transaction.aggregate([
+//       {
+//         $match: {
+//           family: familyId,
+//           date: {
+//             $gte: startDate,
+//             $lt: endDate
+//           }
+//         }
+//       },
+
+//       {
+//         $group: {
+//           _id: "$type",
+//           total: {
+//             $sum: "$amount"
+//           }
+//         }
+//       }
+//     ]);
+
+//     // ==========================
+//     // CATEGORY DISTRIBUTION
+//     // ==========================
+
+//     const categoryDistribution = await Transaction.aggregate([
+//       {
+//         $match: {
+//           family: familyId,
+//           date: {
+//             $gte: startDate,
+//             $lt: endDate
+//           }
+//         }
+//       },
+
+//       {
+//         $lookup: {
+//           from: "categories",
+//           localField: "category",
+//           foreignField: "_id",
+//           as: "category"
+//         }
+//       },
+
+//       {
+//         $unwind: "$category"
+//       },
+
+//       {
+//         $group: {
+//           _id: {
+//             type: "$type",
+//             category: "$category.name"
+//           },
+//           total: {
+//             $sum: "$amount"
+//           }
+//         }
+//       }
+//     ]);
+
+//     // ==========================
+//     // USER DISTRIBUTION
+//     // ==========================
+
+//     const userDistribution = await Transaction.aggregate([
+//       {
+//         $match: {
+//           family: familyId,
+//           date: {
+//             $gte: startDate,
+//             $lt: endDate
+//           }
+//         }
+//       },
+
+//       {
+//         $lookup: {
+//           from: "users",
+//           localField: "user",
+//           foreignField: "_id",
+//           as: "user"
+//         }
+//       },
+
+//       {
+//         $unwind: "$user"
+//       },
+
+//       {
+//         $group: {
+//           _id: {
+//             type: "$type",
+//             user: "$user.name"
+//           },
+//           total: {
+//             $sum: "$amount"
+//           }
+//         }
+//       }
+//     ]);
+
+//     return res.status(200).json({
+//       success: true,
+//       summary,
+//       categoryDistribution,
+//       userDistribution
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch analytics"
+//     });
+//   }
+// };

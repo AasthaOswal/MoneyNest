@@ -60,12 +60,12 @@ const SingleSelectSheet = ({
     onChange(null);
   };
 
-  console.log("selectedId", selectedId);
+//   console.log("selectedId", selectedId);
 
-console.log(
-  "selectedItem",
-  options.find(item => item._id === selectedId)
-);
+// console.log(
+//   "selectedItem",
+//   options.find(item => item._id === selectedId)
+// );
 
   const buttonText = selectedItem?.name || placeholder;
 

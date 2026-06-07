@@ -22,14 +22,14 @@ const allowedPaths = [
   "/family/join"
 ];
 
-console.log(
-  "Current Path:",
-  location.pathname,
-  "Role:",
-  user?.role,
-  "Allowed:",
-  allowedRoles
-);
+// console.log(
+//   "Current Path:",
+//   location.pathname,
+//   "Role:",
+//   user?.role,
+//   "Allowed:",
+//   allowedRoles
+// );
 const needsFamily =
   ["member", "familyAdmin"].includes(user.role);
 

@@ -70,6 +70,8 @@ const CreateTransaction = () => {
     setLoading(true);
     setErrorMsg("");
 
+    const toastId=toast.loading("Please wait...");
+
     try {
       if (!form.category) {
         throw new Error("Please select a category.");
@@ -84,16 +86,22 @@ const CreateTransaction = () => {
         transactionDoc: file,
       });
 
-      toast.succes(response.message);
+      toast.success(response.message, {id:toastId});
+
+      console.log(response.data);
 
       navigate(`/transactions/${response.data._id}`);
     } catch (err) {
-      
-      console.log(err.response)
-    toast.error(err.response.data.message)
-      setErrorMsg(
-        err.response?.data?.message || err.message || "Something went wrong."
-      );
+  console.log("FULL ERROR:", err);
+
+  const message =
+    err.response?.data?.message ||
+    err.message ||
+    "Something went wrong";
+    toast.error(message, {id:toastId});
+      // setErrorMsg(
+      //   err.response?.data?.message || err.message || "Something went wrong."
+      // );
     } finally {
       setLoading(false);
     }
