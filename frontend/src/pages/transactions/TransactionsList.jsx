@@ -312,6 +312,7 @@ const TransactionsList = () => {
                 value={filters.startDate}
                 onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
                 className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
+                style={{ colorScheme: "dark" }}
               />
             </div>
 
@@ -322,6 +323,7 @@ const TransactionsList = () => {
                 value={filters.endDate}
                 onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
                 className="w-full p-2.5 border border-input-border rounded-xl bg-input-bg text-text focus:outline-none focus:border-input-focus transition-colors text-sm"
+                style={{ colorScheme: "dark" }}
               />
             </div>
 

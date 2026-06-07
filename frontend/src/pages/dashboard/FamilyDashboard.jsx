@@ -113,6 +113,7 @@ const FamilyDashboard = () => {
               })
             }
             className="border border-input-border rounded px-3 py-2 bg-input-bg text-text focus:outline-none focus:border-input-focus"
+            style={{ colorScheme: "dark" }}
           />
         </div>
 
@@ -129,6 +130,7 @@ const FamilyDashboard = () => {
               })
             }
             className="border border-input-border rounded px-3 py-2 bg-input-bg text-text focus:outline-none focus:border-input-focus"
+            style={{ colorScheme: "dark" }}
           />
         </div>
 
