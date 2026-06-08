@@ -267,7 +267,7 @@ export const resolveError = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Error marked as resolved",
-      error,
+      data : error,
     });
   } catch (err) {
     console.log(err)
@@ -307,7 +307,7 @@ export const deleteErrorLogs = async (req, res) => {
 
 
 
-// Error grouping (Top recurring errors 🔥)
+// Error grouping (Top recurring errors)
 export const getErrorStats = async (req, res) => {
   try {
     const data = await ErrorLog.aggregate([
@@ -346,7 +346,7 @@ export const getCriticalErrors = async (req, res) => {
 };
 
 
-// Errors by requestId (trace debugging 🔥)
+// Errors by requestId (trace debugging)
 export const getErrorsByRequestId = async (req, res) => {
   try {
     const { requestId } = req.params;

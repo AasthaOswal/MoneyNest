@@ -75,6 +75,7 @@ import Profile from './pages/auth/Profile.jsx';
 
 //ErrorLogs Pages
 import ErrorLogsPage from './pages/admin/error-logs/ErrorLogsPage.jsx'
+import ErrorLogDetails from './pages/admin/error-logs/ErrorlogDetails.jsx';
 
 function App() {
 
@@ -224,6 +225,8 @@ function App() {
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route path="/admin-dashboard" element={<div>Admin Dashboard</div>} />
                   <Route path="/error-logs" element={<ErrorLogsPage/>} />
+                  <Route path="/error-logs/:id" element={<ErrorLogDetails/>} />
+                  
                 </Route>
 
               </Route>

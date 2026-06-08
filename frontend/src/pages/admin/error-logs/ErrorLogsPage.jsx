@@ -143,6 +143,13 @@ const ErrorLogsPage = () => {
   };
 
   const handleDelete = async (id) => {
+
+    const confirmed = window.confirm(
+      "Delete this error log?"
+    );
+
+    if (!confirmed) return;
+    
     const toastId = toast.loading(
       "Deleting error log..."
     );
@@ -413,7 +420,7 @@ const ErrorLogsPage = () => {
                         `/error-logs/${error._id}`
                       );
                     }}
-                    className=" flex-1 inline-flex justify-center items-center gap-2 py-2 rounded-xl bg-primary-subtle text-primary hover:cursor-pointer hover:bg-primary-subtle/70"
+                    className=" flex-1 inline-flex justify-center items-center gap-2 py-2 rounded-xl bg-primary-subtle text-primary hover:cursor-pointer hover:bg-primary-subtle/80 transition-colors"
                   >
                     <Eye size={16} />
                     View
@@ -427,21 +434,25 @@ const ErrorLogsPage = () => {
                           error._id
                         );
                       }}
-                      className=" inline-flex justify-center items-center px-3 rounded-xl bg-success-bg text-success hover:cursor-pointer hover:bg-success-bg/70"
+                      className=" inline-flex justify-center items-center px-3 rounded-xl bg-success-bg text-success hover:cursor-pointer hover:bg-success-bg/80 transition-colors"
                     >
 
                       Mark as Resolved
                     </button>
                   )}
 
+                  {error.isResolved && error.isResolved===true && (
+                    <span className="inline-flex justify-center items-center px-3 rounded-xl bg-success-bg text-success ">Already Resolved</span>
+                  )}
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(
-                        error._id8
+                        error._id
                       );
                     }}
-                    className=" inline-flex justify-center items-center px-3 rounded-xl bg-error-bg text-error hover:cursor-pointer hover:bg-error-bg/70"
+                    className=" inline-flex justify-center items-center px-3 rounded-xl bg-error-bg text-error hover:cursor-pointer hover:bg-error-bg/80 transition-colors"
                   >
                     <Trash2 size={18} />
                   </button>
