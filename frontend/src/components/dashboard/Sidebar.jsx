@@ -13,7 +13,8 @@ import {
   ShieldCheck, 
   LogOut,
   X,
-  LockIcon
+  LockIcon,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -25,7 +26,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const navItems = user?.role === 'admin' 
     ? [
-        { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck }
+        { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck },
+        { name: 'Error Logs', path:'/error-logs', icon:AlertTriangle}
       ]
     : [
         { name: 'Family Dashboard', path: '/dashboard/family', icon: LayoutDashboard, requiresFamily: true },

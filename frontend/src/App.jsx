@@ -72,6 +72,10 @@ import PushNotificationSettings from './pages/notifications/PushNotificationSett
 import AuthCallback from './pages/auth/AuthCallback.jsx';
 import Profile from './pages/auth/Profile.jsx';
 
+
+//ErrorLogs Pages
+import ErrorLogsPage from './pages/admin/error-logs/ErrorLogsPage.jsx'
+
 function App() {
 
   // useEffect(() => {
@@ -219,6 +223,7 @@ function App() {
                 {/* Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route path="/admin-dashboard" element={<div>Admin Dashboard</div>} />
+                  <Route path="/error-logs" element={<ErrorLogsPage/>} />
                 </Route>
 
               </Route>

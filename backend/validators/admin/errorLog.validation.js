@@ -26,7 +26,7 @@ export const getAllErrorsValidation = Joi.object({
     .max(100)
     .default(20),
 
-  sortBy: Joi.string()
+  sortBy: Joi.string().allow("").trim()
     .valid(
       "createdAt",
       "occurrenceCount",
@@ -35,9 +35,28 @@ export const getAllErrorsValidation = Joi.object({
     )
     .default("createdAt"),
 
-  sortOrder: Joi.string()
+  sortOrder: Joi.string().allow("").trim()
     .valid("asc", "desc")
     .default("desc"),
+
+  severity: Joi.string().allow("").trim()
+  .valid(
+    "low",
+    "medium",
+    "high",
+    "critical"
+  ),
+
+  environment: Joi.string().allow("").trim()
+    .valid(
+      "development",
+      "production"
+    ),
+
+    isResolved: Joi.boolean()
+  .truthy("true")
+  .falsy("false")
+  .allow("")
 }).options({
     stripUnknown : true,
     abortEarly : false
