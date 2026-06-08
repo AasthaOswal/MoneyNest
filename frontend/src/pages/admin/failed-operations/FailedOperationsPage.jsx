@@ -311,7 +311,6 @@ const FailedOperationsPage = () => {
                       {op.error?.message || "No error message provided"}
                     </p>
                   </div>
-                  <Activity size={18} className="text-muted shrink-0" />
                 </div>
 
                 <div className="mt-4 text-sm text-text-secondary truncate">

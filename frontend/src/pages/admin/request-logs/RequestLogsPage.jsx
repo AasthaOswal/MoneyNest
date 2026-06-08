@@ -307,7 +307,6 @@ const RequestLogsPage = () => {
                         {log.path}
                       </h3>
                     </div>
-                    <Activity size={18} className="text-muted shrink-0" />
                   </div>
 
                   {/* Operational Metrics Segment */}

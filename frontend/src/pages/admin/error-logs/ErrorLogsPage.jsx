@@ -366,10 +366,7 @@ const ErrorLogsPage = () => {
                     </p>
                   </div>
 
-                  <AlertTriangle
-                    size={18}
-                    className="text-error"
-                  />
+ 
 
                 </div>
 
