@@ -54,11 +54,7 @@ const FailedOperationDetails = () => {
       toast.success(response?.message || "Operation retried successfully");
       
       // Update state directly or refetch. Assuming response.data returns the updated operation.
-      if (response.data) {
-        setOperation(response.data);
-      } else {
-        fetchOperation();
-      }
+      await fetchOperation();
     } catch (error) {
       console.log(error.response)
       toast.error(error?.response?.data?.message || "Failed to retry operation");
@@ -225,7 +221,7 @@ const FailedOperationDetails = () => {
         <div className="pt-4">
           <p className="text-sm text-text-secondary mb-2">Error Stack / Details</p>
           <pre className="bg-(--color-input-bg) border border-(--color-border) rounded-lg p-4 text-sm overflow-auto text-text whitespace-pre-wrap font-mono">
-            {operation.error.stack || "No additional error details available."}
+            {operation.error?.stack || "No additional error details available."}
           </pre>
         </div>
       </SectionCard>

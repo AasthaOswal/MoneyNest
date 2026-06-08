@@ -100,21 +100,7 @@ export const getFailedOperations = async (req, res) => {
 };
 
 
-export const getFailedOperationById = async (req,res) =>{
-  try {
-    const {id} = req.params;
 
-    const op = await FailedOperation.findById(id);
-
-    if(!op){
-      return res.status(404).json({success:true, message:"Failed Operation NOt Found"});
-    }
-
-    return res.status(200).json({success: "Failed Operation found successfully", data:op});
-  } catch (error) {
-    res.status(500).json({success:false, message: "Server Error"});
-  }
-};
 
 export const retryFailedOperationById = async (req, res) => {
   try {
@@ -151,6 +137,22 @@ export const retryFailedOperationById = async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+};
+
+export const getFailedOperationById = async (req,res) =>{
+  try {
+    const {id} = req.params;
+
+    const op = await FailedOperation.findById(id);
+
+    if(!op){
+      return res.status(404).json({success:true, message:"Failed Operation NOt Found"});
+    }
+
+    return res.status(200).json({success: "Failed Operation found successfully", data:op});
+  } catch (error) {
+    res.status(500).json({success:false, message: "Server Error"});
   }
 };
 
