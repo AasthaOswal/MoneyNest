@@ -86,10 +86,11 @@ export const getFailedOperations = async (req, res) => {
 
       pagination: {
         total,
-        page,
+        currentPage:page,
         limit,
         totalPages: Math.ceil(total / limit),
       },
+      
     });
   } catch (error) {
     res.status(500).json({
