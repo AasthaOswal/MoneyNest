@@ -10,7 +10,14 @@ import {
   resolveError
 } from "../../controllers/admin/errorLog.controller.js";
 
+import { authenticateToken, authorizeRoles } from "../../middlewares/auth.middleware.js";
+
+
 const router = express.Router();
+
+
+router.use(authenticateToken, authorizeRoles("admin"));
+
 
 // Get all errors (filters: severity, date range, search)
 router.get("/", getAllErrors);

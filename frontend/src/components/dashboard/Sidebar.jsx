@@ -14,7 +14,9 @@ import {
   LogOut,
   X,
   LockIcon,
-  AlertTriangle
+  AlertTriangle,
+  Logs,
+  XCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,8 +29,9 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navItems = user?.role === 'admin' 
     ? [
         { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck },
-        { name: 'Request Logs', path:'/request-logs', icon:AlertTriangle},
-        { name: 'Error Logs', path:'/error-logs', icon:AlertTriangle}
+        { name: 'Request Logs', path:'/request-logs', icon:Logs},
+        { name: 'Error Logs', path:'/error-logs', icon:AlertTriangle},
+        { name: 'Failed Operations', path:'/failed-operations', icon:XCircle}
         
       ]
     : [

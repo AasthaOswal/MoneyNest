@@ -3,6 +3,9 @@ import cloudinary from "../../config/cloudinary.js";
 import { insertFailedCloudinaryDeletion } from "../failedCloudinaryDeletion/insertFailedCloudinaryDeletion.js";
 import { createFailedOperation } from "../failedOperation/failedOperationCreator.js";
 
+
+const isCronTesting = process.env.CRON_TESTING;
+console.log(isCronTesting)
 export const deleteFromCloudinary = async (publicId) => {
 
 	if (!publicId || typeof publicId !== "string" || publicId.trim() === "") {
@@ -11,7 +14,9 @@ export const deleteFromCloudinary = async (publicId) => {
 
 	try {
 
-		// throw new Error("Testing cron - Error in cloudinary deletion")
+		if(isCronTesting == "true"){
+			throw new Error("Testing cron -On Purpose Error in cloudinary deletion");
+		}
 
 		const result = await cloudinary.uploader.destroy(publicId);
 

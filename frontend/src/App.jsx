@@ -78,8 +78,8 @@ import ErrorLogsPage from './pages/admin/error-logs/ErrorLogsPage.jsx'
 import ErrorLogDetails from './pages/admin/error-logs/ErrorlogDetails.jsx';
 import RequestLogsPage from './pages/admin/request-logs/RequestLogsPage.jsx';
 import RequestLogDetails from './pages/admin/request-logs/RequestLogDetails.jsx';
-
-
+import FailedOperationsPage from './pages/admin/failed-operations/FailedOperationsPage.jsx';
+import FailedOperationDetails from './pages/admin/failed-operations/FailedOperationDetails.jsx'
 
 function App() {
 
@@ -232,6 +232,8 @@ function App() {
                   <Route path="/error-logs/:id" element={<ErrorLogDetails/>} />
                   <Route path="/request-logs" element={<RequestLogsPage/>} />
                   <Route path="/request-logs/:id" element={<RequestLogDetails/>} />
+                  <Route path="/failed-operations" element={<FailedOperationsPage/>} />
+                  <Route path="/failed-operations/:id" element={<FailedOperationDetails/>} />
                   
                 </Route>
 

@@ -278,6 +278,9 @@ const RequestLogsPage = () => {
               Show Logs
             </button>
           </div>
+
+          
+          <p className="mt-5 wrap-break-word break-all text-muted font-sm">Note:- Search by requestId, userEmail, userRole, method, path, ip, userAgent, browser, browserVersion, os, osVersion, deviceType, origin, originType, referer, actorType</p>
         </div>
 
         {/* Grid/Cards Container */}

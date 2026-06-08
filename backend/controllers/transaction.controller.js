@@ -640,8 +640,6 @@ export const getTransactionById = async (req, res) => {
 // ❌ DELETE TRANSACTION
 // =======================
 export const deleteTransaction = async (req, res) => {
-  
-    throw new Error("Error generated on purpose");
   try {
     const { transactionId } = req.params;
 

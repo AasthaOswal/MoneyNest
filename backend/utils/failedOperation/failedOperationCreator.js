@@ -21,6 +21,6 @@ export const createFailedOperation = async ({
       status: "failed",
     });
   } catch (err) {
-    console.error("❌ Failed to log failed operation:", err.message);
+    console.error("Failed to log failed operation:", err.message);
   }
 };

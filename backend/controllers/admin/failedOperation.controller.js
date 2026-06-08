@@ -1,28 +1,95 @@
 import FailedOperation from "../../models/admin/failedOperation.model.js";
 import { retrySingleOperation } from "../../services/retry/retrySingleFailedOperation.service.js";
+import { getFailedOperationsValidation } from "../../validators/admin/failedOperation.validation.js";
 
 
 export const getFailedOperations = async (req, res) => {
   try {
-    const { type, status, search } = req.query;
+    const { error, value } =
+      getFailedOperationsValidation.validate(req.query, {
+        abortEarly: false,
+        stripUnknown: true,
+      });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details.map((err) => err.message),
+      });
+    }
+
+    const {
+      type,
+      status,
+      requestId,
+      search,
+      startDate,
+      endDate,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    } = value;
 
     const filter = {};
 
     if (type) filter.operationType = type;
+
     if (status) filter.status = status;
 
+    if (requestId) filter.requestId = requestId;
+
+    if (startDate || endDate) {
+      filter.createdAt = {};
+
+      if (startDate) {
+        filter.createdAt.$gte = new Date(startDate);
+      }
+
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        filter.createdAt.$lte = end;
+      }
+    }
+
     if (search) {
+      const regex = new RegExp(search, "i");
+
       filter.$or = [
-        { operationType: new RegExp(search, "i") },
-        { "error.message": new RegExp(search, "i") },
+        { operationType: regex },
+        { status: regex },
+        { requestId: regex },
+        { "error.message": regex },
       ];
     }
 
-    const data = await FailedOperation.find(filter).sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
 
-    res.json({
+    const sort = {
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    };
+
+    const [data, total] = await Promise.all([
+      FailedOperation.find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit),
+
+      FailedOperation.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
       success: true,
       data,
+
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -32,6 +99,22 @@ export const getFailedOperations = async (req, res) => {
   }
 };
 
+
+export const getFailedOperationById = async (req,res) =>{
+  try {
+    const {id} = req.params;
+
+    const op = await FailedOperation.findById(id);
+
+    if(!op){
+      return res.status(404).json({success:true, message:"Failed Operation NOt Found"});
+    }
+
+    return res.status(200).json({success: "Failed Operation found successfully", data:op});
+  } catch (error) {
+    res.status(500).json({success:false, message: "Server Error"});
+  }
+};
 
 export const retryFailedOperationById = async (req, res) => {
   try {
@@ -55,12 +138,12 @@ export const retryFailedOperationById = async (req, res) => {
 
     const result = await retrySingleOperation(operation, {
       ignoreMaxRetries: true,
-      resetRetryCount: true, // ✅ THIS LINE
+      resetRetryCount: true, //THIS LINE
     });
 
     res.json({
       success: true,
-      result,
+      data: result,
     });
 
   } catch (error) {
