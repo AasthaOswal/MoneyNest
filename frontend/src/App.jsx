@@ -76,7 +76,7 @@ import Profile from './pages/auth/Profile.jsx';
 //Admin Pages
 import ErrorLogsPage from './pages/admin/error-logs/ErrorLogsPage.jsx'
 import ErrorLogDetails from './pages/admin/error-logs/ErrorlogDetails.jsx';
-import RequestLogsPage from './pages/admin/request-logs/RequestLogspage.jsx';
+import RequestLogsPage from './pages/admin/request-logs/RequestLogsPage.jsx';
 import RequestLogDetails from './pages/admin/request-logs/RequestLogDetails.jsx';
 
 
