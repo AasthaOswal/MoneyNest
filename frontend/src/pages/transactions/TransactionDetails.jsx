@@ -1,157 +1,289 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TransactionService from "../../services/transaction.service";
-import { ArrowRight, Pencil, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
+import {
+  ArrowLeft,
+  Pencil,
+  Trash2,
+  Calendar,
+  Tag,
+  FileText,
+  StickyNote,
+  Plus,
+  List,
+} from "lucide-react";
 
 const TransactionDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [transaction, setTransaction] = useState(null);
+  const [isPdf, setIsPdf] = useState(false);
 
   useEffect(() => {
     const fetchTransaction = async () => {
       const res = await TransactionService.getTransactionById(id);
-
-      // IMPORTANT FIX
       setTransaction(res.data);
+      const fileUrl = res.data?.transactionDoc?.url;
+
+      const isPdfResult = fileUrl?.toLowerCase().includes(".pdf");
+      setIsPdf(isPdfResult);
     };
+
     fetchTransaction();
   }, [id]);
 
   const handleDelete = async () => {
-    await TransactionService.deleteTransaction(id);
-    navigate("/transactions");
+    const loadingToast = toast.loading("Deleting transaction...");
+
+    try {
+      const res = await TransactionService.deleteTransaction(id);
+
+      toast.success(
+        res?.message || "Transaction deleted successfully",
+        { id: loadingToast }
+      );
+
+      navigate("/transactions");
+    } catch (error) {
+      toast.error(
+        error?.response.data.message || "Failed to delete transaction",
+        { id: loadingToast }
+      );
+    }
   };
 
-  if (!transaction)
-    return <div className="text-text p-6">Loading...</div>;
+  if (!transaction) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <p className="text-text-secondary">Loading transaction...</p>
+      </div>
+    );
+  }
+
+  const badgeStyles = {
+    income:
+      "bg-income-bg text-income border border-income/30",
+    expense:
+      "bg-expense-bg text-expense border border-expense/30",
+    investment:
+      "bg-investment-bg text-investment border border-investment/30",
+  };
 
   return (
-    <div className="bg-bg min-h-screen p-6">
-      <div className="max-w-3xl mx-auto bg-surface border border-border rounded-2xl p-6 shadow-sm">
+    <div className="min-h-screen bg-bg p-4 md:p-6">
+      <div className="max-w-4xl mx-auto">
+      
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-text">
-            {transaction.title}
-          </h2>
-
-          <button
-            onClick={() => navigate("/transactions")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg 
-                       bg-primary text-white 
-                       hover:bg-primary-hover transition"
-          >
-            All Transactions
-            <ArrowRight size={18} />
-          </button>
-        </div>
-
-        {/* TYPE BADGE */}
-        <div className="mb-4">
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium 
-              border 
-              ${
-                transaction.type === "income"
-                  ? "border-income text-income"
-                  : transaction.type === "expense"
-                  ? "border-expense text-expense"
-                  : "border-investment text-investment"
-              }`}
-          >
-            {transaction.type.toUpperCase()}
-          </span>
-        </div>
-
-        {/* AMOUNT */}
-        <p className="text-xl font-semibold text-text mb-4">
-          ₹ {transaction.amount}
-        </p>
-
-        {/* DATE */}
-        <p className="text-muted mb-4">
-          {new Date(transaction.date).toLocaleDateString()}
-        </p>
-
-        {/* DESCRIPTION */}
-        {transaction.description && (
-          <div className="mb-4">
-            <p className="text-sm text-muted mb-1">Description</p>
-            <p className="text-text">{transaction.description}</p>
-          </div>
-        )}
-
-        {/* NOTE */}
-        {transaction.note && (
-          <div className="mb-4">
-            <p className="text-sm text-muted mb-1">Note</p>
-            <p className="text-text">{transaction.note}</p>
-          </div>
-        )}
-
-        {/* CATEGORY */}
-        {transaction.category && (
-          <div className="mb-4">
-            <p className="text-sm text-muted mb-1">Category</p>
-            <p className="text-text">{transaction.category.name}</p>
-          </div>
-        )}
-
-        
-        {/* LABELS */}
-        {transaction.labels?.length > 0 && (
-          <div className="mb-4">
-            <p className="text-sm text-muted mb-2">Labels</p>
-            <div className="flex flex-wrap gap-2">
-              {transaction.labels.map((label) => (
-                <span
-                  key={label._id}
-                  className="px-3 py-1 text-sm rounded-full 
-                             border border-primary text-primary"
+        {/* Main Card */}
+        <div
+          className="bg-card border border-border rounded-3xl overflow-hidden"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
+          {/* Header */}
+          <div className="p-6 md:p-8 border-b border-divider">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5">
+              <div>
+                <div
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-4 ${
+                    badgeStyles[transaction.type]
+                  }`}
                 >
-                  {label.name}
-                </span>
-              ))}
+                  {transaction.type?.toUpperCase()}
+                </div>
+
+                <h1 className="text-2xl md:text-3xl font-bold text-text mb-3">
+                  {transaction.title}
+                </h1>
+
+                <p className="text-3xl font-bold text-primary">
+                  ₹ {Number(transaction.amount).toLocaleString("en-IN")}
+                </p>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* DOCUMENT IMAGE */}
-        {transaction.transactionDoc?.url && (
-          <div className="mb-6">
-            <p className="text-sm text-muted mb-2">Attachment</p>
-            <img
-              src={transaction.transactionDoc.url}
-              alt="transaction"
-              className="rounded-lg border border-border max-h-60 object-cover"
-            />
+          {/* Details */}
+          <div className="p-6 md:p-8 space-y-6">
+            {/* Date */}
+            <div className="flex items-start gap-3">
+              <Calendar
+                size={18}
+                className="text-primary mt-1 shrink-0"
+              />
+              <div>
+                <p className="text-sm text-muted">Transaction Date</p>
+                <p className="text-text">
+                  {new Date(transaction.date).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {/* Category */}
+            {transaction.category && (
+              <div className="flex items-start gap-3">
+                <Tag
+                  size={18}
+                  className="text-primary mt-1 shrink-0"
+                />
+                <div>
+                  <p className="text-sm text-muted">Category</p>
+                  <p className="text-text">
+                    {transaction.category.name}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            {transaction.description && (
+              <div className="flex items-start gap-3">
+                <FileText
+                  size={18}
+                  className="text-primary mt-1 shrink-0"
+                />
+                <div className="flex-1">
+                  <p className="text-sm text-muted mb-1">
+                    Description
+                  </p>
+
+                  <div className="bg-surface-2 border border-border rounded-xl p-4">
+                    <p className="text-text whitespace-pre-wrap">
+                      {transaction.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Note */}
+            {transaction.note && (
+              <div className="flex items-start gap-3">
+                <StickyNote
+                  size={18}
+                  className="text-primary mt-1 shrink-0"
+                />
+                <div className="flex-1">
+                  <p className="text-sm text-muted mb-1">
+                    Note
+                  </p>
+
+                  <div className="bg-surface-2 border border-border rounded-xl p-4">
+                    <p className="text-text whitespace-pre-wrap">
+                      {transaction.note}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Labels */}
+            {transaction.labels?.length > 0 && (
+              <div>
+                <p className="text-sm text-muted mb-3">Labels</p>
+
+                <div className="flex flex-wrap gap-2">
+                  {transaction.labels.map((label) => (
+                    <span
+                      key={label._id}
+                      className="px-3 py-1.5 rounded-full text-sm bg-primary-subtle text-primary border border-primary/20"
+                    >
+                      {label.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Attachment */}
+            {transaction.transactionDoc?.url && (
+              
+              <div>
+                <p className="text-sm text-muted mb-3">
+                  Attachment
+                </p>
+                {isPdf ? (
+                  <div className="bg-surface-2 border border-border rounded-2xl p-6 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-text">
+                        PDF Document
+                      </p>
+                      <p className="text-sm text-muted">
+                        Click below to view the file
+                      </p>
+                    </div>
+
+                  </div>
+                ) : 
+                (
+                  <div className="bg-surface-2 border border-border rounded-2xl p-3">
+                    <img
+                      src={transaction.transactionDoc.url}
+                      alt="Transaction Document"
+                      className="w-full max-h-72 object-contain rounded-xl"
+                      onClick={() =>
+                      window.open(transaction.transactionDoc.url, "_blank")} />
+                  </div>
+                ) }
+                            
+                <button
+                  onClick={() =>
+                    window.open(transaction.transactionDoc.url, "_blank")
+                  }
+                  className="mt-3 text-sm text-primary hover:underline hover:cursor-pointer"
+                >
+                  View Full Image/doc
+                </button>
+              </div>
+            )}
+
+            <div className="pt-6 border-t border-divider">
+              <h3 className="text-sm font-medium text-muted mb-3">
+                Actions
+              </h3>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => navigate("/transactions")}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 border border-border text-text hover:bg-surface-3 transition-colors hover:cursor-pointer"
+                >
+                  <List size={16} />
+                  All Transactions
+                </button>
+
+                <button
+                  onClick={() => navigate("/transactions/create")}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-subtle text-primary border border-primary/20 hover:bg-primary/10 transition-colors hover:cursor-pointer"
+                >
+                  <Plus size={16} />
+                  Create Transaction
+                </button>
+
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-error text-error hover:bg-error-bg transition-colors hover:cursor-pointer"
+                >
+                  <Trash2 size={16} />
+                  Delete
+                </button>
+
+                <button
+                  onClick={() =>
+                    navigate(`/transactions/edit/${transaction._id}`)
+                  }
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-text-on-primary hover:bg-primary-hover transition-colors hover:cursor-pointer"
+                >
+                  <Pencil size={16} />
+                  Edit
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-
-        {/* ACTION BUTTONS */}
-        <div className="flex gap-3 pt-4 border-t border-border">
-
-          <button
-            onClick={() => navigate(`/transactions/edit/${id}`)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg 
-                       bg-primary text-white 
-                       hover:bg-primary-hover transition"
-          >
-            <Pencil size={16} />
-            Edit
-          </button>
-
-          <button
-            onClick={handleDelete}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg 
-                       border border-expense text-expense 
-                       hover:bg-expense hover:text-white transition"
-          >
-            <Trash2 size={16} />
-            Delete
-          </button>
         </div>
       </div>
     </div>

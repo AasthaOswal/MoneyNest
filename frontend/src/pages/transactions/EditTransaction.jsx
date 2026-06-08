@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import TransactionService from "../../services/transaction.service";
 import api from "../../axios/axios";
+import TypeSelect from "../../components/transactions/TypeSelect";
 import MultiSelectSheet from "../../components/transactions/MultiSelectSheet";
 import SingleSelectSheet from "../../components/transactions/SingleSelectSheet";
-
 
 const UpdateTransaction = () => {
   const { id } = useParams();
@@ -18,7 +20,7 @@ const UpdateTransaction = () => {
     labels: [],
     description: "",
     note: "",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
   const [file, setFile] = useState(null);
@@ -28,7 +30,7 @@ const UpdateTransaction = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // 🔹 Fetch transaction + categories/labels
+  // Fetch transaction + categories/labels
   const fetchInitialData = async () => {
     try {
       const txnRes = await TransactionService.getTransactionById(id);
@@ -42,7 +44,7 @@ const UpdateTransaction = () => {
         labels: txn.labels.map((l) => l._id || l),
         description: txn.description || "",
         note: txn.note || "",
-        date: txn.date?.split("T")[0],
+        date: txn.date?.split("T")[0] || new Date().toISOString().split("T")[0],
       });
 
       const [categoryRes, labelRes] = await Promise.all([
@@ -54,7 +56,8 @@ const UpdateTransaction = () => {
       setLabels(labelRes.data.data || []);
     } catch (err) {
       console.error(err);
-      setErrorMsg("Failed to load transaction");
+      setErrorMsg("Failed to load transaction details.");
+      toast.error("Failed to load transaction details.");
     } finally {
       setInitialLoading(false);
     }
@@ -64,19 +67,21 @@ const UpdateTransaction = () => {
     fetchInitialData();
   }, [id]);
 
-  // 🔹 Refetch categories when type changes
+  // Refetch categories when type changes
   useEffect(() => {
     const fetchTypeData = async () => {
+      // Prevent fetching if it's the initial load to avoid redundant calls
+      if (initialLoading) return;
+      
       try {
         const res = await api.get(`/categories?type=${form.type}`);
         setCategories(res.data.data || []);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch categories", err);
       }
     };
-
     fetchTypeData();
-  }, [form.type]);
+  }, [form.type, initialLoading]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,8 +97,8 @@ const UpdateTransaction = () => {
     }));
   };
 
-  const handleCategoryChange = (values) => {
-    setForm((prev) => ({ ...prev, category: values }));
+  const handleCategoryChange = (value) => {
+    setForm((prev) => ({ ...prev, category: value }));
   };
 
   const handleLabelChange = (values) => {
@@ -105,18 +110,30 @@ const UpdateTransaction = () => {
     setLoading(true);
     setErrorMsg("");
 
+    const toastId = toast.loading("Updating transaction...");
+
     try {
+      if (!form.category) {
+        throw new Error("Please select a category.");
+      }
+      if (form.labels.length === 0) {
+        throw new Error("Please select at least one label.");
+      }
+
       const response = await TransactionService.updateTransaction(id, {
         ...form,
         transactionDoc: file,
       });
-      console.log(response)
+
+      toast.success(response.message || "Transaction updated!", { id: toastId });
 
       navigate(`/transactions/${response.data._id}`);
     } catch (err) {
-      setErrorMsg(
-        err.response?.data?.message || err.message || "Update failed"
-      );
+      console.log("FULL ERROR:", err);
+      const message = err.response?.data?.message || err.message || "Something went wrong";
+
+      toast.error(message, { id: toastId });
+      setErrorMsg(message);
     } finally {
       setLoading(false);
     }
@@ -124,100 +141,82 @@ const UpdateTransaction = () => {
 
   if (initialLoading) {
     return (
-      <div className="p-6 text-center text-muted">Loading...</div>
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-(--color-bg) px-4 py-6 text-text-secondary">
+        Loading transaction details...
+      </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-bg px-4 py-6 md:px-8 md:py-10">
-      <div className="mx-auto w-full max-w-4xl rounded-2xl border border-border bg-surface shadow-sm">
-
+    <div className="min-h-[calc(100vh-64px)] bg-(--color-bg) px-4 py-6 md:px-8 md:py-10">
+      <div className="mx-auto w-full max-w-4xl rounded-2xl border border-(--color-border) bg-(--color-surface) shadow-(--shadow-card)">
+        
         {/* Header */}
-        <div className="flex flex-col gap-4 border-b border-border px-6 py-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 border-b border-divider px-6 py-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-text">
-              Update Transaction
-            </h2>
-            <p className="mt-1 text-sm text-muted">
+            <h2 className="text-2xl font-bold text-text">Update Transaction</h2>
+            <p className="mt-1 text-sm text-text-secondary">
               Edit your transaction details.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={() => navigate("/transactions")}
-            className="rounded-xl border border-primary px-4 py-2 text-primary hover:bg-primary hover:text-white"
+            className="rounded-xl border border-(--color-primary) px-4 py-2 font-medium text-(--color-primary) transition-colors hover:bg-(--color-primary) hover:text-(--color-text-on-primary) cursor-pointer text-sm"
           >
             Back
           </button>
         </div>
 
-        {/* Error */}
         {errorMsg && (
-          <div className="mx-6 mt-6 rounded-xl border border-expense px-4 py-3 text-expense">
+          <div className="mx-6 mt-6 rounded-xl border border-(--color-error) bg-(--color-error-bg) px-4 py-3 text-sm text-(--color-error)">
             {errorMsg}
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6">
-
-          {/* Type */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {["expense", "income", "investment"].map((type) => (
-              <label
-                key={type}
-                className={`flex cursor-pointer items-center justify-center rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
-                  form.type === type
-                    ? type === "expense"
-                      ? "border-expense bg-surface text-expense"
-                      : type === "income"
-                      ? "border-income bg-surface text-income"
-                      : "border-investment bg-surface text-investment"
-                    : "border-border bg-bg text-muted hover:border-primary hover:text-text"
-                }`}
-              >
-                <input
-                  type="radio"
-                  checked={form.type === type}
-                  onChange={() => handleTypeChange(type)}
-                  className="hidden"
-                />
-                <span className="capitalize">{type}</span>
-              </label>
-            ))}
+          
+          {/* Imported Shared Type Selection Dropdown */}
+          <div className="w-full sm:max-w-xs">
+            <TypeSelect value={form.type} onChange={handleTypeChange} />
           </div>
 
           <div className="space-y-5">
-
-            {/* Title */}
+            {/* Title Input */}
             <div>
               <label className="mb-2 block text-sm font-medium text-text">
-                Title <span className="text-expense">*</span>
+                Title <span className="text-(--color-expense)">*</span>
               </label>
               <input
+                required
                 name="title"
                 value={form.title}
-                placeholder="e.g. Grocery shopping"
+                placeholder="e.g. Monthly Groceries"
                 onChange={handleChange}
-                className="w-full rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                className="w-full rounded-xl border border-(--color-input-border) bg-(--color-input-bg) p-3 text-text shadow-sm outline-none transition-all placeholder-placeholder focus:border-(--color-input-focus) focus:ring-1 focus:ring-(--color-input-focus)"
               />
             </div>
 
-            {/* Amount + Date */}
+            {/* Amount & Date Input Layout */}
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
               <div>
                 <label className="mb-2 block text-sm font-medium text-text">
-                  Amount <span className="text-expense">*</span>
+                  Amount <span className="text-(--color-expense)">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-3.5 text-muted">₹</span>
+                  <span className="pointer-events-none absolute left-4 top-3.5 text-muted">
+                    ₹
+                  </span>
                   <input
+                    required
                     name="amount"
                     type="number"
+                    min="0"
                     value={form.amount}
+                    placeholder="0.00"
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-border bg-bg py-3 pl-8 pr-3 text-text shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    className="w-full rounded-xl border border-(--color-input-border) bg-(--color-input-bg) py-3 pl-8 pr-3 text-text shadow-sm outline-none transition-all placeholder-placeholder focus:border-(--color-input-focus) focus:ring-1 focus:ring-(--color-input-focus)"
                   />
                 </div>
               </div>
@@ -231,13 +230,12 @@ const UpdateTransaction = () => {
                   name="date"
                   value={form.date}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-xl border border-(--color-input-border) bg-(--color-input-bg) p-3 text-text shadow-sm outline-none transition-all focus:border-(--color-input-focus) focus:ring-1 focus:ring-(--color-input-focus)"
                 />
               </div>
-
             </div>
 
-            {/* Description */}
+            {/* Description Textarea */}
             <div>
               <label className="mb-2 block text-sm font-medium text-text">
                 Description
@@ -245,14 +243,14 @@ const UpdateTransaction = () => {
               <textarea
                 name="description"
                 value={form.description}
+                placeholder="Add some descriptive text..."
                 rows="3"
-                placeholder="Add some details..."
                 onChange={handleChange}
-                className="w-full resize-none rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                className="w-full resize-none rounded-xl border border-(--color-input-border) bg-(--color-input-bg) p-3 text-text shadow-sm outline-none transition-all placeholder-placeholder focus:border-(--color-input-focus) focus:ring-1 focus:ring-(--color-input-focus)"
               />
             </div>
 
-            {/* Note */}
+            {/* Note Textarea */}
             <div>
               <label className="mb-2 block text-sm font-medium text-text">
                 Note
@@ -260,14 +258,14 @@ const UpdateTransaction = () => {
               <textarea
                 name="note"
                 value={form.note}
+                placeholder="Any personal notes?"
                 rows="3"
-                placeholder="Optional note..."
                 onChange={handleChange}
-                className="w-full resize-none rounded-xl border border-border bg-bg p-3 text-text shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                className="w-full resize-none rounded-xl border border-(--color-input-border) bg-(--color-input-bg) p-3 text-text shadow-sm outline-none transition-all placeholder-placeholder focus:border-(--color-input-focus) focus:ring-1 focus:ring-(--color-input-focus)"
               />
             </div>
 
-            {/* File */}
+            {/* File Attachment Input */}
             <div>
               <label className="mb-2 block text-sm font-medium text-text">
                 Attachment
@@ -275,24 +273,37 @@ const UpdateTransaction = () => {
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="w-full cursor-pointer rounded-xl border border-border bg-bg p-2 text-text shadow-sm file:mr-4 file:rounded-lg file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:font-medium file:text-text hover:file:bg-border"
+                className="w-full cursor-pointer rounded-xl border border-(--color-input-border) bg-(--color-input-bg) p-2 text-text shadow-sm file:mr-4 file:rounded-lg file:border-0 file:bg-(--color-surface-2) file:px-4 file:py-2 file:text-sm file:font-medium file:text-text hover:file:bg-surface-3 file:cursor-pointer"
               />
             </div>
-
           </div>
 
-          {/* Category + Labels */}
-          <div className="space-y-5 border-t border-border pt-6">
+          {/* Categories & Labels Pickers */}
+          <div className="space-y-5 border-t border-divider pt-6">
+            
             <SingleSelectSheet
               label="Category"
               title="Select Category"
               options={categories}
               selectedId={form.category}
               onChange={handleCategoryChange}
-              placeholder={`Select category for ${form.type}`}
-              emptyText={`No categories found for ${form.type}.`}
+              placeholder={`Select category for ${form.type || 'transaction'}`}
+              emptyText={`No categories found for ${form.type || 'this type'}.`}
               required={true}
             />
+
+            <div className="flex flex-col gap-2 border-b border-divider pb-6 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-text-secondary">
+                Please select a category. If no active categories are available, create one first.
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate("/categories/create")}
+                className="text-sm font-medium text-(--color-primary) hover:text-(--color-primary-hover) cursor-pointer whitespace-nowrap text-left"
+              >
+                Create Category
+              </button>
+            </div>
 
             <MultiSelectSheet
               label="Labels"
@@ -300,23 +311,39 @@ const UpdateTransaction = () => {
               options={labels}
               selectedIds={form.labels}
               onChange={handleLabelChange}
+              placeholder="Select labels"
+              emptyText="No labels found."
               required={true}
             />
+
+            <div className="flex flex-col gap-2 border-b border-divider pb-6 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-text-secondary">
+                Please select at least one label. If no active labels are available, create one first.
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate("/labels/create")}
+                className="text-sm font-medium text-(--color-primary) hover:text-(--color-primary-hover) cursor-pointer whitespace-nowrap text-left"
+              >
+                Create Label
+              </button>
+            </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-primary py-3 text-white hover:bg-primary-hover"
-          >
-            {loading ? "Updating..." : "Update Transaction"}
-          </button>
-
+          {/* Form Action Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-(--color-primary) px-8 py-3 font-semibold text-(--color-text-on-primary) shadow-md transition-all hover:bg-(--color-primary-hover) disabled:cursor-not-allowed disabled:opacity-50 md:w-auto cursor-pointer"
+            >
+              {loading ? "Updating..." : "Update Transaction"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default UpdateTransaction; 
+export default UpdateTransaction;
