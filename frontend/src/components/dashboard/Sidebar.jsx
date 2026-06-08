@@ -27,7 +27,9 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navItems = user?.role === 'admin' 
     ? [
         { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck },
+        { name: 'Request Logs', path:'/request-logs', icon:AlertTriangle},
         { name: 'Error Logs', path:'/error-logs', icon:AlertTriangle}
+        
       ]
     : [
         { name: 'Family Dashboard', path: '/dashboard/family', icon: LayoutDashboard, requiresFamily: true },

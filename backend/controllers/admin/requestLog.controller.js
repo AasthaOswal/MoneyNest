@@ -173,6 +173,36 @@ export const getRequestById = async (req, res) => {
   }
 };
 
+// DELETE SINGLE
+export const deleteRequestLog = async (req, res) => {
+  try {
+    const deleted = await RequestLog.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ success: false });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+// EXPORT (you can extend with filters later)
+export const exportRequestLogsNow = async (req, res) => {
+  try {
+    await exportRequestLogsAndEmail();
+
+    res.json({
+      success: true,
+      message: "Export started",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 export const getAllStats = async (req, res) => {
   try {
@@ -222,7 +252,7 @@ export const getAllStats = async (req, res) => {
 };
 
 
-// ✅ 4. SUSPICIOUS ACTIVITY DETECTION
+// SUSPICIOUS ACTIVITY DETECTION
 export const getSuspiciousActivity = async (req, res) => {
   try {
     const now = new Date();
@@ -272,24 +302,11 @@ export const getSuspiciousActivity = async (req, res) => {
 
 
 
-// ✅ 5. DELETE SINGLE
-export const deleteRequestLog = async (req, res) => {
-  try {
-    const deleted = await RequestLog.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ success: false });
-    }
-
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
 
 
 
-// ✅ 6. DELETE BULK
+
+// DELETE BULK
 export const deleteRequestLogs = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -313,16 +330,3 @@ export const deleteRequestLogs = async (req, res) => {
 
 
 
-// ✅ 7. EXPORT (you can extend with filters later)
-export const exportRequestLogsNow = async (req, res) => {
-  try {
-    await exportRequestLogsAndEmail();
-
-    res.json({
-      success: true,
-      message: "Export started",
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};

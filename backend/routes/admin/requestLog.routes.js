@@ -16,14 +16,16 @@ const router = express.Router();
 
 router.get("/", authenticateToken, authorizeRoles("admin"), getRequestLogs);
 
-router.get("/stats", authenticateToken, authorizeRoles("admin"), getAllStats);
-router.get("/suspicious", authenticateToken, authorizeRoles("admin"), getSuspiciousActivity);
-router.delete("/", authenticateToken, authorizeRoles("admin"), deleteRequestLogs);
+router.get("/:id", authenticateToken, authorizeRoles("admin"), getRequestById);
+
 router.delete("/:id", authenticateToken, authorizeRoles("admin"), deleteRequestLog);
 router.post("/export", authenticateToken, authorizeRoles("admin"), exportRequestLogsNow);
 
 
-router.get("/:id", authenticateToken, authorizeRoles("admin"), getRequestById);
+
+router.get("/stats", authenticateToken, authorizeRoles("admin"), getAllStats);
+router.get("/suspicious", authenticateToken, authorizeRoles("admin"), getSuspiciousActivity);
+router.delete("/", authenticateToken, authorizeRoles("admin"), deleteRequestLogs);
 
 export default router;
 

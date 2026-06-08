@@ -73,9 +73,13 @@ import AuthCallback from './pages/auth/AuthCallback.jsx';
 import Profile from './pages/auth/Profile.jsx';
 
 
-//ErrorLogs Pages
+//Admin Pages
 import ErrorLogsPage from './pages/admin/error-logs/ErrorLogsPage.jsx'
 import ErrorLogDetails from './pages/admin/error-logs/ErrorlogDetails.jsx';
+import RequestLogsPage from './pages/admin/request-logs/RequestLogspage.jsx';
+import RequestLogDetails from './pages/admin/request-logs/RequestLogDetails.jsx';
+
+
 
 function App() {
 
@@ -226,6 +230,8 @@ function App() {
                   <Route path="/admin-dashboard" element={<div>Admin Dashboard</div>} />
                   <Route path="/error-logs" element={<ErrorLogsPage/>} />
                   <Route path="/error-logs/:id" element={<ErrorLogDetails/>} />
+                  <Route path="/request-logs" element={<RequestLogsPage/>} />
+                  <Route path="/request-logs/:id" element={<RequestLogDetails/>} />
                   
                 </Route>
 
