@@ -235,7 +235,7 @@ const ErrorLogsPage = () => {
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-card">
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 
             <div>
               <label className="block text-md font-semibold text-muted mb-1">
@@ -373,7 +373,7 @@ const ErrorLogsPage = () => {
 
                 </div>
 
-                <div className="mt-4 text-sm text-text-secondary">
+                <div className="mt-4 text-sm text-text-secondary text-wrap wrap-break-word">
                   {error.method}{" "}
                   {error.path}
                 </div>
@@ -411,7 +411,7 @@ const ErrorLogsPage = () => {
                   ).toLocaleString()}
                 </div>
 
-                <div className="flex gap-2 mt-5">
+                <div className="flex flex-wrap gap-2 mt-5">
 
                   <button
                     onClick={(e) => {
@@ -452,7 +452,7 @@ const ErrorLogsPage = () => {
                         error._id
                       );
                     }}
-                    className=" inline-flex justify-center items-center px-3 rounded-xl bg-error-bg text-error hover:cursor-pointer hover:bg-error-bg/80 transition-colors"
+                    className=" inline-flex justify-center items-center py-3 px-3 rounded-xl bg-error-bg text-error hover:cursor-pointer hover:bg-error-bg/80 transition-colors"
                   >
                     <Trash2 size={18} />
                   </button>

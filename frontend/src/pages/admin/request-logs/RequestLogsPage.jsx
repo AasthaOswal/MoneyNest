@@ -18,6 +18,7 @@ import {
   HardDrive,
   User,
   Calendar,
+  Send
 } from "lucide-react";
 
 const RequestLogsPage = () => {
@@ -92,6 +93,22 @@ const RequestLogsPage = () => {
       });
     } catch (error) {
       toast.error(error.message || "Failed to delete request log", {
+        id: toastId,
+      });
+    }
+  };
+
+  const handleExportRequestLogs = async()=>{
+    const toastId = toast.loading("Sending request log...");
+
+    try {
+      await RequestLogService.exportRequestLogs();
+
+      toast.success("Request log exported successfully", {
+        id: toastId,
+      });
+    } catch (error) {
+      toast.error(error.message || "Failed to export request log", {
         id: toastId,
       });
     }
@@ -240,10 +257,17 @@ const RequestLogsPage = () => {
           <div className="flex gap-3 mt-6">
             <button
               onClick={clearFilters}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-2 border border-border text-text-secondary hover:bg-surface-3"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-2 border border-border text-text-secondary hover:bg-surface-3 hover:cursor-pointer "
             >
               <RotateCcw size={16} />
               Clear Filters
+            </button>
+            <button
+              onClick={handleExportRequestLogs}
+              className=" inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-subtle text-primary hover:cursor-pointer hover:bg-primary-subtle/80 transition-colors"
+            >
+              <Send size={16} />
+              Send on Email
             </button>
 
             <button

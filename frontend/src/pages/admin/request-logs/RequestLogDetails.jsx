@@ -33,7 +33,7 @@ const RequestLogDetails = () => {
       setRequestLog(response?.data || response);
     } catch (error) {
       toast.error(error?.message || "Failed to fetch request log");
-      navigate("/admin/request-logs");
+      navigate("/request-logs");
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ const RequestLogDetails = () => {
       const response = await RequestLogService.deleteRequestLog(id);
 
       toast.success(response?.message || "Request log deleted");
-      navigate("/admin/request-logs");
+      navigate("/request-logs");
     } catch (error) {
       toast.error(error?.message || "Failed to delete request log");
     }
