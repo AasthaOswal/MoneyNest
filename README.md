@@ -51,6 +51,7 @@ It helps families:
 * Create a family workspace
 * Invite family members using secure invite tokens
 * Shared financial tracking across the family
+* Automated AI-powered Financial Reports sent on Email
 
 ---
 
