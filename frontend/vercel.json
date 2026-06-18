@@ -6,7 +6,6 @@
 
         {
             "source": "/api/:path*",
-            // "destination": "https://moneynest-kskd.onrender.com/api/:path*"
             "destination": "https://moneynest-wsal.onrender.com/api/:path*"
         },
         {
