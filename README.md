@@ -51,6 +51,7 @@ It helps families:
 * Create a family workspace
 * Invite family members using secure invite tokens
 * Shared financial tracking across the family
+* Automated AI-powered Financial Reports sent on Email
 
 ---
 
@@ -155,7 +156,7 @@ Advanced backend monitoring system including:
 * Request logging
 * Error logging
 * Failed operation tracking
-* Retry mechanisms for failed background tasks
+* Custom Failure recorvery systems and retry mechanisms for failed background tasks
 * API monitoring and diagnostics
 
 ---
