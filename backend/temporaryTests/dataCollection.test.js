@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import { buildMonthlyReportData } from "../services/ai-monthly-family-report/dataCollection.js";
+import { buildMonthlyReportData } from "../services/ai-monthly-family-report/dataCollection.service.js";
 
 dotenv.config({
     path: "../.env"

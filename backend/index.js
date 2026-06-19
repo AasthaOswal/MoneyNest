@@ -33,6 +33,7 @@ import { authenticateToken } from "./middlewares/auth.middleware.js";
 import { startFailedOperationsRetry } from "./services/cron/failedOperationRetry.js";
 import { startRequestLogExportCron } from "./services/cron/requestLogExport.js";
 import {startFailedOperationsRetryNew} from "./services/cron/failedOperationNew.cron.js";
+import { startAiMonthlyFinancialReportCron } from "./services/cron/aiMonthlyFamilyReport.cron.js";
 
 import {globalErrorHandler} from "./middlewares/error.middleware.js";
 
@@ -101,7 +102,7 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // initialize socket after app middlewares are ready
 initializeSocket(httpServer, app);
 
-
+// startAiMonthlyFinancialReportCron();
 
 // run cron job
 // startGoalTracker();
