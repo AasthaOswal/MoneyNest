@@ -2,9 +2,13 @@ import cron from "node-cron"
 import Family from "../../models/family.model.js";
 import { buildMonthlyReportData } from "../ai-monthly-family-report/dataCollection.service.js";
 // import { generateFinancialInsights } from "../ai-monthly-family-report/geminiResponse.service.js";
-
+import path from "path";
 import { generateFinancialInsights } from "../ai-monthly-family-report/groqResponse.service.js";
 
+
+import {generateMonthlyReportPdf} from "../ai-monthly-family-report/pdf-generation/generator/generateMonthlyReportPdf.js"
+
+import {mockAiData} from "../ai-monthly-family-report/mocks/mockAiReport.js";
 // runs every minute - for testing
 const GOAL_TRACKER_CRON = "* * * * *";
 
@@ -54,31 +58,44 @@ export const startAiMonthlyFinancialReportCron = () => {
                     );
 
                     // Step 2
-                    // Send to Gemini
+                    // Send to Groq
 
-                    const aiReport =
-                        await generateFinancialInsights(
-                            reportData
-                        );
+                    // const aiReport =
+                    //     await generateFinancialInsights(
+                    //         reportData
+                    //     );
 
                     // Step 3
                     // For now just log response
 
-                    console.log(
-                        "\n---------- AI REPORT ----------"
-                    );
+                    // console.log(
+                    //     "\n---------- AI REPORT ----------"
+                    // );
 
-                    console.log(
-                        JSON.stringify(
-                            aiReport,
-                            null,
-                            2
-                        )
-                    );
+                    // console.log(
+                    //     JSON.stringify(
+                    //         aiReport,
+                    //         null,
+                    //         2
+                    //     )
+                    // );
 
                     console.log(
                         "-------- END AI REPORT --------\n"
                     );
+
+                    await generateMonthlyReportPdf({
+
+                        reportData,
+
+                        aiReport:mockAiData,
+
+                        outputPath: path.join(
+    process.cwd(),
+    "reports",
+    `${family._id}-${reportData.reportMonth}.pdf`
+)
+                    });
 
                      await sleep(10000); // 10 sec
 

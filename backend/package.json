@@ -26,6 +26,7 @@
     "nodemon": "^3.1.14",
     "os": "^0.1.2",
     "path": "^0.12.7",
+    "pdfmake": "^0.3.11",
     "puppeteer": "^24.41.0",
     "socket.io": "^4.8.3",
     "ua-parser-js": "^2.0.10",
