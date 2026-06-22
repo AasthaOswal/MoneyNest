@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import Family from "../../models/family.model.js";
 import Transaction from "../../models/transaction.model.js";
-import User from "../../models/user.model.js";
-import Category from "../../models/category.model.js";
 
 const formatMonth = (date) =>
     `${date.getFullYear()}-${String(
@@ -14,7 +12,6 @@ export const buildMonthlyReportData = async ({
     reportMonthDate = new Date()
 }) => {
 
-
     const family = await Family.findById(familyId)
         .select("familyName")
         .lean();
@@ -22,10 +19,6 @@ export const buildMonthlyReportData = async ({
     if (!family) {
         throw new Error("Family not found");
     }
-
-    // Example:
-    // If report runs on June 1st
-    // We generate report for May
 
     const reportMonthStart = new Date(
         reportMonthDate.getFullYear(),
@@ -101,302 +94,518 @@ export const buildMonthlyReportData = async ({
     });
 
     const monthlyTotals = Object.values(monthlyMap)
-        .sort((a, b) => a.month.localeCompare(b.month))
-        .map(month => ({
+    .sort((a, b) => a.month.localeCompare(b.month))
+    .map(month => {
+
+        const preInvestmentSavings =
+            month.income - month.expense;
+
+        const netSavings =
+            month.income -
+            month.expense -
+            month.investment;
+
+        return {
             ...month,
-            savings: (month.income - month.expense - month.investment)
-        }));
 
+            netSavings,
 
-    const currentMonthSummary =
-    monthlyTotals.find(
-        month =>
-            month.month ===
-            formatMonth(reportMonthStart)
-    ) ?? null;
+            preInvestmentSavings,
 
+            netSavings,
 
-    // =====================================
-    // CATEGORY HISTORY
-    // =====================================
+            investmentRate:
+                month.income === 0
+                    ? 0
+                    : Number(
+                          (
+                              month.investment /
+                              month.income *
+                              100
+                          ).toFixed(2)
+                      ),
 
-    const categoryRaw = await Transaction.aggregate([
-        {
-            $match: {
-                family: new mongoose.Types.ObjectId(familyId),
-                type: "expense",
-                date: {
-                    $gte: threeMonthsAgo,
-                    $lte: reportMonthEnd
-                }
-            }
-        },
-        {
-            $lookup: {
-                from: "categories",
-                localField: "category",
-                foreignField: "_id",
-                as: "category"
-            }
-        },
-        {
-            $unwind: "$category"
-        },
-        {
-            $group: {
-                _id: {
-                    category: "$category.name",
-                    month: {
-                        $dateToString: {
-                            format: "%Y-%m",
-                            date: "$date",
-                            timezone: "Asia/Kolkata"
-                        }
-                    }
-                },
-                amount: {
-                    $sum: "$amount"
-                }
-            }
-        },
-        {
-            $sort: {
-                "_id.month": 1
-            }
-        }
-    ]);
+            expenseToIncomeRatio:
+                month.income === 0
+                    ? 0
+                    : Number(
+                          (
+                              month.expense /
+                              month.income *
+                              100
+                          ).toFixed(2)
+                      ),
 
-    const categoryMap = {};
+            netSavingsRate:
+                month.income === 0
+                    ? 0
+                    : Number(
+                          (
+                              netSavings /
+                              month.income *
+                              100
+                          ).toFixed(2)
+                      ),
 
-    categoryRaw.forEach(item => {
+            totalAllocationRate:
+                month.income === 0
+                    ? 0
+                    : Number(
+                          (
+                              (
+                                  month.expense +
+                                  month.investment
+                              ) /
+                              month.income *
+                              100
+                          ).toFixed(2)
+                      ),
 
-        const category = item._id.category;
+            isOverAllocated:
+                netSavings < 0,
 
-        if (!categoryMap[category]) {
-            categoryMap[category] = {
-                category,
-                monthlyAmounts: []
-            };
-        }
-
-        categoryMap[category].monthlyAmounts.push({
-            month: item._id.month,
-            amount: item.amount
-        });
+            deficitAmount:
+                netSavings < 0
+                    ? Math.abs(netSavings)
+                    : 0
+        };
     });
 
-    const categoryHistory = Object.values(categoryMap);
+
+    // =====================================
+    // PREVIOUS MONTH CATEGORY
+    // =====================================
+
+    const previousMonthStart = new Date(
+        reportMonthStart.getFullYear(),
+        reportMonthStart.getMonth() - 1,
+        1
+    );
+
+    const previousMonthEnd = new Date(
+        reportMonthStart.getFullYear(),
+        reportMonthStart.getMonth(),
+        0,
+        23,
+        59,
+        59,
+        999
+    );
+
+    const previousMonthCategoryRaw =
+        await Transaction.aggregate([
+            {
+                $match: {
+                    family:
+                        new mongoose.Types.ObjectId(
+                            familyId
+                        ),
+                    type: "expense",
+                    date: {
+                        $gte: previousMonthStart,
+                        $lte: previousMonthEnd
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            {
+                $unwind: "$category"
+            },
+            {
+                $group: {
+                    _id: "$category.name",
+                    amount: {
+                        $sum: "$amount"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    amount: -1
+                }
+            },
+            {
+                $limit: 7
+            }
+        ]);
+
+    const previousMonthCategoryMap = {};
+
+    previousMonthCategoryRaw.forEach(item => {
+        previousMonthCategoryMap[item._id] =
+            item.amount;
+    });
+
 
     // =====================================
     // CURRENT MONTH CATEGORY BREAKDOWN
     // =====================================
 
-    const currentMonthCategoryRaw = await Transaction.aggregate([
-        {
-            $match: {
-                family: new mongoose.Types.ObjectId(familyId),
-                type: "expense",
-                date: {
-                    $gte: reportMonthStart,
-                    $lte: reportMonthEnd
+    const currentMonthCategoryRaw =
+        await Transaction.aggregate([
+            {
+                $match: {
+                    family:
+                        new mongoose.Types.ObjectId(
+                            familyId
+                        ),
+                    type: "expense",
+                    date: {
+                        $gte: reportMonthStart,
+                        $lte: reportMonthEnd
+                    }
                 }
-            }
-        },
-        {
-            $lookup: {
-                from: "categories",
-                localField: "category",
-                foreignField: "_id",
-                as: "category"
-            }
-        },
-        {
-            $unwind: "$category"
-        },
-        {
-            $group: {
-                _id: "$category.name",
-                amount: {
-                    $sum: "$amount"
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category",
+                    foreignField: "_id",
+                    as: "category"
                 }
+            },
+            {
+                $unwind: "$category"
+            },
+            {
+                $group: {
+                    _id: "$category.name",
+                    amount: {
+                        $sum: "$amount"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    amount: -1
+                }
+            },
+            {
+                $limit: 7
             }
-        },
-        {
-            $sort: {
-                amount: -1
-            }
-        }
-    ]);
+        ]);
 
     const currentMonthTotalExpense =
         currentMonthCategoryRaw.reduce(
-            (sum, item) => sum + item.amount,
+            (sum, item) =>
+                sum + item.amount,
             0
         );
 
-    const currentMonthCategoryBreakdown =
-        currentMonthCategoryRaw.map(item => ({
-            category: item._id,
-            amount: item.amount,
-            share:
-                currentMonthTotalExpense === 0
-                    ? 0
-                    : Number(
-                        (
-                            item.amount /
-                            currentMonthTotalExpense *
-                            100
-                        ).toFixed(2)
-                    )
-        }));
+    const categoryInsightsData =
+        currentMonthCategoryRaw.map(
+            category => {
+
+                const previousMonth =
+                    previousMonthCategoryMap[
+                        category._id
+                    ] || 0;
+
+                const changePercent =
+                    previousMonth === 0
+                        ? null
+                        : Number(
+                              (
+                                  (
+                                      category.amount -
+                                      previousMonth
+                                  ) /
+                                  previousMonth *
+                                  100
+                              ).toFixed(2)
+                          );
+
+                return {
+                    category:
+                        category._id,
+
+                    currentMonth:
+                        category.amount,
+
+                    previousMonth,
+
+                    changePercent,
+
+                    share:
+                        currentMonthTotalExpense ===
+                        0
+                            ? 0
+                            : Number(
+                                  (
+                                      category.amount /
+                                      currentMonthTotalExpense *
+                                      100
+                                  ).toFixed(2)
+                              )
+                };
+            }
+        );
 
 
     // =====================================
     // MEMBER HISTORY
     // =====================================
 
-    const memberRaw = await Transaction.aggregate([
-        {
-            $match: {
-                family: new mongoose.Types.ObjectId(familyId),
-                type: "expense",
-                date: {
-                    $gte: threeMonthsAgo,
-                    $lte: reportMonthEnd
-                }
-            }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "user",
-                foreignField: "_id",
-                as: "user"
-            }
-        },
-        {
-            $unwind: "$user"
-        },
-        {
-            $group: {
-                _id: {
-                    memberId: "$user._id",
-                    memberName: "$user.name",
-                    month: {
-                        $dateToString: {
-                            format: "%Y-%m",
-                            date: "$date",
-                            timezone: "Asia/Kolkata"
-                        }
+    const memberHistoryRaw =
+        await Transaction.aggregate([
+            {
+                $match: {
+                    family:
+                        new mongoose.Types.ObjectId(
+                            familyId
+                        ),
+                    date: {
+                        $gte: threeMonthsAgo,
+                        $lte: reportMonthEnd
                     }
-                },
-                amount: {
-                    $sum: "$amount"
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
+                $group: {
+                    _id: {
+                        memberId:
+                            "$user._id",
+
+                        memberName:
+                            "$user.name",
+
+                        month: {
+                            $dateToString:
+                                {
+                                    format:
+                                        "%Y-%m",
+                                    date:
+                                        "$date",
+                                    timezone:
+                                        "Asia/Kolkata"
+                                }
+                        },
+
+                        type: "$type"
+                    },
+
+                    amount: {
+                        $sum: "$amount"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    "_id.month": 1
                 }
             }
-        },
-        {
-            $sort: {
-                "_id.month": 1
-            }
-        }
-    ]);
+        ]);
 
+    const monthTotalsMap = {};
 
-    // Build month total expenses
-    const expensePerMonth = {};
-
-    monthlyTotals.forEach(month => {
-        expensePerMonth[month.month] = month.expense;
-    });
+monthlyTotals.forEach(month => {
+    monthTotalsMap[month.month] = {
+        income: month.income,
+        expense: month.expense,
+        investment: month.investment
+    };
+});
 
     const memberMap = {};
 
-    memberRaw.forEach(item => {
+    memberHistoryRaw.forEach(item => {
 
-        const member = item._id.memberName;
+        const member =
+            item._id.memberName;
+
+        const month =
+            item._id.month;
+
+        const type =
+            item._id.type;
 
         if (!memberMap[member]) {
             memberMap[member] = {
                 member,
-                monthlyAmounts: []
+                monthlyData: {}
             };
         }
 
-        const monthExpense =
-            expensePerMonth[item._id.month] || 0;
-
-        const shareOfFamilyExpense = monthExpense === 0 ? 0 : Number((item.amount / monthExpense) * 100).toFixed(2);
-
-        memberMap[member].monthlyAmounts.push({
-            month: item._id.month,
-            amount: item.amount,
-            shareOfFamilyExpense: Number(shareOfFamilyExpense)
-        });
-    });
-
-    const memberHistory = Object.values(memberMap);
-
-
-
-    const topTransactionsRaw = await Transaction.find({
-        family: familyId,
-        type: "expense",
-        date: {
-            $gte: reportMonthStart,
-            $lte: reportMonthEnd
+        if (
+            !memberMap[member]
+                .monthlyData[month]
+        ) {
+            memberMap[
+                member
+            ].monthlyData[month] = {
+                month,
+                income: 0,
+                expense: 0,
+                investment: 0
+            };
         }
-    }).populate("user", "name").populate("category", "name").sort({ amount: -1 }).limit(10).lean();
 
-    const categoryExpenseMap = {};
-
-    currentMonthCategoryBreakdown.forEach(category => {
-        categoryExpenseMap[category.category] =
-            category.amount;
+        memberMap[member]
+            .monthlyData[month][type] =
+            item.amount;
     });
+const memberHistory =
+    Object.values(memberMap).map(
+        member => ({
 
+            member: member.member,
 
-    const totalFamilyExpense = currentMonthTotalExpense;
+            monthlyData: Object.values(
+                member.monthlyData
+            )
+                .sort(
+                    (a, b) =>
+                        a.month.localeCompare(
+                            b.month
+                        )
+                )
+                .map(monthData => {
 
-    const topTransactions = topTransactionsRaw.map(txn => {
+                    const monthTotals =
+                        monthTotalsMap[
+                            monthData.month
+                        ] || {};
 
-        const categoryName =
-            txn.category?.name ?? "Unknown";
+                    const preInvestmentSavings = monthData.income - monthData.expense;
 
-        const categoryExpense =
-            categoryExpenseMap[categoryName] ?? 0;
+                    const netSavings = monthData.income - monthData.expense - monthData.investment;
 
-        return {
-            title: txn.title,
+                    return {
 
-            amount: txn.amount,
+                        month:monthData.month,
+                        memberIncome:monthData.income,
+                        memberExpense:monthData.expense,
+                        memberInvestment:monthData.investment,
 
-            category: categoryName,
+                        incomeContributionPercent:
+                            monthTotals.income
+                                ? Number(
+                                    (
+                                        monthData.income /
+                                        monthTotals.income *
+                                        100
+                                    ).toFixed(2)
+                                )
+                                : 0,
 
-            date:  txn.date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata"}),
+                        expenseContributionPercent:
+                            monthTotals.expense
+                                ? Number(
+                                    (
+                                        monthData.expense /
+                                        monthTotals.expense *
+                                        100
+                                    ).toFixed(2)
+                                )
+                                : 0,
 
-            member: txn.user?.name ?? "Unknown",
+                        investmentContributionPercent:
+                            monthTotals.investment
+                                ? Number(
+                                    (
+                                        monthData.investment /
+                                        monthTotals.investment *
+                                        100
+                                    ).toFixed(2)
+                                )
+                                : 0,
 
-            percentOfCategory: categoryExpense === 0 ? 0 : Number((txn.amount / categoryExpense * 100).toFixed(2)),
+                        preInvestmentSavings,
 
-            percentOfTotalExpense: totalFamilyExpense === 0 ? 0 : Number((txn.amount / totalFamilyExpense * 100).toFixed(2))
-        };
-    });
+                        netSavings,
+
+                        investmentRate:
+                            monthData.income === 0
+                                ? 0
+                                : Number(
+                                    (
+                                        monthData.investment /
+                                        monthData.income *
+                                        100
+                                    ).toFixed(2)
+                                ),
+
+                        expenseToIncomeRatio:
+                            monthData.income === 0
+                                ? 0
+                                : Number(
+                                    (
+                                        monthData.expense /
+                                        monthData.income *
+                                        100
+                                    ).toFixed(2)
+                                ),
+
+                        netSavingsRate:
+                            monthData.income === 0
+                                ? 0
+                                : Number(
+                                    (
+                                        netSavings /
+                                        monthData.income *
+                                        100
+                                    ).toFixed(2)
+                                ),
+
+                        totalAllocationRate:
+                            monthData.income === 0
+                                ? 0
+                                : Number(
+                                    (
+                                        (
+                                            monthData.expense +
+                                            monthData.investment
+                                        ) /
+                                        monthData.income *
+                                        100
+                                    ).toFixed(2)
+                                ),
+
+                        isOverAllocated:
+                            netSavings < 0,
+
+                        deficitAmount:
+                            netSavings < 0
+                                ? Math.abs(netSavings)
+                                : 0
+                    };
+                })
+        })
+    );
+
     return {
-        familyName: family.familyName,
-        reportMonth: formatMonth(reportMonthStart),
 
-        currentMonthSummary,
+        familyName:
+            family.familyName,
+
+        reportMonth:
+            formatMonth(
+                reportMonthStart
+            ),
 
         monthlyTotals,
 
-        categoryHistory,
+        categoryInsightsDataTop7Categories:categoryInsightsData,
 
-        currentMonthCategoryBreakdown,
+        memberHistory
 
-        memberHistory,
-
-        topTransactions
     };
-
 };
