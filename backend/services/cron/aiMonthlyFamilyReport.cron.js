@@ -60,10 +60,10 @@ export const startAiMonthlyFinancialReportCron = () => {
                     // Step 2
                     // Send to Groq
 
-                    const aiReport =
-                        await generateFinancialInsights(
-                            reportData
-                        );
+                    // const aiReport =
+                    //     await generateFinancialInsights(
+                    //         reportData
+                    //     );
 
                     // Step 3
                     // For now just log response
@@ -72,32 +72,32 @@ export const startAiMonthlyFinancialReportCron = () => {
                         "\n---------- AI REPORT ----------"
                     );
 
-                    console.log(
-                        JSON.stringify(
-                            aiReport,
-                            null,
-                            2
-                        )
-                    );
+                    // console.log(
+                    //     JSON.stringify(
+                    //         aiReport,
+                    //         null,
+                    //         2
+                    //     )
+                    // );
 
                     console.log(
                         "-------- END AI REPORT --------\n"
                     );
 
-//                     await generateMonthlyReportPdf({
+                    await generateMonthlyReportPdf({
 
-//                         reportData,
+                        reportData,
 
-//                         aiReport:mockAiData,
+                        aiReport:mockAiData,
 
-//                         outputPath: path.join(
-//     process.cwd(),
-//     "reports",
-//     `${family._id}-${reportData.reportMonth}.pdf`
-// )
-//                     });
+                        outputPath: path.join(
+    process.cwd(),
+    "reports",
+    `${family._id}-${reportData.reportMonth}.pdf`
+)
+                    });
 
-//                      await sleep(10000); // 10 sec
+                     await sleep(10000); // 10 sec
 
                 } catch (familyError) {
 

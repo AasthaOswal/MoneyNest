@@ -1,10 +1,57 @@
+import { COLORS } from "../styles/colors.js"
+
+const buildMetricCard = (
+    title,
+    value,
+    color
+) => ({
+
+    table: {
+
+        widths: ["*"],
+
+        body: [[{
+
+            stack: [
+
+                {
+                    text: title,
+                    style: "metricLabel"
+                },
+
+                {
+                    text: value,
+                    style: "metricValue",
+                    color
+                }
+            ]
+        }]]
+    },
+
+    layout: {
+
+        fillColor: () => COLORS.surface2,
+
+        hLineColor: () => COLORS.border,
+        vLineColor: () => COLORS.border,
+
+        hLineWidth: () => 1,
+        vLineWidth: () => 1,
+
+        paddingLeft: () => 10,
+        paddingRight: () => 10,
+        paddingTop: () => 12,
+        paddingBottom: () => 12
+    }
+});
+
 export const buildSummarySection = (
     reportData,
     aiReport
 ) => {
 
     const summary =
-        reportData.currentMonthSummary;
+        reportData.monthlyTotals.at(-1);
 
     return [
 
@@ -14,54 +61,71 @@ export const buildSummarySection = (
         },
 
         {
-            columns: [
+    columns: [
 
-                {
-                    text: [
-                        {
-                            text: "Income\n",
-                            bold: true
-                        },
-                        `₹${summary.income}`
-                    ]
-                },
+        buildMetricCard(
+            "Income",
+            `₹${summary.income.toLocaleString()}`,
+            COLORS.income
+        ),
 
-                {
-                    text: [
-                        {
-                            text: "Expenses\n",
-                            bold: true
-                        },
-                        `₹${summary.expense}`
-                    ]
-                },
+        buildMetricCard(
+            "Expenses",
+            `₹${summary.expense.toLocaleString()}`,
+            COLORS.expense
+        ),
 
-                {
-                    text: [
-                        {
-                            text: "Savings\n",
-                            bold: true
-                        },
-                        `₹${summary.savings}`
-                    ]
-                },
+        buildMetricCard(
+            "Investments",
+            `₹${summary.investment.toLocaleString()}`,
+            COLORS.investment
+        ),
 
-                {
-                    text: [
-                        {
-                            text: "Investments\n",
-                            bold: true
-                        },
-                        `₹${summary.investment}`
-                    ]
-                }
-            ]
-        },
+        buildMetricCard(
+            "Income to Expense Ratio",
+            `${summary.expenseToIncomeRatio}%`,
+            COLORS.expense
+        ),
 
-        {
-            margin: [0, 20, 0, 0],
-            text:
-                aiReport.reportSummary.summary
-        }
+        
+    ],
+
+    columnGap: 10
+},
+
+{
+    margin: [0, 10, 0, 0],
+
+    columns: [
+
+        buildMetricCard(
+            "Pre Investment Savings",
+            `${summary.preInvestmentSavings}%`,
+            COLORS.savings
+        ),
+
+        buildMetricCard(
+            "Net Savings",
+            `₹${summary.netSavings.toLocaleString()}`,
+            COLORS.savings
+        ),
+
+        buildMetricCard(
+            "Net Savings Rate",
+            `${summary.netSavingsRate}%`,
+            COLORS.savings
+        ),
+
+        
+
+        buildMetricCard(
+            "Investment Rate",
+            `${summary.investmentRate}%`,
+            COLORS.investment
+        )
+    ],
+
+    columnGap: 10
+}
     ];
 };

@@ -180,30 +180,19 @@ Requires comparison across months.
 Do not infer recurring behavior from repeated transaction amounts alone.
 
 
-Insight Priority Order
 
-Always prioritize:
+Generate insights only if they reveal a meaningful relationship,
+change, risk, anomaly, concentration or behavioral shift.
 
-1. dependency risks
-2. concentration risks
-3. contribution mismatches
-4. over-allocation events
-5. savings deterioration/improvement
-6. lifestyle inflation
-7. behavioral changes
-8. efficiency comparisons
-9. category trends
-10. transaction-level explanations
+Do NOT generate an insight simply because a metric is large.
 
-Category-level observations should not dominate the report.
+A metric must be compared against:
+- another member
+- another category
+- a previous month
+- a family-level metric
 
-At least 60% of insights should involve:
-- multiple members
-- multiple metrics
-- multiple months
-- family-level relationships
-
-rather than single metric observations.
+before becoming an insight.
 
 Return ONLY valid JSON.
 

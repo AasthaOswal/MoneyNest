@@ -1,44 +1,121 @@
-export const buildCategorySection =
-    (reportData) => {
+import { COLORS } from "../styles/colors.js";
 
-        return [
+export const buildCategorySection = (
+    reportData
+) => {
 
-            {
-                text:
-                    "Expense Breakdown",
-                style:
-                    "sectionTitle"
+    return [
+
+        {
+            text: "Top Spending Categories",
+            style: "sectionTitle"
+        },
+
+        {
+            margin: [0, 0, 0, 10],
+            text:
+                "Highest spending categories and their month-over-month movement."
+        },
+
+        {
+            layout: {
+
+                fillColor: (rowIndex) => {
+                    if (rowIndex === 0) {
+                        return COLORS.surface3;
+                    }
+
+                    return COLORS.surface;
+                },
+
+                hLineColor: () => COLORS.border,
+                vLineColor: () => COLORS.border,
+
+                hLineWidth: (i) => i === 1 ? 1.2 : 0.6,
+                vLineWidth: () => 0.6,
+
+                paddingLeft: () => 10,
+                paddingRight: () => 10,
+                paddingTop: () => 8,
+                paddingBottom: () => 8
             },
 
-            {
-                table: {
+            table: {
 
-                    widths: [
-                        "*",
-                        "auto",
-                        "auto"
+                headerRows: 1,
+
+                widths: [
+                    "auto",
+                    "auto",
+                    "auto",
+                    "auto",
+                    "auto"
+                ],
+
+                body: [
+
+                    [
+                        {
+                            text: "Category",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Current",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Previous",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Change %",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Share %",
+                            style: "tableHeader"
+                        }
                     ],
 
-                    body: [
+                    ...reportData
+                        .categoryInsightsDataTop7Categories
+                        .map(category => [
 
-                        [
-                            "Category",
-                            "Amount",
-                            "%"
-                        ],
+                            {
+                                text: category.category,
+                                style: "tableCell"
+                            },
 
-                        ...reportData
-                            .currentMonthCategoryBreakdown
-                            .map(c => [
+                            {
+                                text: `₹${category.currentMonth.toLocaleString()}`,
+                                style: "tableCell",
+                                color: COLORS.expense
+                            },
 
-                                c.category,
+                            {
+                                text: `₹${category.previousMonth.toLocaleString()}`,
+                                style: "tableCell"
+                            },
 
-                                `₹${c.amount}`,
+                            {
+                                text:
+                                    category.changePercent === null
+                                        ? "New"
+                                        : `${category.changePercent}%`,
+                                style: "tableCell",
+                                color:
+                                    category.changePercent > 0
+                                        ? COLORS.expense
+                                        : COLORS.savings
+                            },
 
-                                `${c.share}%`
-                            ])
-                    ]
-                }
+                            {
+                                text: `${category.share}%`,
+                                style: "tableCell"
+                            }
+                        ])
+                ]
             }
-        ];
-    };
+        }
+    ];
+};

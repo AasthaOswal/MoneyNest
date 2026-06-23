@@ -1,51 +1,135 @@
-export const buildFinanceOverviewSection =
-    (reportData) => {
+import { COLORS } from "../styles/colors.js";
 
-        return [
+export const buildFinanceOverviewSection = (
+    reportData
+) => {
 
-            {
-                text:
-                    "Monthly Trend",
-                style:
-                    "sectionTitle"
+    return [
+
+        {
+            text: "Financial Trend Analysis",
+            style: "sectionTitle"
+        },
+
+        {
+            margin: [0, 0, 0, 10],
+            text:
+                "Historical 3 months performance of the family."
+        },
+
+        {
+            layout: {
+
+                fillColor: (rowIndex) => {
+                    if (rowIndex === 0) {
+                        return COLORS.surface3;
+                    }
+
+                    return COLORS.surface;
+                },
+
+                hLineColor: () => COLORS.border,
+                vLineColor: () => COLORS.border,
+
+                hLineWidth: (i) => i === 1 ? 1.2 : 0.6,
+                vLineWidth: () => 0.6,
+
+                paddingLeft: () => 10,
+                paddingRight: () => 10,
+                paddingTop: () => 8,
+                paddingBottom: () => 8
             },
 
-            {
-                table: {
+            table: {
 
-                    widths: [
-                        "*",
-                        "*",
-                        "*",
-                        "*",
-                        "*"
+                headerRows: 1,
+
+                widths: [
+                    "auto",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "auto",
+                    "auto"
+                ],
+
+                body: [
+
+                    [
+                        {
+                            text: "Month",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Income",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Expense",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Investment",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Net Savings",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Net Savings Rate",
+                            style: "tableHeader"
+                        },
+                        {
+                            text: "Expense to Income Ratio",
+                            style: "tableHeader"
+                        }
                     ],
 
-                    body: [
+                    ...reportData.monthlyTotals.map(row => [
 
-                        [
-                            "Month",
-                            "Income",
-                            "Expense",
-                            "Investment",
-                            "Savings"
-                        ],
+                        {
+                            text: row.month,
+                            style: "tableCell"
+                        },
 
-                        ...reportData.monthlyTotals
-                            .map(row => [
+                        {
+                            text: `₹${row.income.toLocaleString()}`,
+                            style: "tableCell",
+                            color: COLORS.income,
+                        },
 
-                                row.month,
+                        {
+                            text: `₹${row.expense.toLocaleString()}`,
+                            style: "tableCell",
+                            color: COLORS.expense,
+                        },
 
-                                row.income,
+                        {
+                            text: `₹${row.investment.toLocaleString()}`,
+                            style: "tableCell",
+                            color: COLORS.investment,
+                        },
 
-                                row.expense,
+                        {
+                            text: `₹${row.netSavings.toLocaleString()}`,
+                            style: "tableCell",
+                            color: COLORS.savings,
+                        },
 
-                                row.investment,
+                        {
+                            text: `${row.netSavingsRate}%`,
+                            style: "tableCell",
+                        },
 
-                                row.savings
-                            ])
-                    ]
-                }
+                        {
+                            text: `${row.expenseToIncomeRatio}`,
+                            style: "tableCell",
+                        }
+                    ])
+                ]
             }
-        ];
-    };
+        }
+    ];
+};
