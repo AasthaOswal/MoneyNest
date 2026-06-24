@@ -1,10 +1,6 @@
 import { COLORS } from "../styles/colors.js"; 
 
 import {
-    buildCoverPage
-} from "../components/coverPage.js";
-
-import {
     buildSummarySection
 } from "../components/summarySection.js";
 
@@ -74,10 +70,6 @@ export const buildDocumentDefinition =
                 aiReport
             ),
 
-            ...buildAiInsightsSection(
-                aiReport
-            ),
-
             ...buildFinanceOverviewSection(
                 reportData
             ),
@@ -88,14 +80,15 @@ export const buildDocumentDefinition =
 
             ...buildMemberSection(
                 reportData
-            )
+            ),
+
+            {
+                pageBreak: "before",
+                stack: buildAiInsightsSection(aiReport)
+            },
+
+            
         ]
     };
 };
 
-
-/*
-...buildCoverPage(
-    reportData
-),
-*/

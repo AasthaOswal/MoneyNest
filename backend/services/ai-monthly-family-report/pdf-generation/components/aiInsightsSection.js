@@ -104,72 +104,74 @@ export const buildAiInsightsSection =
 
                 content.push({
 
-        table: {
+                table: {
 
-            widths: ["*"],
+                    widths: ["*"],
 
-            body: [[{
+                    body: [[{
 
-                stack: [
+                        unbreakable: true,
 
-                    {
-                        columns: [
+                        stack: [
+
+                            {
+                                columns: [
+
+                                    {
+                                        text:
+                                            `${index + 1}. ${insight.title}`,
+                                        style:
+                                            "insightTitle"
+                                    },
+
+                                    
+                                ]
+                            },
 
                             {
                                 text:
-                                    `${index + 1}. ${insight.title}`,
+                                    insight.insight,
+
                                 style:
-                                    "insightTitle"
+                                    "insightText",
+
+                                margin:
+                                    [0, 10, 0, 10]
                             },
 
-                            
+                            {
+                                text:
+                                    "SUPPORTING DATA",
+
+                                style:
+                                    "supportingHeader",
+
+                                margin:
+                                    [0, 5, 0, 6]
+                            },
+
+                            buildSupportingTable(
+                                insight.supportingData
+                            )
                         ]
-                    },
+                    }]]
+                },
 
-                    {
-                        text:
-                            insight.insight,
+                layout: {
 
-                        style:
-                            "insightText",
+                    fillColor: () => COLORS.surface2,
 
-                        margin:
-                            [0, 10, 0, 10]
-                    },
+                    hLineWidth: () => 0,
+                    vLineWidth: () => 0,
 
-                    {
-                        text:
-                            "SUPPORTING DATA",
+                    paddingTop: () => 12,
+                    paddingBottom: () => 12,
+                    paddingLeft: () => 12,
+                    paddingRight: () => 12
+                },
 
-                        style:
-                            "supportingHeader",
-
-                        margin:
-                            [0, 5, 0, 6]
-                    },
-
-                    buildSupportingTable(
-                        insight.supportingData
-                    )
-                ]
-            }]]
-        },
-
-        layout: {
-
-            fillColor: () => COLORS.surface2,
-
-            hLineWidth: () => 0,
-            vLineWidth: () => 0,
-
-            paddingTop: () => 12,
-            paddingBottom: () => 12,
-            paddingLeft: () => 12,
-            paddingRight: () => 12
-        },
-
-        margin: [0, 0, 0, 15]
-    });
+                margin: [0, 0, 0, 15]
+            });
         }
     );
 
