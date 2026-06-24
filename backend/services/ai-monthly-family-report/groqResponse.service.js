@@ -247,7 +247,7 @@ console.log(
     "\n========== RAW GROQ RESPONSE =========="
 );
 
-console.log(text);
+// console.log(text);
 
 console.log(
     "\n======================================="
