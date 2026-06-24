@@ -102,7 +102,11 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // initialize socket after app middlewares are ready
 initializeSocket(httpServer, app);
 
+
+if(process.env.START_AI_MONTHLY_REPORT_CRON === "true"){
 startAiMonthlyFinancialReportCron();
+}
+
 
 // run cron job
 // startGoalTracker();
