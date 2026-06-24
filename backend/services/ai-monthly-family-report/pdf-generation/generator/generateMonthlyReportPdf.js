@@ -39,11 +39,13 @@ export const generateMonthlyReportPdf = async ({reportData,aiReport,outputPath})
         const pdf = pdfmake.createPdf(docDefinition);
         
 
-        await pdf.write(outputPath);
+        // await pdf.write(outputPath);
 
-        console.log(`PDF generated: ${outputPath}`);
+        // console.log(`PDF generated: ${outputPath}`);
 
-        return true;
+        // return true;
+
+        return await pdf.getBuffer();
 
     } catch (error) {
 

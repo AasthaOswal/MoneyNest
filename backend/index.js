@@ -102,7 +102,7 @@ app.use("/api/admin/failed-operations", failedOperationRoutes);
 // initialize socket after app middlewares are ready
 initializeSocket(httpServer, app);
 
-startAiMonthlyFinancialReportCron();
+// startAiMonthlyFinancialReportCron();
 
 // run cron job
 // startGoalTracker();

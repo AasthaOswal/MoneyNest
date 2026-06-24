@@ -1,5 +1,6 @@
 import cron from "node-cron"
 import Family from "../../models/family.model.js";
+import User from "../../models/user.model.js";
 import { buildMonthlyReportData } from "../ai-monthly-family-report/dataCollection.service.js";
 // import { generateFinancialInsights } from "../ai-monthly-family-report/geminiResponse.service.js";
 import path from "path";
@@ -9,6 +10,8 @@ import { generateFinancialInsights } from "../ai-monthly-family-report/groqRespo
 import {generateMonthlyReportPdf} from "../ai-monthly-family-report/pdf-generation/generator/generateMonthlyReportPdf.js"
 
 import {mockAiData} from "../ai-monthly-family-report/mocks/mockAiReport.js";
+
+import {sendEmailBrevo} from "../../utils/email/sendEmailBrevo.js"
 // runs every minute - for testing
 const GOAL_TRACKER_CRON = "* * * * *";
 
@@ -60,42 +63,73 @@ export const startAiMonthlyFinancialReportCron = () => {
                     // Step 2
                     // Send to Groq
 
-                    // const aiReport =
-                    //     await generateFinancialInsights(
-                    //         reportData
-                    //     );
+                    const aiReport =
+                        await generateFinancialInsights(
+                            reportData
+                        );
 
                     // Step 3
-                    // For now just log response
 
                     console.log(
                         "\n---------- AI REPORT ----------"
                     );
 
-                    // console.log(
-                    //     JSON.stringify(
-                    //         aiReport,
-                    //         null,
-                    //         2
-                    //     )
-                    // );
+                    console.log(
+                        JSON.stringify(
+                            aiReport,
+                            null,
+                            2
+                        )
+                    );
 
                     console.log(
                         "-------- END AI REPORT --------\n"
                     );
 
-                    await generateMonthlyReportPdf({
 
+                    const pdfBuffer = await generateMonthlyReportPdf({
                         reportData,
-
-                        aiReport:mockAiData,
-
-                        outputPath: path.join(
-    process.cwd(),
-    "reports",
-    `${family._id}-${reportData.reportMonth}.pdf`
-)
+                        aiReport
                     });
+
+                    console.log("pdf buffer generated\n");
+
+
+const members =
+    await User.find({
+        familyId: family._id,
+        isActive: true
+    });
+
+    console.log("members found\n");
+
+for (const member of members) {
+
+    await sendEmailBrevo({
+
+        toEmail: member.email,
+
+        subject:
+            `AI Powered Monthly Financial Report - ${reportData.reportMonth}`,
+            htmlContent: `
+              <h2>Your Monthly Report</h2>
+              <p>Attached is your report for last month.</p>
+            `,
+
+        attachments: [
+            {
+                name:
+                    `Report-${reportData.reportMonth}.pdf`,
+                content:
+                    pdfBuffer.toString("base64")
+            }
+        ]
+    });
+
+    console.log("email sent to: ", member.email, "\n");
+
+    await sleep(30000); //30sec
+}
 
                      await sleep(10000); // 10 sec
 
