@@ -2,7 +2,10 @@ import cron from "node-cron";
 import FailedOperation from "../../models/admin/failedOperation.model.js";
 import { retrySingleOperation } from "../retry/retrySingleFailedOperation.service.js";
 
-const RETRY_CRON = "* * * * *"; // every minute
+// const RETRY_CRON = "* * * * *"; // every minute
+
+
+const RETRY_CRON = "*/30 * * * * *"; // every 30 sec
 
 export const startFailedOperationsRetryNew = () => {
     console.log("🔁 Failed Operations Retry Service Started");
@@ -15,7 +18,7 @@ export const startFailedOperationsRetryNew = () => {
             try {
                 const operations = await FailedOperation.find({
                     status: "failed",
-                    retryCount: { $lt: 3 }, // keep cron limited; admin retry can ignore maxRetries
+                    retryCount: { $lte: 3 }, // keep cron limited; admin retry can ignore maxRetries
                     nextRetryAt: { $lte: new Date() },
                 })
                     .sort({ createdAt: 1 })

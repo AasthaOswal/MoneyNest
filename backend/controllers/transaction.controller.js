@@ -17,6 +17,8 @@ import {errorLogger} from "../utils/logger/errorLogger.js";
 
 import { getIO } from "../config/socket.js";
 
+import {executeRetryable} from "../utils/retryable/executeRetryable.js"
+
 
 // FILE CONFIG
 const fileConfigs = [
@@ -391,11 +393,29 @@ export const updateTransaction = async (req, res) => {
     });
 
     // Delete old file after success
+    // if (oldPublicId) {
+    //   await deleteFromCloudinary(oldPublicId).catch(err =>
+    //     console.error("Cloudinary delete failed:", err)
+    //   );
+    // }
+
     if (oldPublicId) {
-      await deleteFromCloudinary(oldPublicId).catch(err =>
-        console.error("Cloudinary delete failed:", err)
-      );
+
+
+        await executeRetryable({
+
+          operation: () =>
+              deleteFromCloudinary(publicId),
+
+          operationType: "cloudinary_delete",
+
+          payload: {
+              publicId
+          }
+
+      });
     }
+
 
     return res.status(200).json({
       success: true,
@@ -668,10 +688,28 @@ export const deleteTransaction = async (req, res) => {
 
     await Transaction.findByIdAndDelete(transactionId);
 
-    if (transaction.transactionDoc?.publicId) {
-      await deleteFromCloudinary(transaction.transactionDoc.publicId)
-        .catch(err => console.error("Cloudinary delete failed:", err));
+    // if (transaction.transactionDoc?.publicId) {
+    //   await deleteFromCloudinary(transaction.transactionDoc.publicId)
+    //     .catch(err => console.error("Cloudinary delete failed:", err));
+    // }
+    
+    console.log("inside delete  controller before  executeRetryable ")
+    if(transaction.transactionDoc?.publicId){
+      await executeRetryable({
+
+        operation: () =>
+            deleteFromCloudinary(publicId),
+
+        operationType: "cloudinary_delete",
+
+        payload: {
+            publicId:transaction.transactionDoc?.publicId
+        }
+
+      });
     }
+
+    console.log("after  executeRetryable  in delete controller")
 
     //emit to family
     getIO().to(`family:${req.user.familyId}`).emit("transaction:delete", {

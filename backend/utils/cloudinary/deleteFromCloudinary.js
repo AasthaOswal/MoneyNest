@@ -38,18 +38,8 @@ export const deleteFromCloudinary = async (publicId) => {
 
 		console.error("❌ Cloudinary deletion error:", err);
 
-		await insertFailedCloudinaryDeletion([
-			{
-				publicId,
-				reason: err.message
-			}
-		]);
+		throw err;
 
-		await createFailedOperation({
-            operationType: "cloudinary_delete",
-            payload: { publicId: publicId },
-            error: err,
-        });
 	}
 };
 

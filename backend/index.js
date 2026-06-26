@@ -114,7 +114,7 @@ startAiMonthlyFinancialReportCron();
 // startFailedOperationsRetry();
 // startRequestLogExportCron();
 
-// startFailedOperationsRetryNew()
+// startFailedOperationsRetryNew();
 
 app.use(globalErrorHandler);
 

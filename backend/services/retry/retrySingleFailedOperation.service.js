@@ -32,7 +32,8 @@ export const retrySingleOperation = async (operation, options = {}) => {
     operation.retryCount += 1;
     operation.lastRetriedAt = new Date();
 
-    const delay = Math.pow(2, operation.retryCount) * 60 * 1000;
+    // const delay = Math.pow(2, operation.retryCount) * 60 * 1000;
+    const delay = 30 * 1000; // 30 seconds --for testing
     operation.nextRetryAt = new Date(Date.now() + delay);
 
     if (!ignoreMaxRetries && operation.retryCount >= operation.maxRetries) {
