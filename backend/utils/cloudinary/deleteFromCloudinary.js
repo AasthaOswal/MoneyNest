@@ -5,7 +5,7 @@ import { createFailedOperation } from "../failedOperation/failedOperationCreator
 
 
 const isCronTesting = process.env.CRON_TESTING;
-console.log(isCronTesting)
+console.log("From delete cloudinary util: ",isCronTesting)
 export const deleteFromCloudinary = async (publicId) => {
 
 	if (!publicId || typeof publicId !== "string" || publicId.trim() === "") {

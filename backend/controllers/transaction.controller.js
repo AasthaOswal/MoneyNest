@@ -405,12 +405,12 @@ export const updateTransaction = async (req, res) => {
         await executeRetryable({
 
           operation: () =>
-              deleteFromCloudinary(publicId),
+              deleteFromCloudinary(oldPublicId),
 
           operationType: "cloudinary_delete",
 
           payload: {
-              publicId
+              publicId:oldPublicId
           }
 
       });
@@ -698,7 +698,7 @@ export const deleteTransaction = async (req, res) => {
       await executeRetryable({
 
         operation: () =>
-            deleteFromCloudinary(publicId),
+            deleteFromCloudinary(transaction.transactionDoc?.publicId),
 
         operationType: "cloudinary_delete",
 

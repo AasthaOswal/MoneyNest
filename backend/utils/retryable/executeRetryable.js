@@ -15,6 +15,7 @@ export const executeRetryable = async ({
     catch(error){
         
         console.log("Inside execute retryable util logic catch block");
+        console.log("Error: ", error)
 
         await createFailedOperation({
 
