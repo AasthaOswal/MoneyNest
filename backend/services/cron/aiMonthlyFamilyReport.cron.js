@@ -12,8 +12,19 @@ import {generateMonthlyReportPdf} from "../ai-monthly-family-report/pdf-generati
 import {mockAiData} from "../ai-monthly-family-report/mocks/mockAiReport.js";
 
 import {sendEmailBrevo} from "../../utils/email/sendEmailBrevo.js"
-// runs every minute - for testing
-const GOAL_TRACKER_CRON = "*/10 * * * *";
+
+import {createFailedOperation} from "../../utils/failedOperation/failedOperationCreator.js"
+
+import {generateMonthlyReportForFamily} from "../ai-monthly-family-report/monthlyReportMain.service.js"
+
+// runs every 10 minutes - for deployed version testing
+// const GOAL_TRACKER_CRON = "*/10 * * * *";
+
+// runs every 3 minutes - for deployed version testing
+const GOAL_TRACKER_CRON = "*/3 * * * *";
+
+//runs every minute - localhost testing
+// const GOAL_TRACKER_CRON = "* * * * *";
 
 
 // 1st day of every month at 12:00 AM - 0 0 1 * *
@@ -42,100 +53,50 @@ export const startAiMonthlyFinancialReportCron = () => {
 
             for (const family of families) {
 
-                try {
+                console.log(
+                    `Generating report for ${family.familyName}`
+                );
 
-                    console.log(
-                        `\nGenerating report for: ${family.familyName}`
-                    );
+                const reportMonthDate=new Date();
 
-                    // Step 1
-                    // Build financial dataset
+                const result =
+                    await generateMonthlyReportForFamily({
 
-                    const reportData =
-                        await buildMonthlyReportData({
-                            familyId: family._id
-                        });
+                        familyId: family._id,
 
-                    console.log(
-                        "Financial data collected"
-                    );
+                        reportMonthDate
 
-                    // Step 2
-                    // Send to Groq
-
-                    const aiReport =
-                        await generateFinancialInsights(
-                            reportData
-                        );
-
-                    // Step 3
-
-                    console.log(
-                        "\n---------- AI REPORT ----------"
-                    );
-
-                    // console.log(
-                    //     JSON.stringify(
-                    //         aiReport,
-                    //         null,
-                    //         2
-                    //     )
-                    // );
-
-                    console.log(
-                        "-------- END AI REPORT --------\n"
-                    );
-
-
-                    const pdfBuffer = await generateMonthlyReportPdf({
-                        reportData,
-                        aiReport
                     });
 
-                    console.log("pdf buffer generated\n");
+                if (!result.success) {
+                    
+                    console.log("before  failed operation creation function is called")
 
+                    await createFailedOperation({
 
-                    const members = await User.find({ familyId: family._id, isActive: true });
+                        operationType:
+                            "ai_monthly_report_email",
 
-                    console.log("members found\n");
+                        payload: {
 
-                    for (const member of members) {
+                            familyId:
+                                family._id,
 
-                        await sendEmailBrevo({
+                            reportMonthDate,
 
-                            toEmail: member.email,
+                            userIds: null
 
-                            subject: `AI Powered Monthly Financial Report - ${reportData.reportMonth}`,
-                            htmlContent: `
-                                <h2>Your Monthly Report</h2>
-                                <p>Attached is your report for last month.</p>
-                            `,
+                        },
 
-                            attachments: [
-                                {
-                                    name:
-                                        `Report-${reportData.reportMonth}.pdf`,
-                                    content:
-                                        pdfBuffer.toString("base64")
-                                }
-                            ]
-                        });
+                        error:
+                            result.error
 
-                        console.log("email sent to: ", member.email, "\n");
+                    });
 
-                        await sleep(30000); //30sec
-                    }
-
-                     await sleep(10000); // 10 sec
-
-                } catch (familyError) {
-
-                    console.error(
-                        `Failed report generation for family: ${family.familyName}`
-                    );
-
-                    console.error(familyError);
                 }
+
+                await sleep(10000);
+
             }
 
             console.log(

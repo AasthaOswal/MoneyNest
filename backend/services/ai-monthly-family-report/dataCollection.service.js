@@ -591,6 +591,9 @@ const memberHistory =
         })
     );
 
+    
+    // throw new Error("Testing retry cron for ai monthly report email automation")
+
     return {
 
         familyName:

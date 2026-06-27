@@ -6,6 +6,7 @@ import { getFamilyReportData } from "../report/analytics.service.js";
 import { generateReportPDF } from "../report/report.service.js";
 import { sendEmailBrevo } from "../../utils/email/sendEmailBrevo.js";
 import { exportRequestLogsAndEmail } from "../admin/requestLogExport.service.js";
+import {generateMonthlyReportForFamily} from "../ai-monthly-family-report/monthlyReportMain.service.js";
 
 export const operationHandlers = {
   request_log_export: async (payload) => {
@@ -32,6 +33,21 @@ export const operationHandlers = {
     await deleteMultipleFiles(ids);
   },
 
+  ai_monthly_report_email: async (payload) => {
+
+    const result = await generateMonthlyReportForFamily(payload);
+
+    if (!result.success) {
+        throw result.error;
+    }
+  },
+
+};
+
+
+
+/**
+
   monthly_report_email: async (payload) => {
     const { email, familyId, from, to } = payload;
 
@@ -56,4 +72,4 @@ export const operationHandlers = {
       ],
     });
   },
-};
+ */
