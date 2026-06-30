@@ -101,7 +101,8 @@ const FailedOperationsPage = () => {
   };
 
   const handleRetry = async (id) => {
-    const toastId = toast.loading("Retrying operation...");
+    const toastId = toast.loading("Retrying operation. Please wait, this might take a few minutes....");
+      console.time("retry");
 
     try {
       await retryFailedOperation(id);
@@ -114,7 +115,7 @@ const FailedOperationsPage = () => {
         )
       );
 
-      toast.success("Operation retry initiated", {
+      toast.success("Operation retry completed successfully.", {
         id: toastId,
       });
     } catch (error) {
@@ -124,6 +125,8 @@ const FailedOperationsPage = () => {
           id: toastId,
         }
       );
+    } finally{
+        console.timeEnd("retry");
     }
   };
 

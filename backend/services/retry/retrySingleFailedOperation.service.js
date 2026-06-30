@@ -23,6 +23,8 @@ export const retrySingleOperation = async (operation, options = {}) => {
 
     await operation.save();
 
+    console.log(`resolved operation: ${operation.operationType} - ${operation._id}`)
+
     return {
       success: true,
       message: "Operation retried successfully",

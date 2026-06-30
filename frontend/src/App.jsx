@@ -110,8 +110,19 @@ function App() {
       <Toaster 
         position="top-right" 
         reverseOrder={false} 
-        toastOptions={{ 
-          duration: 4000, 
+        toastOptions={{
+          success: {
+            duration: 4000,
+          },
+          error: {
+            duration: 4000,
+          },
+          info:{
+            duration: 6000,
+          },
+          loading: {
+            duration: Infinity,
+          },
         }}
       >
         {(t) => (
@@ -120,7 +131,7 @@ function App() {
               <>
                 {icon}
                 {message}
-                {t.type !== 'loading' && (
+                { (
                   <button 
                     onClick={() => toast.dismiss(t.id)}
                     style={{

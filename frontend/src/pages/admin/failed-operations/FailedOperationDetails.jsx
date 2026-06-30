@@ -48,6 +48,7 @@ const FailedOperationDetails = () => {
   };
 
   const handleRetry = async () => {
+    console.time("retry");
     try {
       setRetrying(true);
       const response = await retryFailedOperation(id);
@@ -60,6 +61,8 @@ const FailedOperationDetails = () => {
       toast.error(error?.response?.data?.message || "Failed to retry operation");
     } finally {
       setRetrying(false);
+
+      console.timeEnd("retry");
     }
   };
 
