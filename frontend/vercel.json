@@ -14,7 +14,7 @@
         },
         {
             "source": "/socket.io",
-            "destination": "https://moneynest-wsal.onrender.com/socket.io"
+            "destination": "https://moneynest-wsal.onrender.com/socket.io/"
         },
         {
             "source": "/(.*)",
