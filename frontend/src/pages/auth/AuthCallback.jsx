@@ -7,7 +7,7 @@ import { initSocket } from "../../socket/socket.js";
 import toast from "react-hot-toast";
 import { setupNotificationListener } from "../../socket/socketNotification.js";
 import axios from "axios";
-
+import { getSocketToken } from "../../socket/socketToken.js";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -30,6 +30,13 @@ const AuthCallback = () => {
         const ENV=import.meta.env.VITE_ENV;
 
         const API_URL = ENV == "production" ? "/api" :  import.meta.env.VITE_API_URL;
+
+        const socketRes = await getSocketToken();
+
+        let token = localStorage.getItem("socketToken");
+        console.log("Socket token:",token)
+
+        console.log(socketRes);
 
 
         // const response = await axios.post(

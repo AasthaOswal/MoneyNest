@@ -7,10 +7,11 @@ import {
   logout,
   forgotPassword,
   resetPassword,
+  getSocketToken
 } from "../controllers/auth.controller.js";
 
 import { signupLimiter, loginLimiter, refreshTokenLimiter, googleAuthLimiter, googleCallbackLimiter,  logoutLimiter, forgotPasswordLimiter, resetPasswordLimiter } from "../middlewares/rateLimiter/authLimiter.js";
-
+import { authenticateToken } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
 // =======================
@@ -41,5 +42,8 @@ router.post("/reset-password/:token", resetPasswordLimiter, resetPassword );
 
 // Logout
 router.post("/logout", logoutLimiter, logout);
+
+
+router.get("/socket-token", authenticateToken, getSocketToken);
 
 export default router;

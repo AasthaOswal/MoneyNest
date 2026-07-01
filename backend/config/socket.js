@@ -31,36 +31,38 @@ export function initializeSocket(httpServer, app) {
   });
 
   ioInstance = io;
-
-  io.use((socket, next) => {
-    console.log("COOKIE HEADER");
-    console.log(socket.handshake.headers.cookie);
+io.use((socket, next) => {
+    console.log("HANDSHAKE AUTH");
+    console.log(socket.handshake.auth);
 
     console.log("HEADERS");
     console.log(socket.handshake.headers);
 
     next();
-  });
+});
 
   io.use((socket, next) => {
     try {
-      const cookies = cookie.parse(
-          socket.handshake.headers.cookie || ""
-      );
+          const token = socket.handshake.auth.token;
 
-      const token = cookies.token;
+    if (!token) {
+      return next(new Error("Authentication error"));
+    }
 
-      if (!token) {
-        return next(new Error("Authentication error"));
-      }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+
+      const decoded = jwt.verify(token, process.env.SOCKET_JWT_SECRET);
       socket.user = decoded;
 
       return next();
-    } catch (err) {
-      return next(new Error("Authentication error"));
-    }
+    } 
+      catch (err) {
+  console.error(err);
+
+  return next(new Error("Authentication error"));
+}
+
   });
 
   io.on("connection", (socket) => {

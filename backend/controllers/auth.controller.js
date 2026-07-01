@@ -523,3 +523,26 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
+
+
+export const getSocketToken = (req, res) => {
+  try {
+    const socketToken = jwt.sign(
+    {
+      userId: req.user.userId,
+      familyId: req.user.familyId,
+    },
+    process.env.SOCKET_JWT_SECRET,
+    {
+      expiresIn: "5m",
+    }
+  );
+
+  res.json({
+    success: true,
+    socketToken,
+  });
+  } catch (error) {
+    console.log("error in get socket token: ", error);
+  }
+};
