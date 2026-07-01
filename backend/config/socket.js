@@ -33,6 +33,16 @@ export function initializeSocket(httpServer, app) {
   ioInstance = io;
 
   io.use((socket, next) => {
+    console.log("COOKIE HEADER");
+    console.log(socket.handshake.headers.cookie);
+
+    console.log("HEADERS");
+    console.log(socket.handshake.headers);
+
+    next();
+  });
+
+  io.use((socket, next) => {
     try {
       const cookies = cookie.parse(
           socket.handshake.headers.cookie || ""
