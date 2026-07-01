@@ -14,7 +14,7 @@ export const authenticateToken = async (req, res, next) => {
         : null;
 
     // Get token from cookie
-    const cookieToken = req.cookies?.token;
+    const cookieToken = req.cookies?.accessToken;
 
     // Prefer header, fallback to cookie
     const token = headerToken || cookieToken;

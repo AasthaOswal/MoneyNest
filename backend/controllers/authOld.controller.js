@@ -19,11 +19,18 @@ const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 If someone tries to use an expired or already used refresh token, it’s a sign of a breach. In that case, you might want to clear the entire refreshToken array to force a logout on all devices. 
 */
 
-const tokenCookieOptions = {
+const refreshTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 24 * 60 * 60 * 1000 // 24 hrs = 1 day
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
+
+const accessTokenCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 15 * 60 * 1000 //15 minutes - just to test auth retry issue
 };
 
 /*
@@ -38,22 +45,32 @@ const googleOAuthCookieOptions = {
     maxAge: 5 * 60 * 1000 // 5 min
 }
 
-// 🔐 Generate Token
-const generateToken = (userId,familyId) => {
-  const token = jwt.sign(
+// 🔐 Generate Tokens
+const generateTokens = (userId,familyId) => {
+  const accessToken = jwt.sign(
     { userId, familyId },
     process.env.JWT_SECRET,
-    { expiresIn: "1d" }
+    { expiresIn: "15m" }
   );
 
-  return token;
+  const refreshToken = jwt.sign(
+    { userId, familyId },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  return { accessToken, refreshToken };
 };
 
 // 🍪 Send refresh token in cookie
-const sendToken = (res, token) => {
-  res.cookie("token", token, tokenCookieOptions);
+const sendRefreshToken = (res, token) => {
+  res.cookie("refreshToken", token, refreshTokenCookieOptions);
 };
 
+// 🍪 Send access token in cookie (Postman friendly)
+const sendAccessToken = (res, token) => {
+  res.cookie("accessToken", token, accessTokenCookieOptions);
+};
 
 // 🧹 Safe user response
 const getSafeUser = (user) => {
@@ -109,19 +126,26 @@ export const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
-          name,
-          email,
-          password: hashedPassword,
-          authProvider: ["local"],
+        name,
+        email,
+        password: hashedPassword,
+        authProvider: ["local"],
+        refreshToken: []
         });
 
-        const token = generateToken(user._id, null);
+        const { accessToken, refreshToken } = generateTokens(user._id, null);
+
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+        user.refreshToken.push(hashedRefreshToken);
 
         await user.save();
 
-        sendToken(res, token)
+        sendRefreshToken(res, refreshToken);
+        sendAccessToken(res, accessToken);
 
-        return res.status(201).json({ success: true, user: getSafeUser(user),});
+        // return res.status(201).json({ success: true, user: getSafeUser(user), accessToken });
+
+        return res.status(201).json({ success: true, user: getSafeUser(user), accessToken});
 
     } catch (err) {
       console.error("Error in signup controller : " , err);
@@ -171,16 +195,22 @@ export const login = async (req, res) => {
       });
     }
 
-    const token  = generateToken(user._id,  user.familyId?._id || null);
+    const { accessToken, refreshToken } = generateTokens(user._id,  user.familyId?._id || null);
 
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+    if (!user.refreshToken) user.refreshToken = [];
+    user.refreshToken.push(hashedRefreshToken);
 
     await user.save();
 
-    sendToken(res, token);
+    sendRefreshToken(res, refreshToken);
+    sendAccessToken(res, accessToken);
 
     return res.status(200).json({
       success: true,
       user: getSafeUser(user),
+      accessToken
     });
 
   } catch (err) {
@@ -192,18 +222,152 @@ export const login = async (req, res) => {
   }
 };
 
+// =======================
+// 🔁 REFRESH TOKEN
+// =======================
+export const refreshAccessToken = async (req, res) => {
+  try {
+    const token = req.cookies.refreshToken;
 
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "No refresh token"
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+
+    const user = await User.findById(decoded.userId);
+
+    if (!user || !user.refreshToken) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid refresh token"
+      });
+    }
+
+    let isValid = false;
+
+    for (let rt of user.refreshToken) {
+      const match = await bcrypt.compare(token, rt);
+      if (match) {
+        isValid = true;
+        break;
+      }
+    }
+
+    if (!isValid) {
+  return res.status(403).json({
+    success: false,
+    code: "INVALID_REFRESH_TOKEN",
+    message: "Invalid refresh token"
+  });
+}
+
+    // let newTokens = [];
+
+    // for (let rt of user.refreshToken) {
+    //   const match = await bcrypt.compare(token, rt);
+    //   if (!match) newTokens.push(rt);
+    // }
+
+    // const { accessToken, refreshToken } = generateTokens(user._id);
+    // const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+    // newTokens.push(hashedRefreshToken);
+    // user.refreshToken = newTokens;
+
+    // await user.save();
+
+    // sendRefreshToken(res, refreshToken);
+    // sendAccessToken(res, accessToken);
+
+
+    const updatedTokens = [];
+
+for (let rt of user.refreshToken) {
+  const match = await bcrypt.compare(token, rt);
+  if (!match) updatedTokens.push(rt);
+}
+
+const { accessToken, refreshToken: newRefreshToken } = generateTokens(user._id,   user.familyId?._id || null);
+const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+
+updatedTokens.push(hashedRefreshToken);
+
+// 🔥 ATOMIC UPDATE (NO VERSION ERROR)
+await User.findByIdAndUpdate(user._id, {
+  refreshToken: updatedTokens
+});
+sendRefreshToken(res, newRefreshToken);
+sendAccessToken(res, accessToken);
+    // return res.json({
+    //   success: true,
+    //   accessToken
+    // });
+
+    return res.json({
+      success: true,
+      accessToken
+    });
+
+  } catch (err) {
+    console.error("Error in refresh token controller : " , err);
+      // 🔴 Refresh token expired
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      success: false,
+      code: "REFRESH_TOKEN_EXPIRED",
+      message: "Session expired. Please login again."
+    });
+  }
+
+  // 🔴 Invalid token (tampered / wrong secret)
+  if (err.name === "JsonWebTokenError") {
+    return res.status(403).json({
+      success: false,
+      code: "INVALID_REFRESH_TOKEN",
+      message: "Invalid refresh token"
+    });
+  }
+
+  return res.status(403).json({
+    success: false,
+    code: "REFRESH_FAILED",
+    message: "Refresh failed"
+  });
+
+  }
+};
 
 // =======================
 // 🔴 LOGOUT (PER DEVICE)
 // =======================
 export const logout = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies.refreshToken;
 
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      const user = await User.findById(decoded.userId);
 
-    res.clearCookie("token", tokenCookieOptions);
+      if (user) {
+        let newTokens = [];
 
+        for (let rt of user.refreshToken) {
+          const match = await bcrypt.compare(token, rt);
+          if (!match) newTokens.push(rt);
+        }
+
+        user.refreshToken = newTokens;
+        await user.save();
+      }
+    }
+
+    res.clearCookie("refreshToken", refreshTokenCookieOptions);
+
+    res.clearCookie("accessToken", accessTokenCookieOptions);
 
     return res.json({
       success: true,
@@ -211,7 +375,9 @@ export const logout = async (req, res) => {
     });
 
   } catch (err) {
-    res.clearCookie("token", tokenCookieOptions);
+    res.clearCookie("refreshToken", refreshTokenCookieOptions);
+
+    res.clearCookie("accessToken", accessTokenCookieOptions);
 
     console.error("Error in logout controller : " , err);
 
@@ -312,13 +478,6 @@ export const googleCallback = async (req, res) => {
     }
 
     const googleUser = await userRes.json();
-
-    if (!googleUser.email_verified) {
-      return res.status(400).json({
-        success: false,
-        message: "Google account email is not verified"
-      });
-    }
     
 
     // 3️⃣ Extract data
@@ -357,6 +516,7 @@ export const googleCallback = async (req, res) => {
           email,
           googleId,
           authProvider: ["google"],
+          refreshToken: []
         });
       }
     }
@@ -364,10 +524,15 @@ export const googleCallback = async (req, res) => {
     // =========================
     // 🔐 USE YOUR EXISTING JWT SYSTEM
     // =========================
-    const token = generateToken(user._id,  user.familyId?._id || null);
+    const { accessToken, refreshToken } = generateTokens(user._id,  user.familyId?._id || null);
 
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    sendToken(res, token);
+    user.refreshToken.push(hashedRefreshToken);
+    await user.save();
+
+    sendRefreshToken(res, refreshToken);
+    sendAccessToken(res, accessToken);
 
     // return res.redirect(`${process.env.CLIENT_URL}/dashboard/family`);
 
@@ -507,6 +672,8 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
+    // 🔥 IMPORTANT: logout all sessions
+    user.refreshToken = [];
 
     await user.save();
 

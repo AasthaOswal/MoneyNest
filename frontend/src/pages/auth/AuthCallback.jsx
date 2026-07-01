@@ -32,14 +32,14 @@ const AuthCallback = () => {
         const API_URL = ENV == "production" ? "/api" :  import.meta.env.VITE_API_URL;
 
 
-        const response = await axios.post(
-          `${API_URL}/auth/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
-        console.log(response)
+        // const response = await axios.post(
+        //   `${API_URL}/auth/refresh-token`,
+        //   {},
+        //   { withCredentials: true }
+        // );
+        // console.log(response)
 
-        localStorage.setItem("accessToken", response?.data?.accessToken);
+        // localStorage.setItem("accessToken", response?.data?.accessToken);
 
         // initialize authenticated socket
         initSocket();

@@ -34,7 +34,11 @@ export function initializeSocket(httpServer, app) {
 
   io.use((socket, next) => {
     try {
-      const token = socket.handshake.auth?.token;
+      const cookies = cookie.parse(
+          socket.handshake.headers.cookie || ""
+      );
+
+      const token = cookies.token;
 
       if (!token) {
         return next(new Error("Authentication error"));

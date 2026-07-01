@@ -7,9 +7,12 @@ export const initSocket = () => {
   if (socket) return socket;
 
   const SOCKET_URL = import.meta.env.VITE_SOCKET_URL; // backend origin only
+  const token = localStorage.getItem("accessToken");
 
   socket = io(SOCKET_URL, {
-    withCredentials: true,
+    // path: "/ws",
+    // transports: ["websocket"],
+    auth: { token },
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,

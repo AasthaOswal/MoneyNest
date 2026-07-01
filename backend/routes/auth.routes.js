@@ -4,7 +4,6 @@ import {
   login,
   googleAuth,     
   googleCallback,
-  refreshAccessToken,
   logout,
   forgotPassword,
   resetPassword,
@@ -32,7 +31,7 @@ router.get("/google", googleAuthLimiter, googleAuth);
 router.get("/google/callback", googleCallbackLimiter, googleCallback);
 
 // Refresh Access Token
-router.post("/refresh-token", refreshTokenLimiter, refreshAccessToken);
+// router.post("/refresh-token", refreshTokenLimiter, refreshAccessToken);
 
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 
