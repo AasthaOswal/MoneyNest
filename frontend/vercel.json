@@ -9,6 +9,14 @@
             "destination": "https://moneynest-wsal.onrender.com/api/:path*"
         },
         {
+            "source": "/socket.io/:path*",
+            "destination": "https://moneynest-wsal.onrender.com/socket.io/:path*"
+        },
+        {
+            "source": "/socket.io",
+            "destination": "https://moneynest-wsal.onrender.com/socket.io"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

@@ -8,7 +8,7 @@ export const initSocket = () => {
 
   const SOCKET_URL = import.meta.env.VITE_SOCKET_URL; // backend origin only
 
-  socket = io(SOCKET_URL, {
+  socket = io("/", {
     withCredentials: true,
     reconnection: true,
     reconnectionAttempts: 5,
