@@ -59,14 +59,7 @@ export const startAiMonthlyFinancialReportCron = () => {
 
                 const reportMonthDate=new Date();
 
-                const result =
-                    await generateMonthlyReportForFamily({
-
-                        familyId: family._id,
-
-                        reportMonthDate
-
-                    });
+                const result = await generateMonthlyReportForFamily({ familyId: family._id, reportMonthDate });
 
                 if (!result.success) {
                     
@@ -74,22 +67,41 @@ export const startAiMonthlyFinancialReportCron = () => {
 
                     await createFailedOperation({
 
-                        operationType:
-                            "ai_monthly_report_email",
+                        operationType:"ai_monthly_report_email",
 
                         payload: {
 
-                            familyId:
-                                family._id,
-
+                            familyId:family._id,
                             reportMonthDate,
-
                             userIds: null
 
                         },
 
-                        error:
-                            result.error
+                        error: result.error
+
+                    });
+
+                }
+
+                if (result.success && result.failedUsers.length > 0) {
+
+                    await createFailedOperation({
+
+                        operationType: "ai_monthly_report_email",
+
+                        payload: {
+
+                            familyId: family._id,
+
+                            reportMonthDate,
+
+                            userIds: result.failedUsers.map(
+                                user => user.userId
+                            )
+
+                        },
+
+                        error: new Error("Some emails failed")
 
                     });
 

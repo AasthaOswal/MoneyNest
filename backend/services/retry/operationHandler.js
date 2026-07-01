@@ -38,7 +38,14 @@ export const operationHandlers = {
     const result = await generateMonthlyReportForFamily(payload);
 
     if (!result.success) {
-        throw result.error;
+      throw result.error;
+    }
+
+    if (result.failedUsers.length > 0) {
+
+      payload.userIds = result.failedUsers.map(u => u.userId);
+
+      throw new Error("Partial email delivery");
     }
   },
 

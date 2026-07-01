@@ -37,6 +37,7 @@ export const retryFailedOperation = async (id) => {
 
     return response.data;
   } catch (error) {
+    console.log(error.response)
     throw error;
   }
 };

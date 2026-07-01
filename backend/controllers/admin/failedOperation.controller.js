@@ -112,7 +112,7 @@ export const retryFailedOperationById = async (req, res) => {
     if (!operation) {
       return res.status(404).json({
         success: false,
-        message: "Operation not found",
+        message: "Operation not found or it is already being retried.",
       });
     }
 

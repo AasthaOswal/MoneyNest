@@ -40,6 +40,7 @@ export const generateMonthlyReportForFamily = async ({
         let members;
 
         if (userIds) {
+            console.log( "in monthlyReportMain.service.js, userIds received: ",userIds, "\n");
 
             members = await User.find({
 
@@ -63,43 +64,61 @@ export const generateMonthlyReportForFamily = async ({
 
         }
 
+        const failedUsers = [];
+
         for (const member of members) {
 
-            await sendEmailBrevo({
+            try {
 
-                toEmail: member.email,
+                // if (member.email === "aasthaoswal29@gmail.com" || member.email === "besibay692@divahd.com") {
+                //     throw new Error("Testing partial email failure");
+                // }
 
-                subject:
-                    `AI Powered Monthly Financial Report - ${reportData.reportMonth}`,
+                await sendEmailBrevo({
 
-                htmlContent: `
-                    <h2>Your Monthly Report</h2>
-                    <p>Attached is your report.</p>
-                `,
+                    toEmail: member.email,
 
-                attachments: [
-                    {
-                        name:
-                            `Report-${reportData.reportMonth}.pdf`,
+                    subject:
+                        `AI Powered Monthly Financial Report - ${reportData.reportMonth}`,
 
-                        content:
-                            pdfBuffer.toString("base64")
-                    }
-                ]
+                    htmlContent: `
+                        <h2>Your Monthly Report</h2>
+                        <p>Attached is your report.</p>
+                    `,
 
-            });
+                    attachments: [
+                        {
+                            name:
+                                `Report-${reportData.reportMonth}.pdf`,
 
-            console.log(
-                `Email sent to ${member.email}`
+                            content:
+                                pdfBuffer.toString("base64")
+                        }
+                    ]
+
+                });
+
+                console.log(`Email sent to ${member.email}`
             );
+            } catch (error) {
 
-            await sleep(30000);
+                failedUsers.push({
+                    userId: member._id,
+                    email: member.email,
+                    error
+                });
+            }
+
+
+
+            await sleep(10000);
 
         }
 
         return {
 
-            success: true
+            success: true,
+            failedUsers
 
         };
 

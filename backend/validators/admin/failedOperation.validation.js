@@ -8,12 +8,13 @@ export const getFailedOperationsValidation = Joi.object({
       "monthly_report_email",
       "push_notification",
       "db_notification",
-      "request_log_export"
+      "request_log_export",
+      "ai_monthly_report_email"
     )
     .optional(),
 
   status: Joi.string().allow("").trim()
-    .valid("pending", "failed", "resolved")
+    .valid("retrying", "failed", "resolved")
     .optional(),
 
   requestId: Joi.string().allow("").trim().optional(),

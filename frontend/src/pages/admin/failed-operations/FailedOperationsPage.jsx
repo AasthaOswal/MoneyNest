@@ -47,12 +47,13 @@ const FailedOperationsPage = () => {
     {id: "monthly_report_email", name: "Monthly Report Email"},
     {id: "push_notification", name: "Push Notificaiton"},
     {id: "db_notification", name: "DB Notification"},
-    {id: "request_log_export", name: "Request Log Export"}
+    {id: "request_log_export", name: "Request Log Export"},
+    {id: "ai_monthly_report_email", name: "AI Monthly Report Email"}
   ];
 
   const statusOptions = [
     { id: "", name: "All Statuses" },
-    { id: "pending", name: "Pending" },
+    { id: "retrying", name: "Retrying" },
     { id: "failed", name: "Failed" },
     { id: "resolved", name: "Completed" }
   ];
@@ -120,7 +121,7 @@ const FailedOperationsPage = () => {
       });
     } catch (error) {
       toast.error(
-        error.message || "Failed to retry operation",
+        error.response.data.message || "Failed to retry operation",
         {
           id: toastId,
         }
@@ -148,7 +149,7 @@ const FailedOperationsPage = () => {
       });
     } catch (error) {
       toast.error(
-        error.message || "Failed to delete operation log",
+        error.response.data.message || "Failed to delete operation log",
         {
           id: toastId,
         }
@@ -170,7 +171,6 @@ const FailedOperationsPage = () => {
     switch (status?.toLowerCase()) {
       case "failed":
         return "bg-error-bg text-error";
-      case "pending":
       case "retrying":
         return "bg-warning-bg text-warning";
       case "completed":

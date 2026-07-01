@@ -14,7 +14,7 @@ const failedOperationSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["pending", "failed", "resolved"],
+      enum: ["retrying", "failed", "resolved"],
       default: "failed",
     },
 
