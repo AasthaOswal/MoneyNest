@@ -43,7 +43,7 @@ import EditGoal from './pages/goals/EditGoal';
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContextNew.jsx';
 import { ThemeProvider } from './context/ThemeContext';
 
 import { useEffect } from "react";
@@ -81,6 +81,8 @@ import RequestLogDetails from './pages/admin/request-logs/RequestLogDetails.jsx'
 import FailedOperationsPage from './pages/admin/failed-operations/FailedOperationsPage.jsx';
 import FailedOperationDetails from './pages/admin/failed-operations/FailedOperationDetails.jsx'
 
+import CustomToaster from './components/CustomToaster.jsx';
+
 function App() {
 
   // useEffect(() => {
@@ -107,64 +109,7 @@ function App() {
       <BrowserRouter>
       {/* <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 4000, }}/> */}
 
-      <Toaster 
-        position="top-right" 
-        reverseOrder={false} 
-        toastOptions={{
-          success: {
-            duration: 4000,
-          },
-          error: {
-            duration: 4000,
-          },
-          info:{
-            duration: 6000,
-          },
-          loading: {
-            duration: Infinity,
-          },
-        }}
-      >
-        {(t) => (
-          <ToastBar toast={t}>
-            {({ icon, message }) => (
-              <>
-                {icon}
-                {message}
-                { (
-                  <button 
-                    onClick={() => toast.dismiss(t.id)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#9ca3af', // Subtle gray color
-                      cursor: 'pointer',
-                      padding: '4px',
-                      marginLeft: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: '4px',
-                      transition: 'color 0.2s, background-color 0.2s',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#374151'; // Darker gray on hover
-                      e.currentTarget.style.backgroundColor = '#f3f4f6'; // Light background on hover
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = '#9ca3af';
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                    aria-label="Close notification"
-                  >
-                    <X size={16} strokeWidth={2.5} />
-                  </button>
-                )}
-              </>
-            )}
-          </ToastBar>
-        )}
-      </Toaster>
+      <CustomToaster/>
       <AuthProvider>
           <Routes>
             {/* Public Routes - Landing, Login, Signup */}

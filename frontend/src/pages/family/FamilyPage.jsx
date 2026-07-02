@@ -3,7 +3,7 @@ import api from "../../axios/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Copy } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const FamilyPage = () => {
   const [family, setFamily] = useState(null);

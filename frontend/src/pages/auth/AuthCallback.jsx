@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../axios/axios";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { getFCMToken } from "../../utils/createFcmToken";
 import { initSocket } from "../../socket/socket.js";
 import toast from "react-hot-toast";

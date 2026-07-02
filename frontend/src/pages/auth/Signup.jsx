@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import AuthService from "../../services/authService";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const {signup} = useAuth();
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -25,12 +29,33 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
+    const toastId = toast.loading("Please wait while we are logging you in...");
 
     try {
-      await AuthService.signup(form);
-      navigate("/dashboard");
+      const loggedInUser = await signup(form);
+      console.log(loggedInUser);
+
+      toast.success("Successful singup.", {id:toastId});
+      
+      if (loggedInUser.role === "admin") {
+      navigate("/admin-dashboard", { replace: true });
+
+      } else if (loggedInUser.role === "member") {
+
+          if (loggedInUser.familyId) {
+              navigate("/dashboard/family", { replace: true });
+          } else {
+              navigate("/family/setup", { replace: true });
+          }
+
+      } else {
+          navigate("/dashboard/family", { replace: true });
+      }
     } catch (err) {
-      setError(err?.response?.data?.message || "Signup failed");
+      toast.error(err.response?.data?.message ||"Some error occured.", {id:toastId});
+      console.log(err)
+      setError(err.response?.data?.message || "Signup failed.");
     } finally {
       setLoading(false);
     }

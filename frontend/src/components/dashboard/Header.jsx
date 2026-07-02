@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu as LucideMenu } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 // import NotificationButton from '../buttons/NotificationButton';
 import { useNavigate } from 'react-router-dom';
 

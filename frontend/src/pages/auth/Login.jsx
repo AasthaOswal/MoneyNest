@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthService from "../../services/authService"; 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth.js";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 const Login = () => {
@@ -10,7 +10,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); // 👈 ADD THIS
+  const { login,user } = useAuth(); // 👈 ADD THIS
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,27 +26,43 @@ const Login = () => {
   };
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    
+    const toastId = toast.loading("Please wait while we are logging you in...");
 
 
-  try {
-    const response = await AuthService.login(credentials);
-    console.log(response)
+    try {
+      const loggedInUser = await login(credentials);
+      console.log(loggedInUser)
 
-    toast.success("Successful login.");
+      toast.success("Successful login.", {id:toastId});
 
-    navigate("/auth/callback");
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message || "Something went wrong"
-    );
-    setError(err.response?.data?.message || "Invalid email or password");
-  }finally {
-    setLoading(false);
-  }
-};
+      if (loggedInUser.role === "admin") {
+      navigate("/admin-dashboard", { replace: true });
+
+      } else if (loggedInUser.role === "member") {
+
+          if (loggedInUser.familyId) {
+              navigate("/dashboard/family", { replace: true });
+          } else {
+              navigate("/family/setup", { replace: true });
+          }
+
+      } else {
+          navigate("/dashboard/family", { replace: true });
+      }
+    } catch (err) {
+
+      toast.error(err.response?.data?.message ||"Some error occured.", {id:toastId});
+      console.log(err)
+      setError(err.response?.data?.message || "Invalid email or password");
+    }finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg p-4">
