@@ -110,9 +110,9 @@ export const AuthProvider = ({ children }) => {
     };
 
       const logout = async () => {
-    await AuthService.logout();
-    setUser(null);
-  };
+        await AuthService.logout();
+        setUser(null);
+    };
 
 
 

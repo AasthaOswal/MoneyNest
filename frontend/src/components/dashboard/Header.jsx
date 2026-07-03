@@ -17,7 +17,7 @@ const Header = ({ setIsOpen }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
 
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   return (
     <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-border bg-surface text-text shadow-card">
 
