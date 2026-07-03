@@ -67,8 +67,9 @@ const login = async (credentials) => {
 };
 
 const loginWithGoogle = async () => {
-  window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-  // window.location.href = "/api/auth/google";
+  const isProduction = import.meta.env.VITE_ENV === "production";
+  const apiBase = isProduction ? "/api" : import.meta.env.VITE_API_URL;
+  window.location.href = `${apiBase}/auth/google`;
 };
 
 

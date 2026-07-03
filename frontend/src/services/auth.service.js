@@ -42,7 +42,9 @@ const login = async (userData) => {
 
 //isme useNavigate() and Navigate to="/" replace dono approcahes baadme laganke dekkhna hai
 const loginWithGoogle = async () => {
-  window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+  const isProduction = import.meta.env.VITE_ENV === "production";
+  const apiBase = isProduction ? "/api" : import.meta.env.VITE_API_URL;
+  window.location.href = `${apiBase}/auth/google`;
 };
 
 
