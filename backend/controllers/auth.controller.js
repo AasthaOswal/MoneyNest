@@ -39,9 +39,9 @@ const googleOAuthCookieOptions = {
 }
 
 // 🔐 Generate Token
-const generateToken = (userId,familyId) => {
+const generateToken = (userId,familyId, tokenVersion) => {
   const token = jwt.sign(
-    { userId, familyId },
+    { userId, familyId, tokenVersion },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
@@ -62,6 +62,7 @@ const getSafeUser = (user) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    tokenVersion: user.tokenVersion,
     familyId: user.familyId ? user.familyId._id : null,
   };
 };
@@ -115,7 +116,7 @@ export const signup = async (req, res) => {
           authProvider: ["local"],
         });
 
-        const token = generateToken(user._id, null);
+        const token = generateToken(user._id, null, user.tokenVersion);
 
         await user.save();
 
@@ -171,7 +172,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const token  = generateToken(user._id,  user.familyId?._id || null);
+    const token  = generateToken(user._id,  user.familyId?._id || null, user.tokenVersion);
 
 
     await user.save();
@@ -201,6 +202,17 @@ export const logout = async (req, res) => {
   try {
     const token = req.cookies.token;
 
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $inc: { tokenVersion: 1 } }, // Atomic increment
+      { new: true }                  // Returns the updated document
+    );
+
+
+    if(!updatedUser){
+      return res.json({success: false,message: "Some issue happened. Please try again later"});
+    }
+
 
     res.clearCookie("token", tokenCookieOptions);
 
@@ -217,7 +229,7 @@ export const logout = async (req, res) => {
 
     return res.json({
       success: false,
-      message: "Logged out"
+      message: "Some issue happened. Please try again later"
     });
   }
 };
@@ -364,7 +376,7 @@ export const googleCallback = async (req, res) => {
     // =========================
     // 🔐 USE YOUR EXISTING JWT SYSTEM
     // =========================
-    const token = generateToken(user._id,  user.familyId?._id || null);
+    const token = generateToken(user._id,  user.familyId?._id || null, user.tokenVersion);
 
     console.log("Cookies before redirect:", req.cookies);
 

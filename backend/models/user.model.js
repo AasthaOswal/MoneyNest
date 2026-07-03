@@ -72,6 +72,12 @@ export const userSchema = new mongoose.Schema({
         default:true
     },
 
+
+    tokenVersion: {
+        type: Number,
+        default: 0,
+    },
+
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

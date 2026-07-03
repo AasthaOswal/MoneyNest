@@ -28,10 +28,21 @@ export const authenticateToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Attach user to request (optional: fetch full user)
-    const user = await User.findById(decoded.userId).select("-password -refreshToken");
+    const user = await User.findById(decoded.userId, decoded.tokenversion, decoded.role).select("-password -refreshToken");
 
     if (!user) {
       return res.status(401).json({ message: "User not found" });
+    }
+
+    // Check if the token's version matches the database version
+    // Note: Make sure you match the casing used when generating the token (e.g., tokenVersion vs tokenversion)
+    if (decoded.tokenVersion !== undefined && user.tokenVersion !== decoded.tokenVersion) {
+      console.log("Token is no longer valid (logged out).")
+      return res.status(401).json({
+        success: false,
+        code: "TOKEN_REVOKED",
+        message: "Token is no longer valid (logged out)."
+      });
     }
 
     req.user = user;
