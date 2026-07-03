@@ -377,7 +377,21 @@ export const googleCallback = async (req, res) => {
 console.log("Set-Cookie token issued");
 
     
-    return res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
+    // return res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<body>
+Signing you in...
+
+<script>
+window.location.replace("${process.env.CLIENT_URL}/auth/callback");
+</script>
+
+</body>
+</html>
+`);
 
   } catch (err) {
     console.error("Google OAuth Error:", err);
