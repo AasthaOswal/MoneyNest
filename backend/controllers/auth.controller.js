@@ -518,6 +518,9 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
+    // Invalidate every existing JWT
+    user.tokenVersion += 1;
+
 
     await user.save();
 
