@@ -17,7 +17,8 @@ const AuthCallback = () => {
     const initAuth = async () => {
         console.log("inside initAuth")
       try {
-        const res = await api.get("/user/me", { skipAuthRefresh: true });
+        const res = await api.get("/user/me", { skipAuthRefresh: true, withCredentials:true });
+        console.log(res);
         const user = res.data.user;
         console.log(user)
 
