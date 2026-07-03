@@ -366,10 +366,15 @@ export const googleCallback = async (req, res) => {
     // =========================
     const token = generateToken(user._id,  user.familyId?._id || null);
 
+    console.log("Cookies before redirect:", req.cookies);
+
 
     sendToken(res, token);
 
     // return res.redirect(`${process.env.CLIENT_URL}/dashboard/family`);
+
+    console.log("About to redirect");
+console.log("Set-Cookie token issued");
 
     
     return res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
