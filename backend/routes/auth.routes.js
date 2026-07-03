@@ -41,7 +41,7 @@ router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.post("/reset-password/:token", resetPasswordLimiter, resetPassword );
 
 // Logout
-router.post("/logout", logoutLimiter, logout);
+router.post("/logout", authenticateToken, logoutLimiter, logout);
 
 
 router.get("/socket-token", authenticateToken, getSocketToken);
