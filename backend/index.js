@@ -128,7 +128,7 @@ app.get("/test-cookie", (req, res) => {
     sameSite: "none",
   });
 
-  res.redirect(process.env.CLIENT_URL);
+  res.status(200).send("Cookie sent");
 });
 
 httpServer.listen(PORT, () => {
