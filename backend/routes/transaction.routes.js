@@ -25,9 +25,7 @@ router.use(authenticateToken, requireFamily);
 // =======================
 router.post(
   "/",
-  upload.fields([
-    { name: "transactionDoc", maxCount: 1 }
-  ]),
+  upload.single("transactionDoc"),
   uploadLimiter,
   createTransaction
 );
@@ -47,9 +45,7 @@ router.get("/:transactionId", readLimiter, getTransactionById);
 // =======================
 router.patch(
   "/:transactionId",
-  upload.fields([
-    { name: "transactionDoc", maxCount: 1 }
-  ]),
+  upload.single("transactionDoc"),
   uploadLimiter,
   updateTransaction
 );

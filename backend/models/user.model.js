@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 
 export const userSchema = new mongoose.Schema({
@@ -73,6 +74,14 @@ export const userSchema = new mongoose.Schema({
     },
 
 
+    cloudinaryStorageId: {
+        type: String,
+        unique: true,
+        immutable: true,
+        default: () => crypto.randomUUID().replace(/-/g, ""),
+    },
+
+
     tokenVersion: {
         type: Number,
         default: 0,
@@ -82,3 +91,11 @@ export const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 export default User;
+
+/*
+    status: {
+        type: String,
+        enum: ["active", "pendingDeletion", "deleted"],
+        default: "active",
+    },
+*/

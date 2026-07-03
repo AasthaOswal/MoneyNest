@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Transaction from "../models/transaction.model.js";
+import User from "../models/user.model.js";
 import Category from "../models/category.model.js";
 import Label from "../models/label.model.js";
 
@@ -19,16 +20,17 @@ import { getIO } from "../config/socket.js";
 
 import {executeRetryable} from "../utils/retryable/executeRetryable.js"
 
+import { uploadToCloudinary } from "../utils/cloudinary/uploadToCloudinary.js";
+import upload from "../middlewares/multer.middleware.js";
+
 
 // FILE CONFIG
-const fileConfigs = [
-  {
-    fieldName: "transactionDoc",
-    allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
-    maxSize: 2 * 1024 * 1024, // 2MB
-    friendlyName: "Transaction Document"
-  }
-];
+const fileConfig = {
+  fieldName: "transactionDoc",
+  allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
+  maxSize: 2 * 1024 * 1024, // 2MB
+  friendlyName: "Transaction Document"
+};
 
 const validateCategoryOrLabel2 = async ({
   model,
@@ -153,7 +155,7 @@ const validateLabels = async ({
 // ➕ CREATE TRANSACTION
 // =======================
 export const createTransaction = async (req, res) => {
-  let uploadedFiles;
+  let uploadResult = null;
   let dbSaved = false;
 
   try {
@@ -197,19 +199,23 @@ export const createTransaction = async (req, res) => {
       })
     ]);
 
+    const user = await User.findById(userId)
+    .select("cloudinaryStorageId");
+
+    const cloudinaryStorageId = user.cloudinaryStorageId;
+
     // Upload file (optional)
-    if (req.files && Object.keys(req.files).length > 0) {
-      uploadedFiles = await validateAndUploadFiles(req.files, fileConfigs);
+    if (req.file ) {
+      uploadResult = await uploadToCloudinary(req.file, fileConfig,cloudinaryStorageId);
     }
 
     const transaction = new Transaction({
       ...value,
       user: userId,
       family: familyId,
-      transactionDoc: uploadedFiles?.transactionDoc
-        ? {
-            url: uploadedFiles.transactionDoc.url,
-            publicId: uploadedFiles.transactionDoc.publicId
+      transactionDoc: uploadResult ? {
+            url: uploadResult.url,
+            publicId: uploadResult.publicId
           }
         : null
     });
@@ -242,9 +248,8 @@ export const createTransaction = async (req, res) => {
   } catch (err) {
     console.error("Error in createTransaction:", err);
 
-    if (!dbSaved && uploadedFiles) {
-      const publicIds = Object.values(uploadedFiles).map(f => f.publicId);
-      await deleteMultipleFiles(publicIds);
+    if (!dbSaved && uploadResult) {
+      await deleteFromCloudinary(uploadResult.publicId);
     }
 
     if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
@@ -266,12 +271,14 @@ export const createTransaction = async (req, res) => {
 // ✏️ UPDATE TRANSACTION
 // =======================
 export const updateTransaction = async (req, res) => {
-  let uploadedFiles = null;
+  let uploadResult = null;
   let dbSaved = false;
+  console.log("inside transaction controller - update")
 
   try {
     const { transactionId } = req.params;
     const userFamilyId = req.user.familyId;
+    const userId = req.user._id;
 
     if (!transactionId || !mongoose.Types.ObjectId.isValid(transactionId)) {
       return res.status(400).json({
@@ -350,16 +357,20 @@ export const updateTransaction = async (req, res) => {
 
     let oldPublicId = null;
 
-    // File handling
-    if (req.files && Object.keys(req.files).length > 0) {
-      uploadedFiles = await validateAndUploadFiles(req.files, fileConfigs);
+    const user = await User.findById(userId).select("cloudinaryStorageId");
 
-      if (uploadedFiles.transactionDoc) {
+    const cloudinaryStorageId = user.cloudinaryStorageId;
+
+    // File handling
+    if (req.file) {
+      uploadResult = await uploadToCloudinary(req.file, fileConfig, cloudinaryStorageId);
+
+      if (uploadResult) {
         oldPublicId = existingTransaction.transactionDoc?.publicId;
 
         value.transactionDoc = {
-          url: uploadedFiles.transactionDoc.url,
-          publicId: uploadedFiles.transactionDoc.publicId
+          url: uploadResult.url,
+          publicId: uploadResult.publicId
         };
       }
     }
@@ -426,9 +437,8 @@ export const updateTransaction = async (req, res) => {
   } catch (err) {
     console.error("Error in updateTransaction:", err);
 
-    if (!dbSaved && uploadedFiles) {
-      const publicIds = Object.values(uploadedFiles).map(f => f.publicId);
-      await deleteMultipleFiles(publicIds);
+    if (!dbSaved && uploadResult) {
+      await deleteFromCloudinary(uploadResult.publicId);
     }
 
     if ( err.name === "InvalidCategory" || err.name === "InvalidLabel" || err.name === "InvalidCategoryOrLabel" ){
