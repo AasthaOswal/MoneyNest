@@ -46,14 +46,5 @@ router.post("/logout", logoutLimiter, logout);
 
 router.get("/socket-token", authenticateToken, getSocketToken);
 
-app.get("/test-cookie", (req, res) => {
-  res.cookie("test", "123", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
-
-  res.redirect(process.env.CLIENT_URL);
-});
 
 export default router;

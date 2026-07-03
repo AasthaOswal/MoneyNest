@@ -120,6 +120,17 @@ app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5000;
 
+
+app.get("/test-cookie", (req, res) => {
+  res.cookie("test", "123", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+
+  res.redirect(process.env.CLIENT_URL);
+});
+
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
