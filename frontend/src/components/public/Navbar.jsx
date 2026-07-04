@@ -46,7 +46,7 @@ const Navbar = () => {
           
 
 
-           {!loading && user
+           {!loading && user &&
              (
               <>
                 <Link
