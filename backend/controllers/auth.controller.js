@@ -364,21 +364,6 @@ export const googleCallback = async (req, res) => {
 
     let user = await User.findOne({ googleId });
 
-    
-    
-    if (user.status === "pendingDeletion") {
-        return res.status(403).json({
-            success: false,
-            message: "Your account is pending deletion."
-        });
-    }
-
-    if (user.status === "deleted") {
-        return res.status(403).json({
-            success: false,
-            message: "This account has been deleted."
-        });
-    }
 
     // =========================
     // 🟢 USER CREATION / LOGIN
@@ -403,6 +388,21 @@ export const googleCallback = async (req, res) => {
           authProvider: ["google"],
         });
       }
+    }
+
+        
+    if (user.status === "pendingDeletion") {
+        return res.status(403).json({
+            success: false,
+            message: "Your account is pending deletion."
+        });
+    }
+
+    if (user.status === "deleted") {
+        return res.status(403).json({
+            success: false,
+            message: "This account has been deleted."
+        });
     }
 
     // =========================
