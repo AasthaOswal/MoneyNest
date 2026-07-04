@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AuthService from "../../services/authService";
 import { Eye, EyeOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -19,9 +20,13 @@ const ResetPassword = () => {
     setError("");
     setLoading(true);
 
+    const toastId = toast.loading("Please wait while we reset your password.");
+
     try {
       const res = await AuthService.resetPassword(token, password);
-      setMessage(res.message);
+      // setMessage(res.message);
+
+      toast.success("Password reset successfully. Redirecting you to login page....", {id:toastId});
 
       // redirect after success
       setTimeout(() => {
@@ -29,65 +34,86 @@ const ResetPassword = () => {
       }, 2000);
 
     } catch (err) {
-      setError(err.response?.data?.message || "Reset failed");
+      // setError(err.response?.data?.message || "Reset failed");
+      toast.error(err.response?.data?.message || "Some error occured.", {id:toastId});
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-4">
-      <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-xl border border-border">
+  <div className="min-h-screen w-full bg-bg flex  justify-center py-6 p-2 sm:p-6 relative overflow-hidden">
 
-        <h2 className="text-3xl font-bold mb-6 text-center text-text">
-          Reset Password
-        </h2>
+    {/* Background Glow */}
+    <div className="absolute -top-40 -left-40 h-120 w-96 rounded-full bg-primary-subtle blur-3xl opacity-70"></div>
+    <div className="absolute -bottom-40 -right-40 h-128 w-lg rounded-full bg-investment-bg blur-3xl opacity-60"></div>
 
-        {message && (
-          <div className="bg-income/10 border border-income text-income px-4 py-2 rounded mb-4 text-sm">
-            {message}
-          </div>
-        )}
+    <div className="relative z-10 w-full h-fit max-w-lg rounded-3xl bg-card border border-border p-6 sm:p-10 shadow-(--shadow-card) mt-12">
 
-        {error && (
-          <div className="bg-expense/10 border border-expense text-expense px-4 py-2 rounded mb-4 text-sm">
-            {error}
-          </div>
-        )}
+      {/* Heading */}
+      <h2 className="text-xl sm:text-3xl mt-4 font-bold text-center text-text">
+        Reset Password
+      </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+      <p className="mt-2 text-center text-text-secondary">
+        Enter your new password to regain access to your account.
+      </p>
+
+      {/* Success Message */}
+      {/* {message && (
+        <div className="mt-6 rounded-xl border border-success bg-success-bg px-4 py-3 text-sm text-success">
+          {message}
+        </div>
+      )} */}
+
+      {/* Error Message */}
+      {/* {error && (
+        <div className="mt-6 rounded-xl border border-error bg-error-bg px-4 py-3 text-sm text-error">
+          {error}
+        </div>
+      )} */}
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="mt-8 space-y-3 sm:space-y-6">
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-text-secondary">
+            New Password
+          </label>
 
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               required
-              placeholder="New Password"
-              className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary pr-10"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-input-border bg-input-bg px-4 py-3 pr-12 text-text placeholder:text-placeholder transition-all duration-200 focus:border-input-focus focus:ring-2 focus:ring-primary-subtle focus:outline-none hover:border-border-hover"
             />
 
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted"
+              className="absolute inset-y-0 right-0 flex items-center pr-4 text-text-secondary hover:text-primary transition-colors"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-lg"
-          >
-            {loading ? "Resetting..." : "Reset Password"}
-          </button>
+        {/* Reset Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl bg-primary py-3 font-semibold text-text-on-primary transition-all duration-200 hover:bg-primary-hover hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
+        >
+          {loading ? "Resetting..." : "Reset Password"}
+        </button>
 
-        </form>
-      </div>
+      </form>
     </div>
-  );
+  </div>
+);
 };
 
 export default ResetPassword;

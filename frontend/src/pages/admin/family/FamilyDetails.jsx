@@ -204,7 +204,7 @@ const FamilyDetails = () => {
           
           {/* Members List Section */}
           <SectionCard title="Family Members List" icon={User}>
-            <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">
+            <div className="space-y-4 max-h-112 overflow-y-auto pr-1">
               {members && members.length > 0 ? (
                 members.map((member) => (
                   <div 
@@ -223,7 +223,7 @@ const FamilyDetails = () => {
                       <span className="truncate">{member.email}</span>
                     </div>
 
-                    <div className="flex justify-between items-center text-xs pt-1 border-t border-(--color-divider) text-muted">
+                    <div className="flex justify-between items-center text-xs pt-1 border-t border-divider text-muted">
                       <span>Role: <strong className="text-text-secondary font-normal">{member.role || "user"}</strong></span>
                       <span>Joined: {new Date(member.createdAt).toLocaleDateString()}</span>
                     </div>

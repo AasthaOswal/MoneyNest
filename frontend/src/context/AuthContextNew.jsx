@@ -42,26 +42,30 @@ export const AuthProvider = ({ children }) => {
 
             const setup = async ()=>{
 
-                const ENV=import.meta.env.VITE_ENV;
+                try {
+                    const ENV=import.meta.env.VITE_ENV;
 
-                const API_URL = ENV == "production" ? "/api" :  import.meta.env.VITE_API_URL;
+                    const API_URL = ENV == "production" ? "/api" :  import.meta.env.VITE_API_URL;
 
-                const socketRes = await getSocketToken();
+                    const socketRes = await getSocketToken();
 
-                let token = localStorage.getItem("socketToken");
-                console.log("Socket token:",token)
+                    let token = localStorage.getItem("socketToken");
+                    console.log("Socket token:",token)
 
-                console.log(socketRes);
+                    console.log(socketRes);
 
 
-                // initialize authenticated socket
-                initSocket();
+                    // initialize authenticated socket
+                    initSocket();
 
-                setupNotificationListener((data) => {
-                console.log("inside notification listener")
-                console.log(data)
-                toast.success(`${data.notification.title} - ${data.notification.body}`);
-                });
+                    setupNotificationListener((data) => {
+                    console.log("inside notification listener")
+                    console.log(data)
+                    toast.success(`${data.notification.title} - ${data.notification.body}`);
+                    });
+                } catch (error) {
+                    console.error("Error suring setup in authContext: ", error);
+                }
             };
 
             setup();

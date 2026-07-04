@@ -66,118 +66,139 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-4">
-  <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-xl border border-border">
-    
-    <h2 className="text-3xl font-bold mb-6 text-center text-text">
-      Welcome Back
-    </h2>
+  <div className="min-h-screen w-full bg-bg flex items-center justify-center py-6 p-2 sm:p-6 relative overflow-hidden">
 
-    {error && (
-      <div className="bg-expense/10 border border-expense text-expense px-4 py-2 rounded mb-4 text-sm">
-        {error}
-      </div>
-    )}
+    {/* Background Glow */}
+    <div className="absolute -top-40 -left-40 h-120 w-96 rounded-full bg-primary-subtle blur-3xl opacity-70"></div>
+    <div className="absolute -bottom-40 -right-40 h-128 w-lg rounded-full bg-investment-bg blur-3xl opacity-60"></div>
 
-    <form onSubmit={handleLogin} className="space-y-5">
+    <div
+      className="relative z-10 w-full h-fit max-w-lg rounded-3xl bg-card border border-border p-6 sm:p-10 shadow-(--shadow-card) my-12"
+    >
 
-      <div>
-        <label className="block text-sm font-medium mb-1 text-muted">
-          Email Address
-        </label>
-        <input
-          type="email"
-          name="email"
-          required
-          className="w-full px-4 py-2 border border-border rounded-lg 
-          bg-surface text-text
-          focus:ring-2 focus:ring-primary focus:outline-none"
-          placeholder="name@example.com"
-          value={credentials.email}
-          onChange={handleChange}
-        />
-      </div>
 
-      {/* <div>
-        <label className="block text-sm font-medium mb-1 text-muted">
-          Password
-        </label>
-        <input
-          type="password"
-          name="password"
-          required
-          className="w-full px-4 py-2 border border-border rounded-lg 
-          bg-surface text-text
-          focus:ring-2 focus:ring-primary focus:outline-none"
-          placeholder="••••••••"
-          value={credentials.password}
-          onChange={handleChange}
-        />
-      </div> */}
+      {/* Heading */}
+      <h2 className="text-xl sm:text-3xl mt-4 font-bold text-center text-text">
+        Login
+      </h2>
 
-      <div>
-            <label className="block text-sm font-medium mb-1 text-muted">Password</label>
-            <div className="relative"> {/* 👈 Container for positioning icon */}
-              <input
-                type={showPassword ? "text" : "password"} // 👈 Toggle type
-                name="password"
-                required
-                className="w-full px-4 py-2 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary focus:outline-none pr-10"
-                placeholder="••••••••"
-                value={credentials.password}
-                onChange={handleChange}
-              />
-              <button
-                type="button" // 👈 Important: prevent form submission
-                onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-primary transition-colors"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
+      <p className="mt-2 text-center text-text-secondary">
+        Sign in to continue managing your family's finances.
+      </p>
+
+      {/* Error */}
+      {/* {error && (
+        <div className="mt-6 rounded-xl border border-error bg-error-bg px-4 py-3 text-sm text-error">
+          {error}
+        </div>
+      )} */}
+
+      {/* Form */}
+      <form onSubmit={handleLogin} className="mt-8 space-y-3 sm:space-y-6">
+
+        {/* Email */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-text-secondary">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="name@example.com"
+            value={credentials.email}
+            onChange={handleChange}
+            className=" w-full rounded-xl border border-input-border bg-input-bg px-4 py-3 text-text placeholder:text-placeholder transition-all duration-200 focus:border-input-focus focus:ring-2 focus:ring-primary-subtle focus:outline-none hover:border-border-hover"
+          />
+        </div>
+
+        {/* Password */}
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <label className="text-sm font-medium text-text-secondary">
+              Password
+            </label>
+
+            <Link
+              to="/forgot-password"
+              className="text-sm text-primary transition-colors hover:text-primary-hover"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              required
+              placeholder="••••••••"
+              value={credentials.password}
+              onChange={handleChange}
+              className="w-full rounded-xl border border-input-border bg-input-bg px-4 py-3 pr-12 text-text placeholder:text-placeholder transition-all duration-200 focus:border-input-focus focus:ring-2 focus:ring-primary-subtle focus:outline-none hover:border-border-hover"
+            />
+
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 right-0 flex items-center pr-4 text-text-secondary hover:text-primary transition-colors"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Login Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className=" w-full rounded-xl bg-primary py-3 font-semibold text-text-on-primary transition-all duration-200 hover:bg-primary-hover hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
+        >
+          {loading ? "Logging in..." : "Sign In"}
+        </button>
+      </form>
+
+      {/* Divider */}
+      <div className="my-4 sm:my-8 flex items-center">
+        <div className="h-px flex-1 bg-divider"></div>
+        <span className="px-2 sm:px-4 text-sm text-muted">OR</span>
+        <div className="h-px flex-1 bg-divider"></div>
+      </div>
+
+      {/* Google */}
       <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-lg transition-colors shadow-md disabled:opacity-50"
+        onClick={handleGoogleLogin}
+        className=" flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-surface-2 py-3 text-text transition-all duration-200 hover:border-border-hover hover:bg-surface-3 hover:cursor-pointer"
       >
-        {loading ? "Logging in..." : "Sign In"}
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google"
+          className="h-5 w-5"
+        />
+
+        <span className="font-medium">
+          Continue with Google
+        </span>
       </button>
 
-    </form>
 
-    <p className="mt-6 text-center text-muted text-sm">
-      Don't have an account?{" "}
-      <Link to="/signup" className="text-primary hover:underline font-semibold">
-        Create Account
-      </Link>
-    </p>
 
-    <button
-      onClick={handleGoogleLogin}
-      className="w-full py-2 rounded-lg border border-border bg-bg hover:bg-surface transition flex items-center justify-center gap-2"
-    >
-      <img
-        src="https://www.svgrepo.com/show/475656/google-color.svg"
-        alt="Google"
-        className="w-5 h-5"
-      />
-      Continue with Google
-    </button>
-
-    <p className="mt-4 text-center">
-      <Link
-        to="/forgot-password"
-        className="text-sm text-blue-600 hover:underline"
-      >
-        Forgot Password?
-      </Link>
-    </p>
-
+      {/* Signup */}
+      <div className="mt-4 sm:mt-8 border-t border-divider pt-6 text-center">
+        <p className="text-text-secondary">
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            className="font-semibold text-primary transition-colors hover:text-primary-hover"
+          >
+            Create Account
+          </Link>
+        </p>
+      </div>
+    </div>
   </div>
-</div>
-  );
+);
 };
 
 export default Login;
