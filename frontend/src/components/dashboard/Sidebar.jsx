@@ -34,6 +34,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Failed Operations', path:'/failed-operations', icon:XCircle},
         { name: 'Notifications', path:'/notifications', icon:XCircle},
         { name: 'All Users', path:'/all-users', icon:XCircle},
+        { name: 'All Families', path:'/all-families', icon:XCircle},
         
       ]
     : [

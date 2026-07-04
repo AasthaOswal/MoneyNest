@@ -12,7 +12,8 @@ import {
   transferFamilyAdmin,
   getAllFamilies,
   getFamilyById,
-  requestFamilyDeletion
+  requestFamilyDeletion,
+  approveFamilyDeletion
 } from "../controllers/family.controller.js";
 
 import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
@@ -89,4 +90,6 @@ router.get("/:familyId", authenticateToken, authorizeRoles("admin"), getFamilyBy
 
 
 router.post("/request-deletion", authenticateToken, requireFamily, authorizeRoles("familyAdmin"), requestFamilyDeletion);
+
+router.patch("/approve-deletion/:familyId", authenticateToken, authorizeRoles("admin"), approveFamilyDeletion);
 export default router;

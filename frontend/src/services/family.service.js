@@ -116,6 +116,60 @@ const requestFamilyDeletion = async () => {
   }
 };
 
+/**
+ * Get all families (Admin)
+ */
+const getAllFamilies = async (params = {}) => {
+  try {
+    const response = await api.get("/family", {
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching families:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+};
+
+/**
+ * Get family details by ID (Admin)
+ */
+const getFamilyById = async (familyId) => {
+  try {
+    const response = await api.get(`/family/${familyId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching family:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+};
+
+/**
+ * Approve family deletion (Admin)
+ */
+const approveFamilyDeletion = async (familyId) => {
+  try {
+    const response = await api.patch(
+      `/family/approve-deletion/${familyId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error approving family deletion:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+};
+
 
 const FamilyService = {
   createFamily,
@@ -126,7 +180,12 @@ const FamilyService = {
   removeFamilyMember,
   getFamilyMember,
   transferFamilyAdmin,
-  requestFamilyDeletion
+  requestFamilyDeletion,
+
+  // Admin
+  getAllFamilies,
+  getFamilyById,
+  approveFamilyDeletion,
 };
 
 export default FamilyService;

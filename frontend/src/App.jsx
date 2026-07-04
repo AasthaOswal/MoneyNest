@@ -85,6 +85,8 @@ import FailedOperationDetails from './pages/admin/failed-operations/FailedOperat
 import CustomToaster from './components/CustomToaster.jsx';
 import AllUsersPage from './pages/admin/users/AllUsersPage.jsx';
 import UserDetails from './pages/admin/users/UserDetails.jsx';
+import AllFamiliesPage from './pages/admin/family/AllFamiliesPage.jsx';
+import FamilyDetails from './pages/admin/family/FamilyDetails.jsx';
 
 function App() {
 
@@ -196,6 +198,8 @@ function App() {
                   <Route path="/failed-operations/:id" element={<FailedOperationDetails/>} />
                   <Route path="/all-users" element={<AllUsersPage/>} />
                   <Route path="/all-users/:id" element={<UserDetails/>}/>
+                  <Route path="/all-families" element={<AllFamiliesPage/>} />
+                  <Route path="/family/:id" element={<FamilyDetails/>} />
 
                   
                 </Route>
