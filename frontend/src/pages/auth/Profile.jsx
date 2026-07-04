@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Mail, Shield, Calendar, Bell, Lock, LogOut } from "lucide-react";
+import { User, Mail, Shield, Calendar, Bell, Lock, LogOut, Trash2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -124,7 +124,7 @@ const ProfilePage = () => {
                 flex items-center gap-3
                 border border-border
                 bg-card
-                hover:bg-error-bg
+                hover:bg-card-hover
                 rounded-xl
                 px-4 py-4
                 transition
@@ -132,7 +132,7 @@ const ProfilePage = () => {
             "
             onClick={() => navigate("/family/leave")}
             >
-                <LogOut className="text-error" size={18} />
+                <LogOut className="text-primary" size={18} />
 
                 <div className="text-left">
                     <p className="text-text font-medium">
@@ -141,6 +141,34 @@ const ProfilePage = () => {
 
                     <p className="text-muted text-sm">
                     Exit your current family group
+                    </p>
+                </div>
+            </button>
+
+
+            {/* Delete Account Button */}
+            <button
+            className="
+                flex items-center gap-3
+                border border-border
+                bg-error-bg/50
+                hover:bg-error-bg/80
+                rounded-xl
+                px-4 py-4
+                transition
+                hover:cursor-pointer
+            "
+            onClick={() => navigate("/request-account-delete")}
+            >
+                <Trash2 className="text-error" size={18} />
+
+                <div className="text-left">
+                    <p className="text-text font-medium">
+                    Delete Account
+                    </p>
+
+                    <p className="text-muted text-sm">
+                    Send Request to admin to delete your account.
                     </p>
                 </div>
             </button>

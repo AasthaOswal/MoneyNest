@@ -87,6 +87,7 @@ import AllUsersPage from './pages/admin/users/AllUsersPage.jsx';
 import UserDetails from './pages/admin/users/UserDetails.jsx';
 import AllFamiliesPage from './pages/admin/family/AllFamiliesPage.jsx';
 import FamilyDetails from './pages/admin/family/FamilyDetails.jsx';
+import RequestAccountDeletion from './pages/user/RequestAccountDeletion.jsx';
 
 function App() {
 
@@ -133,6 +134,7 @@ function App() {
               {/* Dashboard Layout Wrapper */}
               <Route element={<DashboardLayout />}>
                 <Route path="/profile" element= {<Profile/>} />
+                <Route path="/request-account-delete" element={<RequestAccountDeletion/>}/>
 
                 {/* Member + Family Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['member', 'familyAdmin']} />}>
