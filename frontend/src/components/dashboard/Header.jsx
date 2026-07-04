@@ -1,6 +1,6 @@
 import React from 'react';
 import { Menu as LucideMenu } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
+// import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 // import NotificationButton from '../buttons/NotificationButton';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 const Header = ({ setIsOpen }) => {
-  const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
 
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const Header = ({ setIsOpen }) => {
         </div> */}
 
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle
         <button
           onClick={toggleTheme}
           title="Toggle Theme"
@@ -66,7 +66,7 @@ const Header = ({ setIsOpen }) => {
           "
         >
           {theme === "light" ? "🌙" : "☀️"}
-        </button>
+        </button> */}
 
         {/* User Dropdown */}
         <Menu as="div" className="relative ">

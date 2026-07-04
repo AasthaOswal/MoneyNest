@@ -111,7 +111,7 @@ function App() {
   //   return () => unsubscribe();
   // }, []);
   return (
-    <ThemeProvider>
+    // <ThemeProvider>
       <BrowserRouter>
       {/* <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 4000, }}/> */}
 
@@ -214,7 +214,7 @@ function App() {
           </Routes>
       </AuthProvider>
       </BrowserRouter>
-    </ThemeProvider>
+    // </ThemeProvider>
   );
 }
 

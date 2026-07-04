@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../../context/ThemeContext';
+// import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 
 
 
 const Navbar = () => {
-  const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } = useTheme();
 
   const {user,loading} = useAuth();
 
@@ -33,9 +33,9 @@ const Navbar = () => {
           <Link to="/">WealthNest</Link>
         </div>
         <div className="flex gap-4 items-center">
-          <button onClick={toggleTheme} className="p-2 rounded hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--color-text)' }}>
+          {/* <button onClick={toggleTheme} className="p-2 rounded hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--color-text)' }}>
             {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-          </button>
+          </button> */}
 
           <>
             <Link to="/login" className="font-medium" style={{ color: 'var(--color-text)' }}>Login</Link>
