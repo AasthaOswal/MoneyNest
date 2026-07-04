@@ -32,7 +32,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Request Logs', path:'/request-logs', icon:Logs},
         { name: 'Error Logs', path:'/error-logs', icon:AlertTriangle},
         { name: 'Failed Operations', path:'/failed-operations', icon:XCircle},
-        { name: 'Notifications', path:'/notifications', icon:XCircle}
+        { name: 'Notifications', path:'/notifications', icon:XCircle},
+        { name: 'All Users', path:'/all-users', icon:XCircle},
         
       ]
     : [

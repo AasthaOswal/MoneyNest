@@ -5,7 +5,7 @@ import api from "../axios/axios";
  */
 export const getMyProfile = async () => {
   try {
-    const response = await api.get("/users/me");
+    const response = await api.get("/user/me");
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -17,7 +17,7 @@ export const getMyProfile = async () => {
  */
 export const saveFcmToken = async (tokenData) => {
   try {
-    const response = await api.post("/users/fcm-token", tokenData);
+    const response = await api.post("/user/fcm-token", tokenData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -29,7 +29,7 @@ export const saveFcmToken = async (tokenData) => {
  */
 export const requestAccountDeletion = async () => {
   try {
-    const response = await api.post("/users/deletion-request");
+    const response = await api.post("/user/deletion-request");
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -41,7 +41,7 @@ export const requestAccountDeletion = async () => {
  */
 export const approveUserDeletion = async (userId) => {
   try {
-    const response = await api.patch(`/users/${userId}/approve-deletion`);
+    const response = await api.patch(`/user/${userId}/approve-deletion`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -53,7 +53,7 @@ export const approveUserDeletion = async (userId) => {
  */
 export const getAllUsers = async (params = {}) => {
   try {
-    const response = await api.get("/users", {
+    const response = await api.get("/user", {
       params,
     });
 
@@ -68,7 +68,7 @@ export const getAllUsers = async (params = {}) => {
  */
 export const getUserById = async (userId) => {
   try {
-    const response = await api.get(`/users/${userId}`);
+    const response = await api.get(`/user/${userId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

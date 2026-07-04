@@ -83,6 +83,8 @@ import FailedOperationsPage from './pages/admin/failed-operations/FailedOperatio
 import FailedOperationDetails from './pages/admin/failed-operations/FailedOperationDetails.jsx'
 
 import CustomToaster from './components/CustomToaster.jsx';
+import AllUsersPage from './pages/admin/users/AllUsersPage.jsx';
+import UserDetails from './pages/admin/users/UserDetails.jsx';
 
 function App() {
 
@@ -192,6 +194,9 @@ function App() {
                   <Route path="/request-logs/:id" element={<RequestLogDetails/>} />
                   <Route path="/failed-operations" element={<FailedOperationsPage/>} />
                   <Route path="/failed-operations/:id" element={<FailedOperationDetails/>} />
+                  <Route path="/all-users" element={<AllUsersPage/>} />
+                  <Route path="/all-users/:id" element={<UserDetails/>}/>
+
                   
                 </Route>
 
