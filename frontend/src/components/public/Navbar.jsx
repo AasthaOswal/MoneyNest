@@ -37,8 +37,17 @@ const Navbar = () => {
             {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
           </button>
 
-           {!loading &&
-            (user ? (
+          <>
+            <Link to="/login" className="font-medium" style={{ color: 'var(--color-text)' }}>Login</Link>
+
+            <Link to="/signup" className="px-4 py-2 rounded font-medium text-white" style={{ backgroundColor: 'var(--color-primary)' }}>Sign Up</Link>
+          </>
+
+          
+
+
+           {!loading && user
+             (
               <>
                 <Link
                   to={getDashboardPath()}
@@ -49,13 +58,8 @@ const Navbar = () => {
                 </Link>
 
               </>
-            ) : (
-              <>
-                <Link to="/login" className="font-medium" style={{ color: 'var(--color-text)' }}>Login</Link>
-
-                <Link to="/signup" className="px-4 py-2 rounded font-medium text-white" style={{ backgroundColor: 'var(--color-primary)' }}>Sign Up</Link>
-              </>
-            ))}
+            ) 
+            }
         </div>
       </div>
     </nav>
