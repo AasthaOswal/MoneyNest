@@ -5,6 +5,9 @@ import User from "../models/user.model.js";
 import crypto from "crypto";
 import { createFamilySchema, joinFamilySchema, editFamilySchema } from "../validators/family.validation.js";
 import mongoose from "mongoose";
+import { executeRetryable } from "../utils/retryable/executeRetryable.js";
+import { createNotification } from "../utils/notification/createNotification.js";
+import { sendEmailBrevoNoAttachments } from "../utils/email/sendEmailBrevo.js";
 
 //later on add(not now):-
 /* 
@@ -542,4 +545,277 @@ export const getFamilyMember = async (req, res) => {
       message: "Error fetching member",
     });
   }
+};
+
+
+export const requestFamilyDeletion = async (req, res) => {
+
+    try {
+
+        if (req.user.role !== "familyAdmin") {
+            return res.status(403).json({
+                success: false,
+                message: "Only family admin can request deletion."
+            });
+        }
+
+        const family = await Family.findById(req.user.familyId);
+
+        if (!family) {
+            return res.status(404).json({
+                success: false,
+                message: "Family not found."
+            });
+        }
+
+        if (family.status === "pendingDeletion") {
+            return res.status(400).json({
+                success: false,
+                message: "Family deletion request already pending."
+            });
+        }
+
+        if (family.status === "deleted") {
+            return res.status(400).json({
+                success: false,
+                message: "Family has already been deleted."
+            });
+        }
+
+        const admin = await User.findOne({role: "admin"});
+        
+        await executeRetryable({
+            operationType: "db_notification",
+            payload: {
+                userId: admin._id,
+                title: "Family Deletion Request",
+                body: `User ${req.user._id} has requested family deletion for family: ${req.user.familyId}.`,
+                type: "family_deletion",
+                data: {
+                    requestedUserId: req.user._id,
+                    familyId: req.user.familyId
+                },
+            },
+
+            operation: () =>
+                createNotification({
+                    userId: admin._id,
+                    title: "Family Deletion Request",
+                    body: `User ${req.user._id} has requested family deletion for family: ${req.user.familyId}.`,
+                    type: "family_deletion",
+                    data: {
+                        requestedUserId: req.user._id,
+                        familyId: req.user.familyId
+                    },
+                }),
+        });
+
+
+        await executeRetryable({
+            operationType: "email",
+
+            payload: {
+                toEmail: admin.email,
+                subject: "Family Deletion Request",
+                htmlContent: `
+                    <p>User ${req.user._id} has requested family deletion for family: ${req.user.familyId}.</p>
+                `,
+            },
+
+            operation: () =>
+                sendEmailBrevoNoAttachments({
+                    toEmail: admin.email,
+                    subject: "Family Deletion Request",
+                    htmlContent: `
+                        <p>User ${req.user._id} has requested family deletion for family: ${req.user.familyId}.</p>
+                    `,
+                }),
+        });
+
+        family.status = "pendingDeletion";
+
+        family.inviteToken = null;
+        family.inviteTokenExpires = null;
+
+        await family.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Family deletion request submitted."
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to submit deletion request."
+        });
+
+    }
+
+};
+
+export const approveFamilyDeletion = async (req, res) => {
+
+    try {
+
+        const { familyId } = req.params;
+
+        const family = await Family.findById(familyId);
+
+        if (!family) {
+            return res.status(404).json({
+                success: false,
+                message: "Family not found."
+            });
+        }
+
+        if (family.status !== "pendingDeletion") {
+            return res.status(400).json({
+                success: false,
+                message: "Family is not awaiting deletion."
+            });
+        }
+
+        family.status = "deleted";
+
+        family.inviteToken = null;
+        family.inviteTokenExpires = null;
+
+        await family.save();
+
+        await User.updateMany(
+            { familyId: family._id },
+            {
+                $set: {
+                    familyId: null,
+                    role: "member"
+                }
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Family deleted successfully."
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete family."
+        });
+
+    }
+
+};
+
+
+export const getAllFamilies = async (req, res) => {
+    try {
+
+        const {
+            page = 1,
+            limit = 10,
+            status,
+            search,
+            sortBy = "createdAt",
+            sortOrder = "desc",
+        } = req.query;
+
+        const query = {};
+
+        if (status) {
+            query.status = status;
+        }
+
+        if (search) {
+            query.familyName = {
+                $regex: search,
+                $options: "i",
+            };
+        }
+
+        const skip = (page - 1) * limit;
+
+        const families = await Family.find(query)
+            .populate(
+                "familyAdmin",
+                "name email"
+            )
+            .sort({
+                [sortBy]: sortOrder === "asc" ? 1 : -1,
+            })
+            .skip(skip)
+            .limit(Number(limit));
+
+        const total = await Family.countDocuments(query);
+
+        return res.status(200).json({
+            success: true,
+            families,
+            pagination: {
+                page: Number(page),
+                limit: Number(limit),
+                total,
+                pages: Math.ceil(total / limit),
+            },
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch families.",
+        });
+
+    }
+};
+
+
+export const getFamilyById = async (req, res) => {
+    try {
+
+        const family = await Family.findById(req.params.familyId)
+            .populate(
+                "familyAdmin",
+                "name email role status"
+            );
+
+        if (!family) {
+            return res.status(404).json({
+                success: false,
+                message: "Family not found.",
+            });
+        }
+
+        const members = await User.find({
+            familyId: family._id,
+        }).select(
+            "name email role status createdAt"
+        );
+
+        return res.status(200).json({
+            success: true,
+            family,
+            members,
+            totalMembers: members.length,
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch family.",
+        });
+
+    }
 };

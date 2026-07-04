@@ -18,7 +18,13 @@ const familySchema = new mongoose.Schema({
     },
     inviteTokenExpires: {
         type: Date
-    }
+    },
+
+    status: {
+        type: String,
+        enum: ["active", "pendingDeletion", "deleted"],
+        default: "active",
+    },
 
 
 }, { timestamps: true });

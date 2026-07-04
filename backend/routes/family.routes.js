@@ -9,7 +9,10 @@ import {
   removeFamilyMember,
   leaveFamily,
   getFamilyMember,
-  transferFamilyAdmin
+  transferFamilyAdmin,
+  getAllFamilies,
+  getFamilyById,
+  requestFamilyDeletion
 } from "../controllers/family.controller.js";
 
 import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
@@ -79,4 +82,11 @@ router.patch(
   transferFamilyAdmin
 );
 
+
+router.get("/", authenticateToken, authorizeRoles("admin"), getAllFamilies);
+
+router.get("/:familyId", authenticateToken, authorizeRoles("admin"), getFamilyById);
+
+
+router.post("/request-deletion", authenticateToken, requireFamily, authorizeRoles("familyAdmin"), requestFamilyDeletion);
 export default router;

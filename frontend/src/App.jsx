@@ -59,6 +59,7 @@ import ManageFamily from './pages/family/ManageFamily';
 import LeaveFamily from "./pages/family/LeaveFamily";
 import RemoveFamilyMember from './pages/family/RemoveFamilyMember.jsx';
 import TransferFamilyAdmin from './pages/family/TransferFamilyAdmin.jsx';
+import RequestFamilyDeletion from './pages/family/RequestFamilyDeletion.jsx';
 
 // Dashboard pages
 import FamilyDashboard from './pages/dashboard/FamilyDashboard.jsx';
@@ -147,6 +148,7 @@ function App() {
                   <Route path="/family/create" element={<CreateFamily />} />
                   <Route path="/family/join" element={<JoinFamily />} />
                   <Route path="/family/leave" element={<LeaveFamily />} />
+                  <Route path="/family/request-delete" element={<RequestFamilyDeletion/>} />
 
                   {/* Categories related pages */}
                   <Route path="/categories" element={<CategoriesPage />} />

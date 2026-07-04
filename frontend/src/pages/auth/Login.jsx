@@ -40,12 +40,12 @@ const Login = () => {
 
       toast.success("Successful login.", {id:toastId});
 
-      if (loggedInUser.role === "admin") {
+      if (loggedInUser?.role === "admin") {
       navigate("/admin-dashboard", { replace: true });
 
-      } else if (loggedInUser.role === "member") {
+      } else if (loggedInUser?.role === "member") {
 
-          if (loggedInUser.familyId) {
+          if (loggedInUser?.familyId) {
               navigate("/dashboard/family", { replace: true });
           } else {
               navigate("/family/setup", { replace: true });
@@ -56,6 +56,7 @@ const Login = () => {
       }
     } catch (err) {
 
+      console.log(err.response)
       toast.error(err.response?.data?.message ||"Some error occured.", {id:toastId});
       console.log(err)
       setError(err.response?.data?.message || "Invalid email or password");

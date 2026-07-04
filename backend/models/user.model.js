@@ -73,6 +73,12 @@ export const userSchema = new mongoose.Schema({
         default:true
     },
 
+    status: {
+        type: String,
+        enum: ["active", "pendingDeletion", "deleted"],
+        default: "active",
+    },
+
 
     cloudinaryStorageId: {
         type: String,
@@ -91,11 +97,3 @@ export const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 export default User;
-
-/*
-    status: {
-        type: String,
-        enum: ["active", "pendingDeletion", "deleted"],
-        default: "active",
-    },
-*/

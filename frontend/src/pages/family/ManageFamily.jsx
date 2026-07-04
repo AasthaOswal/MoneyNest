@@ -223,6 +223,19 @@ const ManageFamily = () => {
                 ))}
               </div>
             </div>
+
+
+            {/* Request Family Delete */}
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 p-4 mt-8">
+              <p>Send request to admin to delete this family</p>
+
+              <button
+                onClick={()=>navigate("/family/request-delete")}
+                className="px-3 py-1.5 rounded-lg bg-error-bg text-error hover:border-border-hover border border-transparent transition-all text-sm hover:cursor-pointer"
+              >
+                Request Delete
+              </button>
+            </div>
           </div>
         )}
 

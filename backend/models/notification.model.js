@@ -20,7 +20,9 @@ const notificationSchema = new mongoose.Schema({
       "family",
       "reminder",
       "report",
-      "notification"
+      "notification",
+      "account_deletion",
+      "family_deletion"
     ],
   },
 

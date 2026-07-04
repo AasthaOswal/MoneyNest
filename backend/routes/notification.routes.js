@@ -14,7 +14,7 @@ import { requireFamily } from "../middlewares/family.middleware.js";
 const router = express.Router();
 
 // 🔐 Protected routes
-router.use(authenticateToken, requireFamily);
+router.use(authenticateToken);
 
 // 📋 Get all notifications
 router.get("/", getAllNotifications);

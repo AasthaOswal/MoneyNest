@@ -103,6 +103,19 @@ const transferFamilyAdmin = async (userId) => {
   }
 };
 
+const requestFamilyDeletion = async () => {
+  try {
+    const response = await api.post("/family/request-deletion");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error requesting family deletion:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+};
+
 
 const FamilyService = {
   createFamily,
@@ -112,7 +125,8 @@ const FamilyService = {
   leaveFamily,
   removeFamilyMember,
   getFamilyMember,
-  transferFamilyAdmin
+  transferFamilyAdmin,
+  requestFamilyDeletion
 };
 
 export default FamilyService;

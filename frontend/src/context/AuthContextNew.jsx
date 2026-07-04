@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error);
+            throw error;
         }finally{
             setLoading(false);
         }

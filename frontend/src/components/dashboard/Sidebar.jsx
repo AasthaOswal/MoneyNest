@@ -31,7 +31,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: 'Admin Dashboard', path: '/admin-dashboard', icon: ShieldCheck },
         { name: 'Request Logs', path:'/request-logs', icon:Logs},
         { name: 'Error Logs', path:'/error-logs', icon:AlertTriangle},
-        { name: 'Failed Operations', path:'/failed-operations', icon:XCircle}
+        { name: 'Failed Operations', path:'/failed-operations', icon:XCircle},
+        { name: 'Notifications', path:'/notifications', icon:XCircle}
         
       ]
     : [
