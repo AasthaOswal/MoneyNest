@@ -32,7 +32,7 @@ const Navbar = () => {
     backgroundColor: "var(--color-surface)",
   }}
 >
-  <div className="max-w-6xl mx-auto flex items-center justify-between px-3 sm:px-4 py-3">
+  <div className="max-w-7xl w-full mx-auto flex items-center justify-between px-3 sm:px-4 py-3">
     {/* Logo */}
     <div
       className="font-bold text-lg sm:text-xl shrink-0"
@@ -62,7 +62,7 @@ const Navbar = () => {
 
         <Link
           to="/signup"
-          className="hidden min-[500px]:inline-flex max-[500px]:rounded-lg rounded-xl font-medium whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-all duration-200 hover:bg-primary-hover bg-primary text-text-on-primary"
+          className="inline-flex max-[500px]:rounded-lg rounded-xl font-medium whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-all duration-200 hover:bg-primary-hover bg-primary text-text-on-primary"
         >
           Sign Up
         </Link>
