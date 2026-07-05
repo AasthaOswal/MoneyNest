@@ -39,6 +39,8 @@ import {globalErrorHandler} from "./middlewares/error.middleware.js";
 
 import { createNotification } from "./utils/notification/createNotification.js";
 
+import { startPersonalGoalTracker } from "./services/cron/goals/personalGoalTracker.cron.js";
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -109,6 +111,7 @@ if(process.env.START_AI_MONTHLY_REPORT_CRON === "true"){
 startAiMonthlyFinancialReportCron();
 }
 
+// startPersonalGoalTracker();
 
 // run cron job
 // startGoalTracker();

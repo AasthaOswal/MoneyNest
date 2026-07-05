@@ -22,7 +22,8 @@ const notificationSchema = new mongoose.Schema({
       "report",
       "notification",
       "account_deletion",
-      "family_deletion"
+      "family_deletion",
+      "goal_update"
     ],
   },
 

@@ -12,26 +12,20 @@ const goalSchema = new mongoose.Schema({
     required: true
   },
 
-  owner: {
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   },
 
   type: {
     type: String,
-    enum: ["income", "expense", "investment", "saving"],
+    enum: ["income", "expense", "investment", "preInvestmentSavings" ,"netSavings"],
     required: true
   },
 
   goalType: {
     type: String,
     enum: ["target", "limit"],
-    required: true
-  },
-
-  period: {
-    type: String,
-    enum: ["daily", "weekly", "monthly", "yearly"],
     required: true
   },
 
@@ -44,6 +38,22 @@ const goalSchema = new mongoose.Schema({
     type: String,
     enum: ["active", "completed", "failed"],
     default: "active"
+  },
+
+  visibility: {
+    type: String,
+    enum: ["family", "personal"],
+    default: "family"
+  },
+
+  startDate:{
+    type:Date,
+    required:true,
+  },
+
+  endDate:{
+    type:Date,
+    required:true,
   },
 
   lastNotifiedAt: {

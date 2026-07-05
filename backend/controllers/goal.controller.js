@@ -55,7 +55,7 @@ const getProgressForGoal = async (goal) => {
 // CREATE GOAL
 export const createGoal = async (req, res) => {
   try {
-    const { title, type, goalType, period, amount } = req.body;
+    const { title, type, goalType, startDate, endDate, amount, visibility } = req.body;
 
     if (!req.user?.familyId || !req.user?._id) {
       return res.status(401).json({
@@ -68,19 +68,20 @@ export const createGoal = async (req, res) => {
       title,
       type,
       goalType,
-      period,
+      startDate,
+      endDate,
+      visibility,
       amount,
       family: req.user.familyId,
-      owner: req.user._id,
+      createdBy: req.user._id,
     });
 
-    const progress = await getProgressForGoal(goal);
+    // const progress = await getProgressForGoal(goal);
 
     return res.status(201).json({
       success: true,
       goal: {
         ...goal.toObject(),
-        progress,
       },
     });
   } catch (err) {
@@ -89,6 +90,8 @@ export const createGoal = async (req, res) => {
       req,
       severity: "high",
     });
+
+    console.log(err)
 
     return res.status(500).json({
       success: false,
