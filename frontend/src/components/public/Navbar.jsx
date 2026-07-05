@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-// import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 
 
 
 const Navbar = () => {
-  // const { theme, toggleTheme } = useTheme();
 
   const {user,loading} = useAuth();
 
@@ -27,42 +25,67 @@ const Navbar = () => {
     return "/dashboard/family";
   };
   return (
-    <nav className="flex justify-between items-center p-4 shadow-sm sticky top-0 z-50 bg-surface border-b border-border" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
-      <div className='max-w-6xl mx-auto flex justify-between w-full'>
-        <div className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>
-          <Link to="/">WealthNest</Link>
-        </div>
-        <div className="flex gap-4 items-center">
-          {/* <button onClick={toggleTheme} className="p-2 rounded hover:bg-black/5 dark:hover:bg-white/10" style={{ color: 'var(--color-text)' }}>
-            {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-          </button> */}
+    <nav
+  className="sticky top-0 z-50 border-b shadow-sm"
+  style={{
+    borderColor: "var(--color-border)",
+    backgroundColor: "var(--color-surface)",
+  }}
+>
+  <div className="max-w-6xl mx-auto flex items-center justify-between px-3 sm:px-4 py-3">
+    {/* Logo */}
+    <div
+      className="font-bold text-lg sm:text-xl shrink-0"
+      style={{ color: "var(--color-primary)" }}
+    >
+      <Link to="/">WealthNest</Link>
+    </div>
 
-          <>
-            <Link to="/login" className="font-medium" style={{ color: 'var(--color-text)' }}>Login</Link>
+    {/* Right Side */}
+<div className="relative h-10 flex items-center justify-end min-w-45 sm:min-w-55">
 
-            <Link to="/signup" className="px-4 py-2 rounded font-medium text-white" style={{ backgroundColor: 'var(--color-primary)' }}>Sign Up</Link>
-          </>
+  {/* Guest Buttons */}
+  <div
+    className={`absolute right-0 flex items-center gap-2 sm:gap-4 transition-all duration-300 ease-in-out ${
+      loading || !user
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 -translate-y-2 pointer-events-none"
+    }`}
+  >
+    <Link
+      to="/login"
+      className="max-[500px]:rounded-lg rounded-xl font-medium whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-all duration-200 hover:bg-primary-hover bg-primary text-text-on-primary"
+    >
+      Login
+    </Link>
 
-          
+    <Link
+      to="/signup"
+      className="hidden min-[500px]:inline-flex max-[500px]:rounded-lg rounded-xl font-medium whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-all duration-200 hover:bg-primary-hover bg-primary text-text-on-primary"
+    >
+      Sign Up
+    </Link>
+  </div>
 
+  {/* Dashboard Button */}
+  <div
+    className={`absolute right-0 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]t ${
+      !loading && user
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 translate-y-2 pointer-events-none"
+    }`}
+  >
+    <Link
+      to={getDashboardPath()}
+      className="max-[500px]:rounded-lg rounded-xl font-medium whitespace-nowrap px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base transition-all duration-200 hover:opacity-90 bg-primary text-text-on-primary hover:bg-primary-hover"
+    >
+      Go to Dashboard
+    </Link>
+  </div>
 
-           {!loading && user &&
-             (
-              <>
-                <Link
-                  to={getDashboardPath()}
-                  className="px-4 py-2 rounded font-medium text-white"
-                  style={{ backgroundColor: "var(--color-primary)" }}
-                >
-                  Go to Dashboard
-                </Link>
-
-              </>
-            ) 
-            }
-        </div>
-      </div>
-    </nav>
+</div>
+  </div>
+</nav>
   );
 };
 

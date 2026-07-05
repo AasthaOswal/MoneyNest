@@ -37,6 +37,8 @@ import { startAiMonthlyFinancialReportCron } from "./services/cron/aiMonthlyFami
 
 import {globalErrorHandler} from "./middlewares/error.middleware.js";
 
+import { createNotification } from "./utils/notification/createNotification.js";
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -129,6 +131,17 @@ app.get("/test-cookie", (req, res) => {
   });
 
   res.status(200).send("Cookie sent");
+});
+
+app.get("/test-notification", async (req, res) => {
+    const notification = await createNotification({
+        userId: "69bd56ce68e2a684f848be3f",
+        familyId: null,
+        title: "Test Notification",
+        body: "Hello",
+    });
+
+    res.json(notification);
 });
 
 httpServer.listen(PORT, () => {
