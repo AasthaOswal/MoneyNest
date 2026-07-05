@@ -287,9 +287,9 @@ export const googleCallback = async (req, res) => {
     const { code, state } = req.query;
 
     // 🔐 STATE VALIDATION (CRITICAL)
-    // const storedState = req.cookies.google_oauth_state;
+    const storedState = req.cookies.google_oauth_state;
     
-    const storedState = "wrong_state_on_purpose_for_testing";
+    // const storedState = "wrong_state_on_purpose_for_testing";
 
     if (!state || state !== storedState) {
       res.clearCookie("google_oauth_state");
