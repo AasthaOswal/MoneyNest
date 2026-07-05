@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../axios/axios";
 import { useAuth } from "../../hooks/useAuth";
 import { getFCMToken } from "../../utils/createFcmToken";
@@ -13,10 +13,35 @@ const AuthCallback = () => {
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
+  const [searchParams] = useSearchParams();
+
+  const messages = {
+    INVALID_STATE: "Authentication failed. Please try again.",
+    MISSING_CODE: "Authorization code was missing.",
+    TOKEN_EXCHANGE_FAILED: "Couldn't complete Google sign in.",
+    FAILED_TO_FETCH_GOOGLE_USER: "Couldn't retrieve your Google profile.",
+    EMAIL_NOT_VERIFIED: "Your Google email address is not verified.",
+    GOOGLE_ACCOUNT_HAS_NO_EMAIL: "Your Google account doesn't have an email address.",
+    ACCOUNT_PENDING_DELETION: "Your account is pending deletion.",
+    ACCOUNT_DELETED: "This account has been deleted.",
+    GOOGLE_LOGIN_FAILED: "Google login failed. Please try again."
+  };
+
   useEffect(() => {
     const initAuth = async () => {
         console.log("inside initAuth")
       try {
+        const error = searchParams.get("error");
+
+        if (error) {
+          toast.error(messages[error] || "Some error occured. Please try again later.");
+
+          setTimeout(() => {
+            navigate("/", { replace: true });
+          }, 1000);
+
+          return;
+        }
         const res = await api.get("/user/me", { skipAuthRefresh: true, withCredentials:true });
         console.log(res);
         const user = res.data.user;
@@ -102,9 +127,9 @@ const AuthCallback = () => {
     };
 
     initAuth();
-  }, [navigate, setUser]);
+  }, [navigate, setUser, searchParams]);
 
-  return <div>Logging you in. Please wait.....</div>;
+  return <div>We are processing your request.Please wait.....</div>;
 };
 
 export default AuthCallback;

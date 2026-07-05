@@ -67,6 +67,16 @@ const getSafeUser = (user) => {
   };
 };
 
+const redirectSuccess = (res) => {
+  return res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
+};
+
+const redirectError = (res, code) => {
+  return res.redirect(
+    `${process.env.CLIENT_URL}/auth/callback?error=${encodeURIComponent(code)}`
+  );
+};
+
 // =======================
 // 🟢 LOCAL SIGNUP
 // =======================
@@ -277,22 +287,18 @@ export const googleCallback = async (req, res) => {
     const { code, state } = req.query;
 
     // 🔐 STATE VALIDATION (CRITICAL)
-    const storedState = req.cookies.google_oauth_state;
+    // const storedState = req.cookies.google_oauth_state;
+    
+    const storedState = "wrong_state_on_purpose_for_testing";
 
     if (!state || state !== storedState) {
-      res.clearCookie("google_oauth_state"); 
-      return res.status(401).json({
-        success: false,
-        message: "Invalid state (CSRF detected)"
-      });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "INVALID_STATE");
     }
 
     if (!code) {
-      res.clearCookie("google_oauth_state"); 
-      return res.status(400).json({
-        success: false,
-        message: "Authorization code missing"
-      });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "MISSING_CODE");
     }
 
   // cleanup
@@ -317,11 +323,8 @@ export const googleCallback = async (req, res) => {
 
     if (!tokenRes.ok) {
       console.log(tokenData);
-      res.clearCookie("google_oauth_state"); 
-      return res.status(400).json({
-        success: false,
-        message: "Token exchange failed"
-      });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "TOKEN_EXCHANGE_FAILED");
     }
 
     // 2️⃣ Get user info
@@ -332,20 +335,15 @@ export const googleCallback = async (req, res) => {
     });
 
     if (!userRes.ok) {
-      res.clearCookie("google_oauth_state"); 
-      return res.status(400).json({
-        success: false,
-        message: "Failed to fetch Google user"
-      });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "FAILED_TO_FETCH_GOOGLE_USER");
     }
 
     const googleUser = await userRes.json();
 
     if (!googleUser.email_verified) {
-      return res.status(400).json({
-        success: false,
-        message: "Google account email is not verified"
-      });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "EMAIL_NOT_VERIFIED");
     }
     
 
@@ -355,11 +353,8 @@ export const googleCallback = async (req, res) => {
 
 
     if (!googleUser.email) {
-      res.clearCookie("google_oauth_state"); 
-      return res.status(400).json({
-        success: false,
-        message: "Google account has no email"
-      });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "GOOGLE_ACCOUNT_HAS_NO_EMAIL");
     }
 
     let user = await User.findOne({ googleId });
@@ -392,17 +387,13 @@ export const googleCallback = async (req, res) => {
 
         
     if (user.status === "pendingDeletion") {
-        return res.status(403).json({
-            success: false,
-            message: "Your account is pending deletion."
-        });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "ACCOUNT_PENDING_DELETION");
     }
 
     if (user.status === "deleted") {
-        return res.status(403).json({
-            success: false,
-            message: "This account has been deleted."
-        });
+      res.clearCookie("google_oauth_state");
+      return redirectError(res, "ACCOUNT_DELETED");
     }
 
     // =========================
@@ -415,15 +406,13 @@ export const googleCallback = async (req, res) => {
 
     sendToken(res, token);
     
-    return res.redirect(`${process.env.CLIENT_URL}/auth/callback`);
+    return redirectSuccess(res);
 
   } catch (err) {
     console.error("Google OAuth Error:", err);
+
     res.clearCookie("google_oauth_state");
-    return res.status(500).json({
-      success: false,
-      message: "Google login failed"
-    });
+    return redirectError(res, "GOOGLE_LOGIN_FAILED");
   }
 };
 
