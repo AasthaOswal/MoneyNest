@@ -89,6 +89,72 @@ const GoalDetails = () => {
     });
   };
 
+  const getTrackingValue = (totals, type) => {
+  switch (type) {
+    case "income":
+      return totals.income;
+
+    case "expense":
+      return totals.expense;
+
+    case "investment":
+      return totals.investment;
+
+    case "preInvestmentSavings":
+      return totals.income - totals.expense;
+
+    case "netSavings":
+      return totals.income - totals.expense - totals.investment;
+
+    default:
+      return 0;
+  }
+};
+
+const getTrackingLabel = (type) => {
+  switch (type) {
+    case "income":
+      return "Income Recorded";
+
+    case "expense":
+      return "Expenses Recorded";
+
+    case "investment":
+      return "Investments Recorded";
+
+    case "preInvestmentSavings":
+      return "Pre-Investment Savings";
+
+    case "netSavings":
+      return "Net Savings";
+
+    default:
+      return "Tracked Value";
+  }
+};
+
+const getTrackingDescription = (type) => {
+  switch (type) {
+    case "income":
+      return "Total income counted towards this goal.";
+
+    case "expense":
+      return "Total expenses counted towards this goal.";
+
+    case "investment":
+      return "Total investments counted towards this goal.";
+
+    case "preInvestmentSavings":
+      return "Income minus expenses during the goal period.";
+
+    case "netSavings":
+      return "Income minus expenses and investments during the goal period.";
+
+    default:
+      return "";
+  }
+};
+
   return (
     <div className="min-h-screen bg-bg p-4 md:p-6">
       <div className="max-w-4xl mx-auto">
@@ -126,49 +192,106 @@ const GoalDetails = () => {
           </div>
 
           {/* Progress Section */}
-          <div className="p-6 md:p-8 border-b border-divider bg-surface/50">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-text-secondary font-medium flex items-center gap-2">
-                <TrendingUp size={16} className="text-primary" />
-                Goal Progress
-              </span>
-              <span className="text-sm font-bold text-text">
-                {goal.progress?.progress}%
-              </span>
+          {/* ========================= Goal Summary ========================= */}
+          <div className="p-6 md:p-8 border-b border-divider">
+            <div
+              className={`rounded-2xl  p-5 ${
+                goal.progress.hasExceededLimit
+                  ? "bg-error-bg/50 "
+                  : goal.status === "completed"
+                  ? "bg-success-bg/50 "
+                  : "bg-primary-subtle "
+              }`}
+            >
+              <p className="text-xs uppercase tracking-wide text-muted mb-2">
+                Goal Summary
+              </p>
+
+              <p className="text-lg font-medium text-text leading-relaxed">
+                {goal.goalSummary?.message}
+              </p>
             </div>
-            
-            {/* Progress Bar Container */}
-            <div className="w-full bg-surface-3 h-3 rounded-full overflow-hidden border border-border">
-              <div 
-                className={`h-full transition-all duration-500 rounded-full ${
-                  goal.progress?.hasExceededLimit ? 'bg-error' : 'bg-success'
-                }`}
-                style={{ width: `${Math.min(goal.progress?.progress || 0, 100)}%` }}
-              />
+          </div>
+
+          {/* ========================= Goal Metrics ========================= */}
+          <div className="p-6 md:p-8 border-b border-divider">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+              {/* Target / Limit */}
+              <div className="bg-surface-2 border border-border rounded-2xl p-4">
+                <p className="text-xs text-muted mb-1">
+                  {goal.goalType === "target" ? "Target Amount" : "Limit Amount"}
+                </p>
+
+                <p className="text-xl font-bold text-primary">
+                  ₹{goal.progress.targetAmount.toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              {/* Current */}
+              <div className="bg-surface-2 border border-border rounded-2xl p-4">
+                <p className="text-xs text-muted mb-1">
+                  {goal.goalType === "target"
+                    ? "Current Value"
+                    : "Current Usage"}
+                </p>
+
+                <p className="text-xl font-bold text-text">
+                  ₹{goal.progress.currentAmount.toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              {/* Remaining / Exceeded */}
+              <div className="bg-surface-2 border border-border rounded-2xl p-4">
+                <p className="text-xs text-muted mb-1">
+                  {goal.progress.hasExceededLimit
+                    ? "Exceeded By"
+                    : "Remaining"}
+                </p>
+
+                <p
+                  className={`text-xl font-bold ${
+                    goal.progress.hasExceededLimit
+                      ? "text-error"
+                      : "text-success"
+                  }`}
+                >
+                  ₹
+                  {(
+                    goal.progress.hasExceededLimit
+                      ? goal.progress.exceededAmount
+                      : goal.progress.remainingAmount
+                  ).toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              {/* Progress */}
+              <div className="bg-surface-2 border border-border rounded-2xl p-4">
+                <p className="text-xs text-muted mb-1">Progress</p>
+
+                <p className="text-xl font-bold text-text">
+                  {goal.progress.progress}%
+                </p>
+              </div>
             </div>
 
-            {/* Quick Metrics Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-              <div className="bg-surface-2 border border-border rounded-xl p-3">
-                <p className="text-xs text-muted">Current Amount</p>
-                <p className="text-base font-semibold text-text mt-0.5">
-                  ₹ {Number(goal.progress?.currentAmount).toLocaleString("en-IN")}
-                </p>
-              </div>
-              <div className="bg-surface-2 border border-border rounded-xl p-3">
-                <p className="text-xs text-muted">Remaining Balance</p>
-                <p className={`text-base font-semibold mt-0.5 ${goal.progress?.remainingAmount < 0 ? 'text-error' : 'text-text'}`}>
-                  ₹ {Number(goal.progress?.remainingAmount).toLocaleString("en-IN")}
-                </p>
-              </div>
-              {goal.progress?.exceededAmount > 0 && (
-                <div className="bg-error-bg border border-error/20 rounded-xl p-3 col-span-2 md:col-span-1">
-                  <p className="text-xs text-error">Exceeded Amount</p>
-                  <p className="text-base font-semibold text-error mt-0.5">
-                    ₹ {Number(goal.progress?.exceededAmount).toLocaleString("en-IN")}
-                  </p>
-                </div>
-              )}
+            {/* Tracking Value */}
+            <div className="mt-6 bg-surface border border-border rounded-2xl p-5">
+              <p className="text-xs uppercase tracking-wide text-muted mb-2">
+                Tracking Value
+              </p>
+
+              <h3 className="text-lg font-semibold text-text">
+                {getTrackingLabel(goal.type)}
+              </h3>
+
+              <p className="text-3xl font-bold text-primary mt-2">
+                ₹{getTrackingValue(goal.progress.totals, goal.type).toLocaleString("en-IN")}
+              </p>
+
+              <p className="text-sm text-text-secondary mt-2">
+                {getTrackingDescription(goal.type)}
+              </p>
             </div>
           </div>
 
@@ -225,19 +348,7 @@ const GoalDetails = () => {
               </div>
             </div>
 
-            {/* Target Settings Summary Box */}
-            <div className="flex items-start gap-3">
-              <Target size={18} className="text-primary mt-1 shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm text-muted mb-1">Target Configurations</p>
-                <div className="bg-surface-2 border border-border rounded-xl p-4">
-                  <p className="text-text text-sm leading-relaxed">
-                    This financial target tracks active <span className="text-warning font-medium">{goal.type}</span> patterns. 
-                    It operates structurally as a tracking <span className="text-primary font-medium">{goal.goalType}</span> parameters config.
-                  </p>
-                </div>
-              </div>
-            </div>
+
 
             {/* Actions Footer Panel */}
             <div className="pt-6 border-t border-divider">

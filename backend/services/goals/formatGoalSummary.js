@@ -1,10 +1,12 @@
 // utils/goals/formatGoalSummary.js
 
+import { escape } from "querystring";
+
 const formatCurrency = (amount) => {
     return `₹${Number(amount).toLocaleString("en-IN")}`;
 };
 
-const getGoalStatusMessage = ({ goal, progress }) => {
+const getGoalStatusMessage = ({ goal, progress, }) => {
     const progressPercent = Number(progress.progress).toFixed(2);
 
     // Goal hasn't started
@@ -81,7 +83,7 @@ const getGoalStatusMessage = ({ goal, progress }) => {
     return `✅ "${goal.title}" is well within its limit (${progressPercent}% used).`;
 };
 
-export const formatGoalSummary = ({ goal, progress }) => {
+export const formatGoalSummary = ({ goal, progress, getOnlyMessage=false  }) => {
     const progressPercent = Number(progress.progress).toFixed(2);
 
     const message = getGoalStatusMessage({ goal, progress });
@@ -148,14 +150,24 @@ export const formatGoalSummary = ({ goal, progress }) => {
 
     `;
 
-    return {
-        emailHtml,
-        notificationTitle: "Personal Goal Update",
-        notificationBody,
-        goalMessage: {
-            goalId: goal._id,
-            title: goal.title,
-            message,
-        },
-    };
+    if(getOnlyMessage === false){
+
+        return {
+            emailHtml,
+            notificationTitle: "Personal Goal Update",
+            notificationBody,
+            goalMessage: {
+                goalId: goal._id,
+                title: goal.title,
+                message,
+            },
+        }
+
+    }else{
+        return {
+            message
+        }
+    }
+
+    
 };

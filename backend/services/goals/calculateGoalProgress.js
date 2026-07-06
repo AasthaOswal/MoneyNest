@@ -10,12 +10,22 @@ const calculateGoalProgress = async (goal) => {
 
     // Family goal
     if (goal.visibility === "family") {
-        match.family = goal.family;
+        match.family =
+            typeof goal.family === "object"
+                ? goal.family._id
+                : goal.family;
     }
+
+    
+
+
 
     // Private goal
     else {
-        match.user = goal.createdBy;
+        match.user =
+            typeof goal.createdBy === "object"
+                ? goal.createdBy._id
+                : goal.createdBy;
     }
 
     const totals = await Transaction.aggregate([

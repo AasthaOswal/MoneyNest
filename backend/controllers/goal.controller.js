@@ -4,7 +4,7 @@ import Transaction from "../models/transaction.model.js";
 import { getDateRange } from "../utils/goals/getDateRange.js";
 import { errorLogger } from "../utils/logger/errorLogger.js";
 import calculateGoalProgress from "../services/goals/calculateGoalProgress.js"
-
+import { formatGoalSummary } from "../services/goals/formatGoalSummary.js";
 
 
 // GET ALL GOALS FOR FAMILY
@@ -87,10 +87,15 @@ export const getAllGoals = async (req, res) => {
             });
 
         const goalsWithProgress = await Promise.all(
-            goals.map(async (goal) => ({
-                ...goal.toObject(),
-                progress: await calculateGoalProgress(goal),
-            }))
+            goals.map(async (goal) => {
+                const progress = await calculateGoalProgress(goal);
+
+                return {
+                    ...goal.toObject(),
+                    progress,
+                    goalSummary: formatGoalSummary({goal, progress, getOnlyMessage:true}),
+                };
+            })
         );
 
         return res.status(200).json({
@@ -155,12 +160,14 @@ export const getGoalById = async (req, res) => {
         }
 
         const progress = await calculateGoalProgress(goal);
+        const goalSummary = formatGoalSummary({goal, progress, getOnlyMessage:true});
 
         return res.status(200).json({
             success: true,
             goal: {
                 ...goal.toObject(),
                 progress,
+                goalSummary
             },
         });
     } catch (error) {
@@ -187,12 +194,18 @@ export const createGoal = async (req, res) => {
             visibility,
         } = req.body;
 
+        const goalStartDate = new Date(startDate);
+        goalStartDate.setHours(0, 0, 0, 0);
+
+        const goalEndDate = new Date(endDate);
+        goalEndDate.setHours(23, 59, 59, 999);
+
         const goal = await Goal.create({
             title,
             description,
             amount,
-            startDate,
-            endDate,
+            startDate:goalStartDate,
+            endDate:goalEndDate,
             type,
             goalType,
             visibility,

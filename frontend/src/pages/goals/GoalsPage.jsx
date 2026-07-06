@@ -12,7 +12,9 @@ import {
   Target,
   Shield,
   Layers,
-  DollarSign
+  DollarSign,
+  Users,
+  Lock
 } from "lucide-react";
 
 // Assuming GoalService and FilterSelect are implemented in your standard directories
@@ -108,7 +110,7 @@ const GoalsPage = () => {
   }, []);
 
   return (
-    <div className="bg-bg min-h-[calc(100vh-64px)] p-0 sm:p-4 md:p-8 flex flex-col items-center">
+    <div className="bg-bg min-h-[calc(100vh-64px)]  flex flex-col items-center p-4 sm:p-6">
       <div className="w-full max-w-7xl space-y-6">
         
         {/* Header Segment */}
@@ -215,20 +217,20 @@ const GoalsPage = () => {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-2 border border-border text-text-secondary hover:bg-surface-3 hover:cursor-pointer transition-colors"
             >
               <RotateCcw size={16} />
-              Clear Configurations
+              Clear Filters
             </button>
             <button
               onClick={fetchGoals}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-text-on-primary hover:bg-primary-hover font-medium hover:cursor-pointer transition-colors"
             >
               <Search size={16} />
-              Query Analytics Engine
+              Search
             </button>
           </div>
         </div>
 
         {/* Primary Data Output Node Matrix */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 min-h-[50vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 min-h-[50vh]">
           {!loading &&
             goals.map((goal) => {
               // Standardizing progress values safe for fallback layout operations
@@ -237,70 +239,85 @@ const GoalsPage = () => {
               return (
                 <div
                   key={goal._id}
-                  className="bg-card border border-border rounded-2xl p-5 shadow-card transition-all hover:bg-card-hover h-fit flex flex-col justify-between"
+                  className="bg-card border border-border rounded-2xl p-5 shadow-card transition-all  h-fit flex flex-col justify-between"
                 >
                   <div>
                     {/* Header: Identity tags + Current State status updates */}
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="flex flex-col gap-2 max-w-[75%]">
+                    <div className="flex flex-col gap-2 max-w-[75%]">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${getTypeClasses(goal.type)}`}>
+                          <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold uppercase tracking-wider ${getTypeClasses(goal.type)}`}>
                             {goal.type}
                           </span>
-                          <span className={`px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide capitalize ${getStatusClasses(goal.status)}`}>
+                          <span className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold tracking-wide capitalize ${getStatusClasses(goal.status)}`}>
                             {goal.status}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold tracking-wide capitalize bg-primary-subtle text-primary`}>
+                            {goal.visibility}
                           </span>
                         </div>
                         <h3 className="text-base text-text font-bold break-words mt-1">
                           {goal.title}
                         </h3>
                       </div>
-                      
-                      {/* Privacy Strategy Icon indicator */}
-                      <span className={`p-2 rounded-xl text-xs ${goal.visibility === 'family' ? 'bg-primary-subtle text-primary' : 'bg-surface-3 text-text-secondary'}`} title={`${goal.visibility} visibility scope`}>
-                        <Shield size={16} />
-                      </span>
+
+          
+
+                    <div className="mt-5 rounded-xl flex flex-wrap justify-between items-center">
+                        <p className="text-base uppercase tracking-wider text-text-secondary font-semibold">
+                            {goal.goalType === "target"
+                                ? "Target Amount"
+                                : "Maximum Limit"}
+                        </p>
+
+                        <h2 className="mt-1 text-base font-semibold text-text">
+                            ₹{goal.amount.toLocaleString("en-IN")}
+                        </h2>
+
+
                     </div>
 
-                    {/* Numeric Tracking Information Block */}
-                    <div className="mt-4 bg-surface-2 rounded-xl p-3 border border-border flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <DollarSign size={16} className="text-muted" />
-                        <span className="text-xs text-text-secondary">Allocation Target</span>
-                      </div>
-                      <span className="text-sm font-mono font-bold text-text">
-                        {goal.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                      </span>
+                    
+
+                  {/* Summary */}
+                  <div className="mt-4 rounded-xl bg-surface-2 border border-border p-3">
+                    <p className="text-sm text-text-secondary">
+                      {goal.goalSummary.message}
+                    </p>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex justify-between items-center flex-wrap gap-3 mt-4">
+                    <div>
+                      <p className="text-xs text-text-secondary">
+                        {goal.goalType === "target" ? "Current" : "Spent"}
+                      </p>
+                      <p className="font-semibold">
+                        ₹{goal.progress.currentAmount.toLocaleString("en-IN")}
+                      </p>
                     </div>
 
-                    {/* Progress Engine UI Node */}
-                    <div className="mt-4 space-y-2">
-                      <div className="flex justify-between items-center text-xs text-text-secondary">
-                        <div className="flex items-center gap-1.5">
-                          <Target size={14} className="text-muted" />
-                          <span className="capitalize">{goal.goalType} Strategy</span>
-                        </div>
-                        <span className="font-mono font-semibold text-text">{progressPct.toFixed(1)}%</span>
-                      </div>
-                      
-                      {/* Progress Bar Track wrapper */}
-                      <div className="w-full bg-input-bg rounded-full h-2 overflow-hidden border border-border">
-                        <div
-                          className={`h-full transition-all duration-500 rounded-full ${
-                            goal.goalType === "limit" && progressPct > 90
-                              ? "bg-error"
-                              : "bg-primary"
-                          }`}
-                          style={{ width: `${progressPct}%` }}
-                        />
-                      </div>
-                    </div>
+                    <div>
+                      <p className="text-xs text-text-secondary">
+                        {goal.goalType === "target" ? "Remaining" : goal.progress.hasExceededLimit ? "Exceeded" : "Remaining"}
+                      </p>
 
-                    {/* Meta Data Context Rows (Family vs Personal Created By) */}
+                      <p className="font-semibold">
+                        ₹{(
+                          goal.progress.hasExceededLimit
+                            ? goal.progress.exceededAmount
+                            : goal.progress.remainingAmount
+                        ).toLocaleString("en-IN")}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Meta Data Context Rows (Family vs Personal Created By) */}
                     <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-divider text-[11px] text-text-secondary">
                       <div className="flex items-center gap-1.5 truncate">
-                        <Layers size={13} className="text-muted shrink-0" />
-                        <span className="truncate">{goal.family?.familyName || "System Block"}</span>
+                        <Calendar size={13} />
+                      <span>
+                        {new Date(goal.startDate).toLocaleDateString()} - {new Date(goal.endDate).toLocaleDateString()}
+                      </span>
                       </div>
                       <div className="flex items-center gap-1.5 justify-end truncate">
                         <span className="truncate text-muted">By: {goal.createdBy?.name || "Anonymous"}</span>
@@ -309,15 +326,7 @@ const GoalsPage = () => {
                   </div>
 
                   {/* Actions Bar Footer Control Block */}
-                  <div>
-                    <div className="mt-4 pt-3 border-t border-divider flex items-center gap-1.5 text-[11px] text-muted">
-                      <Calendar size={13} />
-                      <span>
-                        {new Date(goal.startDate).toLocaleDateString()} - {new Date(goal.endDate).toLocaleDateString()}
-                      </span>
-                    </div>
-
-                    <div className="flex gap-2 mt-4">
+                  <div className="flex gap-2 mt-4">
                       <button
                         onClick={() => navigate(`/goals/${goal._id}`)}
                         className="flex-1 inline-flex justify-center items-center gap-2 py-2 rounded-xl bg-primary-subtle text-primary hover:cursor-pointer hover:bg-primary-subtle/80 transition-colors text-xs font-semibold"
@@ -327,7 +336,6 @@ const GoalsPage = () => {
                       </button>
 
                     </div>
-                  </div>
                 </div>
               );
             })}
