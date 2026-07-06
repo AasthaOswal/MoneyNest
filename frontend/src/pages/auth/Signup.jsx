@@ -43,7 +43,7 @@ const Signup = () => {
 
     try {
       const loggedInUser = await signup(form);
-      console.log(loggedInUser);
+      console.log("From signup.jsx, loggedInUser: ", loggedInUser);
 
       toast.success("Successful singup.", {id:toastId});
       

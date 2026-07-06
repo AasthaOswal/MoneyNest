@@ -132,6 +132,8 @@ export const signup = async (req, res) => {
 
         sendToken(res, token)
 
+        console.log( "From singup controller : ", user);
+
         return res.status(201).json({ success: true, user: getSafeUser(user),});
 
     } catch (err) {
