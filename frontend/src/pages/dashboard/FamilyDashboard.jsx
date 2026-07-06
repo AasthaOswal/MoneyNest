@@ -184,11 +184,11 @@ const FamilyDashboard = () => {
           color="text-investment"
         />
 
-        <Card title="Balance" value={summary.balance} color="text-primary" />
+        <Card title="Net Savings" value={summary.netSavings} color="text-primary" />
 
         <Card
-          title="Total Gains"
-          value={summary.totalGains}
+          title="Pre Investment Savings"
+          value={summary.preInvestmentSavings}
           color="text-success"
         />
 

@@ -265,20 +265,20 @@ categoryStats.forEach(cat => {
 
 
     // 🔹 Derived values
-    const balance =
+    const netSavings =
       formattedSummary.income -
       formattedSummary.expense -
       formattedSummary.investment;
 
-    const totalGains = balance + formattedSummary.investment;
+    const preInvestmentSavings = formattedSummary.income - formattedSummary.expense;
 
     return res.status(200).json({
       success: true,
       data: {
         summary: {
           ...formattedSummary,
-          balance,
-          totalGains
+          netSavings,
+          preInvestmentSavings
         },
         totalTransactions: totalCounts[0]?.totalTransactions || 0,
         categoryStats: groupedCategoryStats,
@@ -416,20 +416,20 @@ export const individualDashboardController = async (req, res) => {
       formattedSummary[item._id] = item.totalAmount;
     });
 
-    const balance =
+    const netSavings =
       formattedSummary.income -
       formattedSummary.expense -
       formattedSummary.investment;
 
-    const totalGains = balance + formattedSummary.investment;
+    const preInvestmentSavings = formattedSummary.income - formattedSummary.expense;
 
     return res.status(200).json({
       success: true,
       data: {
         summary: {
           ...formattedSummary,
-          balance,
-          totalGains
+          preInvestmentSavings,
+          netSavings
         },
         totalTransactions: totalCounts[0]?.totalTransactions || 0,
         categoryStats,
