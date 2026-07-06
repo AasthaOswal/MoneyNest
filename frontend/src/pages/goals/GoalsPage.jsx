@@ -14,7 +14,8 @@ import {
   Layers,
   DollarSign,
   Users,
-  Lock
+  Lock,
+  Plus
 } from "lucide-react";
 
 // Assuming GoalService and FilterSelect are implemented in your standard directories
@@ -60,7 +61,7 @@ const GoalsPage = () => {
       
       if (response.success) {
         setGoals(response.goals);
-        toast.success("Goals updated successfully", { id: toastId });
+        toast.success("Goals fetched successfully", { id: toastId });
       } else {
         throw new Error(response.message || "Failed to fetch goals.");
       }
@@ -121,6 +122,13 @@ const GoalsPage = () => {
               Track targets, spend ceilings, savings benchmarks, and multi-tenant family allocations.
             </p>
           </div>
+          <button
+            onClick={()=>navigate("/goals/create")}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-text-on-primary hover:bg-primary-hover font-medium hover:cursor-pointer transition-colors"
+          >
+            <Plus size={16} />
+            Create Goal
+          </button>
         </div>
 
         {/* Dynamic Contextual Filters Grid */}
