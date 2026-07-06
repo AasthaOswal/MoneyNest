@@ -41,6 +41,8 @@ import { createNotification } from "./utils/notification/createNotification.js";
 
 import { startPersonalGoalTracker } from "./services/cron/goals/personalGoalTracker.cron.js";
 
+import { startFamilyGoalTracker } from "./services/cron/goals/familyGoalTracker.cron.js";
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -111,7 +113,8 @@ if(process.env.START_AI_MONTHLY_REPORT_CRON === "true"){
 startAiMonthlyFinancialReportCron();
 }
 
-// startPersonalGoalTracker();
+startPersonalGoalTracker();
+startFamilyGoalTracker();
 
 // run cron job
 // startGoalTracker();

@@ -8,11 +8,11 @@ import { executeRetryable } from "../../../utils/retryable/executeRetryable.js";
 import { sendEmailBrevoNoAttachments } from "../../../utils/email/sendEmailBrevo.js";
 import { createNotification } from "../../../utils/notification/createNotification.js";
 
-// runs every 3 minutes - deployed testing
-// const PERSONAL_GOAL_TRACKER_CRON = "*/3 * * * *";
+// runs every 5 minutes - deployed testing
+const PERSONAL_GOAL_TRACKER_CRON = "*/5 * * * *";
 
 // runs every minute - localhost testing
-const PERSONAL_GOAL_TRACKER_CRON = "* * * * *";
+// const PERSONAL_GOAL_TRACKER_CRON = "* * * * *";
 
 // every day at 9:00 AM
 // const PERSONAL_GOAL_TRACKER_CRON = "0 9 * * *";
@@ -58,55 +58,56 @@ export const startPersonalGoalTracker = () => {
                     // Include all personal goal summaries
                     // ===========================================
 
+                    await executeRetryable({
+                        operationType: "email",
+            
+                        payload: {
+                            toEmail: user.email,
+                            subject: "Weekly Goal Update",
+                            htmlContent: `
+                                <p>Here is your goal summary: ${goalSummaries}</p>
+                            `,
+                        },
+            
+                        operation: () =>
+                            sendEmailBrevoNoAttachments({
+                                toEmail: user.email,
+                                subject: "Weekly Goal Update",
+                                htmlContent: `
+                                    <p>Here is your goal summary: ${goalSummaries}</p>
+                                `,
+                            }),
+                    });
+
                     // ===========================================
                     // CREATE ONE DATABASE NOTIFICATION
                     // ===========================================
 
-                            await executeRetryable({
-                                operationType: "db_notification",
-                                payload: {
-                                    userId: user._id,
-                                    title: "Weekly Goals Update",
-                                    body: `Your  goal summary: ${goalSummaries}`,
-                                    type: "goal_update",
-                                    data: {
-                                            goalSummaries
-                                        },
+                    await executeRetryable({
+                        operationType: "db_notification",
+                        payload: {
+                            userId: user._id,
+                            title: "Weekly Goals Update",
+                            body: `Your  goal summary: ${goalSummaries}`,
+                            type: "goal_update",
+                            data: {
+                                    goalSummaries
                                 },
-                    
-                                operation: () =>
-                                    createNotification({
-                                        userId: user._id,
-                                        title: "Weekly Goals Update",
-                                        body: `Your  goal summary: ${goalSummaries}`,
-                                        type: "goal_update",
-                                        data: {
-                                            goalSummaries
-                                        },
-                                    }),
-                            });
-                    
-                    
-                            await executeRetryable({
-                                operationType: "email",
-                    
-                                payload: {
-                                    toEmail: user.email,
-                                    subject: "Weekly Goal Update",
-                                    htmlContent: `
-                                        <p>Here is your goal summary: ${goalSummaries}</p>
-                                    `,
+                        },
+            
+                        operation: () =>
+                            createNotification({
+                                userId: user._id,
+                                title: "Weekly Goals Update",
+                                body: `Your  goal summary: ${goalSummaries}`,
+                                type: "goal_update",
+                                data: {
+                                    goalSummaries
                                 },
-                    
-                                operation: () =>
-                                    sendEmailBrevoNoAttachments({
-                                        toEmail: user.email,
-                                        subject: "Weekly Goal Update",
-                                        htmlContent: `
-                                            <p>Here is your goal summary: ${goalSummaries}</p>
-                                        `,
-                                    }),
-                            });
+                            }),
+                    });
+            
+            
                 }
 
                 console.log(

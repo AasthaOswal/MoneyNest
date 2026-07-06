@@ -5,8 +5,12 @@ import User from "../../../models/user.model.js";
 import Goal from "../../../models/goal.model.js";
 import calculateGoalProgress from "../../goals/calculateGoalProgress.js";
 
-// runs every 3 minutes - deployed testing
-const FAMILY_GOAL_TRACKER_CRON = "*/3 * * * *";
+import { executeRetryable } from "../../../utils/retryable/executeRetryable.js";
+import { sendEmailBrevoNoAttachments } from "../../../utils/email/sendEmailBrevo.js";
+import { createNotification } from "../../../utils/notification/createNotification.js";
+
+// runs every 5 minutes - deployed testing
+const FAMILY_GOAL_TRACKER_CRON = "*/5 * * * *";
 
 // runs every minute - localhost testing
 // const FAMILY_GOAL_TRACKER_CRON = "* * * * *";
@@ -40,6 +44,10 @@ export const startFamilyGoalTracker = () => {
                     status: "active",
                 });
 
+                console.log("Families found: ", families);
+
+                const familyIds = families.map(family => family._id);
+
                 /*
                     CHANGE:
                     Fetch ALL active users belonging to ANY family in a single query.
@@ -57,10 +65,12 @@ export const startFamilyGoalTracker = () => {
                     This avoids the N+1 query problem and scales much better.
                 */
                 const users = await User.find({
-                    familyId: { $ne: null },
+                    familyId: { $in: familyIds },
                     status: "active",
                     isActive: true,
                 });
+
+                console.log("Users found: ", users);
 
                 /*
                     CHANGE:
@@ -130,9 +140,54 @@ export const startFamilyGoalTracker = () => {
                         // Include all family goal summaries
                         // ===========================================
 
+                        await executeRetryable({
+                            operationType: "email",
+                
+                            payload: {
+                                toEmail: user.email,
+                                subject: "Weekly Goal Update",
+                                htmlContent: `
+                                    <p>Here is your goal summary: ${goalSummaries}</p>
+                                `,
+                            },
+                
+                            operation: () =>
+                                sendEmailBrevoNoAttachments({
+                                    toEmail: user.email,
+                                    subject: "Weekly Goal Update",
+                                    htmlContent: `
+                                        <p>Here is your goal summary: ${goalSummaries}</p>
+                                    `,
+                                }),
+                        });
+
                         // ===========================================
                         // CREATE ONE DATABASE NOTIFICATION
                         // ===========================================
+
+                        await executeRetryable({
+                            operationType: "db_notification",
+                            payload: {
+                                userId: user._id,
+                                title: "Weekly Goals Update",
+                                body: `Your  goal summary: ${goalSummaries}`,
+                                type: "goal_update",
+                                data: {
+                                        goalSummaries
+                                    },
+                            },
+                
+                            operation: () =>
+                                createNotification({
+                                    userId: user._id,
+                                    title: "Weekly Goals Update",
+                                    body: `Your  goal summary: ${goalSummaries}`,
+                                    type: "goal_update",
+                                    data: {
+                                        goalSummaries
+                                    },
+                                }),
+                        });
                     }
                 }
 
