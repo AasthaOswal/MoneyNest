@@ -71,68 +71,96 @@ const calculateGoalProgress = async (goal) => {
         default:
         currentAmount = 0;
     }
-// Prevent negative values
-currentAmount = Math.max(0, currentAmount);
 
-let progress = 0;
-let remainingAmount = 0;
-let exceededAmount = 0;
+    // Prevent negative values
+    currentAmount = Math.max(0, currentAmount);
 
-let hasExceededLimit = false;
-let isCompleted = false;
+    const now = new Date();
 
-if (goal.goalType === "target") {
+    const hasStarted = now >= goal.startDate;
+    const hasEnded = now > goal.endDate;
+    const isWithinDateRange = hasStarted && !hasEnded;
 
-    progress =
-        goal.amount === 0
-            ? 100
-            : Math.min((currentAmount / goal.amount) * 100, 100);
+    let progress = 0;
+    let remainingAmount = 0;
+    let exceededAmount = 0;
 
-    remainingAmount = Math.max(goal.amount - currentAmount, 0);
+    let hasExceededLimit = false;
 
-    isCompleted = currentAmount >= goal.amount;
+    let status = "active";
 
-} else {
+    if (goal.goalType === "target") {
 
-    // LIMIT GOAL
+        progress =
+            goal.amount === 0
+                ? 100
+                : Math.min((currentAmount / goal.amount) * 100, 100);
 
-    progress =
-        goal.amount === 0
-            ? 100
-            : (currentAmount / goal.amount) * 100;
+        remainingAmount = Math.max(goal.amount - currentAmount, 0);
 
-    hasExceededLimit = currentAmount > goal.amount;
+        // Status
+        if (currentAmount >= goal.amount) {
+            status = "completed";
+        } else if (hasEnded) {
+            status = "failed";
+        } else {
+            status = "active";
+        }
 
-    exceededAmount = hasExceededLimit
-        ? currentAmount - goal.amount
-        : 0;
+    } else {
 
-    remainingAmount = hasExceededLimit
-        ? 0
-        : goal.amount - currentAmount;
+        // LIMIT GOAL
 
-    isCompleted = !hasExceededLimit;
-}
+        progress =
+            goal.amount === 0
+                ? 100
+                : (currentAmount / goal.amount) * 100;
 
-return {
-    currentAmount,
-    targetAmount: goal.amount,
+        hasExceededLimit = currentAmount > goal.amount;
 
-    progress: Number(progress.toFixed(2)),
+        exceededAmount = hasExceededLimit
+            ? currentAmount - goal.amount
+            : 0;
 
-    remainingAmount,
-    exceededAmount,
+        remainingAmount = hasExceededLimit
+            ? 0
+            : goal.amount - currentAmount;
 
-    hasExceededLimit,
+        // Status
+        if (hasExceededLimit) {
+            status = "failed";
+        } else if (hasEnded) {
+            status = "completed";
+        } else {
+            status = "active";
+        }
+    }
 
-    isCompleted,
 
-    totals: {
-        income,
-        expense,
-        investment,
-    },
-};
+    return {
+        currentAmount,
+        targetAmount: goal.amount,
+
+        progress: Number(progress.toFixed(2)),
+
+        remainingAmount,
+        exceededAmount,
+
+        hasExceededLimit,
+
+        status,
+
+        hasStarted,
+        hasEnded,
+        isWithinDateRange,
+
+        totals: {
+            income,
+            expense,
+            investment,
+        },
+    };
+
 };
 
 export default calculateGoalProgress;

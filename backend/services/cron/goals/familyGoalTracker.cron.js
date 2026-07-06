@@ -8,6 +8,7 @@ import calculateGoalProgress from "../../goals/calculateGoalProgress.js";
 import { executeRetryable } from "../../../utils/retryable/executeRetryable.js";
 import { sendEmailBrevoNoAttachments } from "../../../utils/email/sendEmailBrevo.js";
 import { createNotification } from "../../../utils/notification/createNotification.js";
+import { formatGoalSummary } from "../../goals/formatGoalSummary.js";
 
 // runs every 5 minutes - deployed testing
 const FAMILY_GOAL_TRACKER_CRON = "*/5 * * * *";
@@ -15,8 +16,9 @@ const FAMILY_GOAL_TRACKER_CRON = "*/5 * * * *";
 // runs every minute - localhost testing
 // const FAMILY_GOAL_TRACKER_CRON = "* * * * *";
 
-// every day at 9:00 AM
-// const FAMILY_GOAL_TRACKER_CRON = "0 9 * * *";
+
+// Every Sunday at 9:00 AM
+// const FAMILY_GOAL_TRACKER_CRON = "0 9 * * 0";
 
 export const startFamilyGoalTracker = () => {
     cron.schedule(
@@ -120,14 +122,25 @@ export const startFamilyGoalTracker = () => {
 
                     const goalSummaries = [];
 
+                    
                     for (const goal of goals) {
-                        const progress =
-                            await calculateGoalProgress(goal);
+                        const progress = await calculateGoalProgress(goal);
 
-                        goalSummaries.push({
+                        if (goal.status !== progress.status) {
+
+                            goal.status = progress.status;
+
+                            await goal.save();
+
+                        }
+
+
+                        const formattedGoal = formatGoalSummary({
                             goal,
                             progress,
                         });
+
+                        goalSummaries.push(formattedGoal);
                     }
 
                     console.log(`\nFamily: ${family.familyName}`);
@@ -140,52 +153,59 @@ export const startFamilyGoalTracker = () => {
                         // Include all family goal summaries
                         // ===========================================
 
+                        const emailHtml = `
+                            <h1>Family Goals Update</h1>
+                            <p>Here's the latest progress on your family financial goals.</p>
+                            <hr/>
+                            ${goalSummaries.map((goal) => goal.emailHtml).join("<br/>")}
+                            <hr/>
+                            <p>Keep tracking your finances and stay on top of your goals.</p>
+                        `;
+
                         await executeRetryable({
                             operationType: "email",
-                
+
                             payload: {
                                 toEmail: user.email,
-                                subject: "Weekly Goal Update",
-                                htmlContent: `
-                                    <p>Here is your goal summary: ${goalSummaries}</p>
-                                `,
+                                subject: "Personal Goals Weekly Update",
+                                htmlContent: emailHtml,
                             },
-                
+
                             operation: () =>
                                 sendEmailBrevoNoAttachments({
                                     toEmail: user.email,
-                                    subject: "Weekly Goal Update",
-                                    htmlContent: `
-                                        <p>Here is your goal summary: ${goalSummaries}</p>
-                                    `,
+                                    subject: "Personal Goals Weekly Update",
+                                    htmlContent: emailHtml,
                                 }),
                         });
+
 
                         // ===========================================
                         // CREATE ONE DATABASE NOTIFICATION
                         // ===========================================
 
+                        
+                        const notificationBody = goalSummaries
+                        .map((goal) => `• ${goal.notificationBody}`)
+                        .join("\n");
+
                         await executeRetryable({
                             operationType: "db_notification",
+
                             payload: {
                                 userId: user._id,
-                                title: "Weekly Goals Update",
-                                body: `Your  goal summary: ${goalSummaries}`,
+                                title: "Famils Goals Update",
+                                body: notificationBody,
                                 type: "goal_update",
-                                data: {
-                                        goalSummaries
-                                    },
+
                             },
-                
+
                             operation: () =>
                                 createNotification({
                                     userId: user._id,
-                                    title: "Weekly Goals Update",
-                                    body: `Your  goal summary: ${goalSummaries}`,
+                                    title: "Family Goals Update",
+                                    body: notificationBody,
                                     type: "goal_update",
-                                    data: {
-                                        goalSummaries
-                                    },
                                 }),
                         });
                     }
