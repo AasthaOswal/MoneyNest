@@ -39,6 +39,7 @@ It helps families:
 📈 Understand spending patterns using categories & labels
 🔔 Stay informed with real-time in-app and email updates
 🔐 Maintain secure and role-based access control
+💡 AI insights using groq API key
 
 ---
 
@@ -48,7 +49,7 @@ It helps families:
 
 * **Dual Dashboards:** Access a **Personal Dashboard** for private financial tracking and a **Family Dashboard** for shared family wealth transparency.
 * **Family Creation & Invites:** Seamlessly create a family workspace or invite family members using a secure invite link.
-* **AI-Powered Financial Reports:** Automatically generates and emails comprehensive monthly financial reports using the **Groq API** powered by the **llama-3.3-70b-versatile** model, providing deeply personalized spending insights, trend anomalies, and savings recommendations.
+* **AI-Powered Financial Reports:** Automatically generates and emails comprehensive monthly financial reports with AI Insights using the **Groq API** powered by the **llama-3.3-70b-versatile** model, providing deeply personalized spending insights, trend anomalies, and savings recommendations.
 * **Real-time updates:** Get real time updates for family dashboard and transactions using Socket.io integration. 
 
 ---
