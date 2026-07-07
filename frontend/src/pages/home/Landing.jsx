@@ -35,18 +35,8 @@ import {
 const features = [
   {
     icon: BarChart3,
-    title: "Real-time Dashboard Updated System",
+    title: "Real-time Dashboard Updates System",
     desc: "Dashboard is updated in real-time via Socket.io when any family member makes changes to transactions.",
-  },
-  {
-    icon: Bell,
-    title: "Weekly Goal Updates System",
-    desc: "Receive automated weekly email and in-app notifications with detailed goal progress to help you stay on track.",
-  },
-  {
-    icon: FileSpreadsheet,
-    title: "Transactions Export & Email System",
-    desc: "Filter and export transaction records via Excel download or send directly to your email, all on a single click.",
   },
   {
     icon: Brain,
@@ -58,6 +48,17 @@ const features = [
     title: "Link-based Invite System",
     desc: "Invite family members using a shareable link, allowing them to join your family workspace instantly.",
   },
+  {
+    icon: Bell,
+    title: "Weekly Goal Updates System",
+    desc: "Receive automated weekly email and in-app notifications with detailed goal progress to help you stay on track.",
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "Transactions Export & Email System",
+    desc: "Filter and export transaction records via Excel download or send directly to your email, all on a single click.",
+  },
+  
   {
     icon: Target,
     title: "Personal Goals & Personal Dashboard",
