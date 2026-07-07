@@ -70,11 +70,9 @@ const Header = ({ setIsOpen }) => {
 
         {/* User Dropdown */}
         <Menu as="div" className="relative ">
-          <MenuButton className="flex items-center gap-2 focus:outline-none rounded-xl
+          <MenuButton className="flex items-center gap-2 rounded-xl
             border border-border
-            bg-surface-2
-            hover:bg-card-hover
-            transition-colors p-2 hover:cursor-pointer">
+            bg-surface-2  focus:outline-none focus:ring-0 focus-visible:outline-none  focus-visible:ring-0 hover:bg-card-hover transition-colors p-2 hover:cursor-pointer">
 
             <div className="w-8 h-8 rounded-full bg-primary text-text-on-primary flex items-center justify-center font-bold shadow-card">
               {user?.name?.charAt(0).toUpperCase() ||
@@ -88,7 +86,7 @@ const Header = ({ setIsOpen }) => {
           <MenuItems
             transition
             className="
-              absolute right-0 mt-3 w-50 origin-top-right
+              absolute right-0 mt-3 w-60 origin-top-right
               rounded-2xl
               border border-border
               bg-surface
@@ -98,11 +96,15 @@ const Header = ({ setIsOpen }) => {
               data-closed:scale-95
               data-closed:opacity-0
               transition
+              focus:outline-none
+              focus:ring-0
+              focus-visible:outline-none
+              focus-visible:ring-0
             "
           >
 
             {/* Mobile User Info */}
-            <div className="lg:hidden px-4 py-4 border-b border-border">
+            <div className=" px-4 py-4 border-b border-border">
               <p className="text-[10px] uppercase tracking-wider text-muted">
                 Signed in as
               </p>
@@ -111,7 +113,7 @@ const Header = ({ setIsOpen }) => {
                 {user?.email}
               </p>
 
-              <span className="inline-block mt-3 px-2 py-1 rounded-full text-[10px] font-semibold uppercase bg-primary-subtle text-primary">
+              <span className="inline-block mt-3 text-sm  font-semibold uppercase text-primary">
                 {user?.role}
               </span>
             </div>
@@ -135,7 +137,7 @@ const Header = ({ setIsOpen }) => {
             </MenuItem>
 
             {/* Notifications */}
-            <MenuItem>
+            {/* <MenuItem>
               <button
                 onClick={() => navigate("/settings/push-notifications")}
                 className="
@@ -150,7 +152,7 @@ const Header = ({ setIsOpen }) => {
                 <Bell className="w-4 h-4" />
                 Notification Settings
               </button>
-            </MenuItem>
+            </MenuItem> */}
 
             {/* Logout */}
             <div className="border-t border-border">

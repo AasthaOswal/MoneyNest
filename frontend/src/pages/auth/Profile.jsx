@@ -93,7 +93,7 @@ const ProfilePage = () => {
 
         <div className="p-5 flex flex-col gap-4">
 
-          <button
+          {/* <button
             className="
               flex items-center gap-3
               border border-border
@@ -116,7 +116,7 @@ const ProfilePage = () => {
                 Manage push notifications
               </p>
             </div>
-          </button>
+          </button> */}
 
             {/* Leave Family Button */}
             <button
