@@ -5,6 +5,7 @@ import {
   removeTransactionListeners,
 } from "../../socket/socketTransaction";
 import toast from "react-hot-toast";
+import {useAuth} from "../../hooks/useAuth"
 
 import YearlyTrendChart from "../../components/familyDashboard/YearlyTrendChart";
 import ContributionChart from "../../components/familyDashboard/ContributionChart";
@@ -17,6 +18,8 @@ const FamilyDashboard = () => {
     from: "",
     to: "",
   });
+
+  const {socketReady} = useAuth();
 
   const fetchDashboard = async (customFilters = filters) => {
     try {
@@ -35,9 +38,13 @@ const FamilyDashboard = () => {
   useEffect(() => {
     fetchDashboard();
 
-    const handleTransactionChange = () => {
+    const handleTransactionChange = (payload) => {
+      console.log(payload);
+
+      const toastMessage = payload.message + " " + "Hence refreshing dashboard for real time sync."
+
       toast.success(
-        "Refetching dashboard as change is detected in transactions."
+        toastMessage ||"Refetching dashboard as change is detected in transactions."
       );
 
       fetchDashboard();
@@ -48,7 +55,7 @@ const FamilyDashboard = () => {
     return () => {
       removeTransactionListeners(handleTransactionChange);
     };
-  }, []);
+  }, [socketReady]);
 
   const summary = data?.summary || {};
 

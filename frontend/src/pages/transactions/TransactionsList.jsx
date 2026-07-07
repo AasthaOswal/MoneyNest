@@ -96,7 +96,7 @@ const TransactionsList = () => {
     fetchMeta();
   }, []);
 
-  const fetchTransactions = async (pageToFetch = 1, fromListener=false, listenerMessage) => {
+  const fetchTransactions = async (pageToFetch = 1, fromListener=false, toastMessage) => {
     setLoading(true);
     const toastId = toast.loading("Fetching Transactions.....")
     try {
@@ -119,8 +119,8 @@ const TransactionsList = () => {
       setSummary(res.summary);
       setTotalPages(res.totalPages || 1);
       setPage(res.page || 1);
-      if(fromListener){
-        toast.success(listenerMessage, {id: toastId});
+      if(fromListener === true){
+        toast.success(toastMessage, {id: toastId});
       }else{
         
         toast.success("Transactions fetched successfully", {id: toastId});
@@ -219,10 +219,12 @@ const TransactionsList = () => {
       console.log("fetching transcation");
       console.log("Received: ", payload);
       console.log("Paylod message: ", payload.message);
-      toast.success(payload.message)
+
+      const toastMessage = payload.message + " " + "Hence refreshing dashboard for real time sync."
+      // toast.success(toastMessage);
 
 
-      fetchTransactions(1, true, payload.message + "Hence Refetching Transactions...");
+      fetchTransactions(1, true,toastMessage);
     };
 
     if(socketReady === false){
