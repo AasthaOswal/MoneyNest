@@ -1,21 +1,80 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
+  ArrowDown,
   BarChart3,
   Bell,
   FileText,
   Users,
   ShieldCheck,
   TrendingUp,
+  Target,
+  UserPlus,
+  FileSpreadsheet,
+  Brain
+
 } from "lucide-react";
 
+  const colorClasses = {
+  income: {
+    text: "text-income",
+    bg: "bg-income",
+  },
+  expense: {
+    text: "text-expense",
+    bg: "bg-expense",
+  },
+  investment: {
+    text: "text-investment",
+    bg: "bg-investment",
+  },
+};
+
+
+const features = [
+  {
+    icon: BarChart3,
+    title: "Real-time Dashboard Updated System",
+    desc: "Dashboard is updated in real-time via Socket.io when any family member makes changes to transactions.",
+  },
+  {
+    icon: Bell,
+    title: "Weekly Goal Updates System",
+    desc: "Receive automated weekly email and in-app notifications with detailed goal progress to help you stay on track.",
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "Transactions Export & Email System",
+    desc: "Filter and export transaction records via Excel download or send directly to your email, all on a single click.",
+  },
+  {
+    icon: Brain,
+    title: "AI Powered Monthly PDF Reports System",
+    desc: "Receive AI-powered monthly PDF reports with financial insights through our automated email system.",
+  },
+  {
+    icon: UserPlus,
+    title: "Link-based Invite System",
+    desc: "Invite family members using a shareable link, allowing them to join your family workspace instantly.",
+  },
+  {
+    icon: Target,
+    title: "Personal Goals & Personal Dashboard",
+    desc: "You get a personal dashbaord as well as you can create personal goals and track them even while being part of the family.",
+  },
+];
+
 const Landing = () => {
+
+  const navigate = useNavigate();
+
+
   return (
     <div className="min-h-screen bg-bg text-text selection:bg-primary selection:text-white">
 
       {/* HERO */}
-      <section className="py-24 px-4">
+      <section className="py-12 sm:py-24 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
             Manage family finances <br />
@@ -23,11 +82,17 @@ const Landing = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-10">
-            Track income, expenses, and goals across your entire family —
+            Track income, expenses, imvestments, pre-investment savings, savings and goals across your entire family —
             all in one clean, real-time dashboard.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
+           <a
+              href="#features"
+              className="px-8 py-4 bg-surface border border-border text-text rounded-xl text-lg font-semibold hover:border-primary transition-all  flex items-center justify-center gap-2 shadow-lg"
+            >
+              Features <ArrowDown size={18} />
+            </a>
             <Link
               to="/signup"
               className="px-8 py-4 bg-primary hover:bg-primary-hover text-text-on-primary rounded-xl text-lg font-semibold flex items-center justify-center gap-2 shadow-lg transition-all"
@@ -35,9 +100,8 @@ const Landing = () => {
               Get Started <ArrowRight size={18} />
             </Link>
 
-            <button className="px-8 py-4 bg-surface border border-border text-text rounded-xl text-lg font-semibold hover:border-primary transition-all">
-              Live Demo
-            </button>
+
+ 
           </div>
         </div>
       </section>
@@ -58,36 +122,32 @@ const Landing = () => {
       </section>
 
       {/* FEATURES */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4" id="features">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-16">
-            Everything your family needs
+          <h2 className="text-3xl font-bold text-center mb-16 mt-6">
+            Collaborative Family Finance System Features
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<BarChart3 size={28} />}
-              title="Real-time Analytics"
-              desc="Understand spending patterns, track income sources, and make smarter decisions instantly."
-            />
+         
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
 
-            <FeatureCard
-              icon={<Bell size={28} />}
-              title="Smart Alerts"
-              desc="Get notified when expenses go high or budgets are close to limits."
-            />
-
-            <FeatureCard
-              icon={<FileText size={28} />}
-              title="Reports & Export"
-              desc="Generate clean reports for your family discussions or financial planning."
-            />
+              return (
+                <FeatureCard
+                  key={index}
+                  icon={<Icon size={28} />}
+                  title={feature.title}
+                  desc={feature.desc}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* STORY / VISUAL */}
-      <section className="py-24 px-4 bg-surface border-y border-border">
+      <section  id="about" className="py-24 px-4 bg-surface border-y border-border">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
 
           {/* TEXT */}
@@ -133,11 +193,15 @@ const Landing = () => {
           </p>
 
           <Link
-            to="/signup"
-            className="px-10 py-4 bg-primary hover:bg-primary-hover text-white rounded-xl text-lg font-semibold shadow-lg transition-all"
-          >
-            Create Your Family Account
-          </Link>
+  to="/signup"
+  className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-lg font-semibold text-text-on-primary shadow-lg transition-all duration-200 hover:bg-primary-hover hover:shadow-xl group"
+>
+  Start for Free
+  <ArrowRight
+    size={18}
+    className="transition-transform duration-200 group-hover:translate-x-1"
+  />
+</Link>
         </div>
       </section>
     </div>
@@ -154,20 +218,25 @@ const FeatureCard = ({ icon, title, desc }) => (
   </div>
 );
 
-const ProgressBar = ({ label, value, color }) => (
-  <div>
-    <div className="flex justify-between text-sm mb-2">
-      <span className="text-text font-medium">{label}</span>
-      <span className={`text-${color} font-semibold`}>{value}</span>
-    </div>
+const ProgressBar = ({ label, value, color }) => {
+  const colors = colorClasses[color];
 
-    <div className="w-full h-3 bg-border rounded-full">
-      <div
-        className={`h-full rounded-full bg-${color}`}
-        style={{ width: value }}
-      />
-    </div>
-  </div>
-);
+  return (
+    <div>
+      <div className="flex justify-between text-sm mb-2">
+        <span className="text-text font-medium">{label}</span>
+        <span className={`${colors.text} font-semibold`}>
+          {value}
+        </span>
+      </div>
 
+      <div className="w-full h-3 bg-border rounded-full">
+        <div
+          className={`${colors.bg} h-full rounded-full`}
+          style={{ width: value }}
+        />
+      </div>
+    </div>
+  );
+};
 export default Landing;

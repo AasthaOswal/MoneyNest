@@ -88,6 +88,7 @@ import UserDetails from './pages/admin/users/UserDetails.jsx';
 import AllFamiliesPage from './pages/admin/family/AllFamiliesPage.jsx';
 import FamilyDetails from './pages/admin/family/FamilyDetails.jsx';
 import RequestAccountDeletion from './pages/user/RequestAccountDeletion.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 
 function App() {
 
@@ -116,6 +117,7 @@ function App() {
       {/* <Toaster position="top-right" reverseOrder={false} toastOptions={{ duration: 4000, }}/> */}
 
       <CustomToaster/>
+      <ScrollToTop/>
       <AuthProvider>
           <Routes>
             {/* Public Routes - Landing, Login, Signup */}

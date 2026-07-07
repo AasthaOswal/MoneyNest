@@ -38,7 +38,7 @@ const Navbar = () => {
       className="font-bold text-lg sm:text-xl shrink-0"
       style={{ color: "var(--color-primary)" }}
     >
-      <Link to="/">WealthNest</Link>
+      <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>MoneyNest</Link>
     </div>
 
     {/* Right Side */}
