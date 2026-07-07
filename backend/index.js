@@ -142,9 +142,10 @@ app.get("/test-cookie", (req, res) => {
 app.get("/test-notification", async (req, res) => {
     const notification = await createNotification({
         userId: "69bd56ce68e2a684f848be3f",
+        // familyId: "69bf69622b2fc1b9d7922efc",
         familyId: null,
         title: "Test Notification",
-        body: "Hello",
+        body: "Hello - with familyId",
     });
 
     res.json(notification);

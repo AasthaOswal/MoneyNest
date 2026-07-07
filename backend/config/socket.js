@@ -69,9 +69,23 @@ io.use((socket, next) => {
     console.log("Socket connected:", socket.id);
 
     const { userId, familyId } = socket.user;
+    console.log(socket.user)
 
     socket.join(`user:${userId}`);
-    if (familyId) socket.join(`family:${familyId}`);
+    console.log(`${userId} has joined room: "user:${userId}"`);
+
+    if (familyId) {
+      socket.join(`family:${familyId}`);
+      console.log(`${userId} has joined room: "family:${familyId}" `)
+    }
+
+      socket.on("error", (err) => {
+        console.error("Socket error:", err);
+      });
+
+      socket.on("disconnect", (reason) => {
+        console.log(`Socket ${socket.id} disconnected:`, reason);
+      });
   });
 
   app.set("io", io);

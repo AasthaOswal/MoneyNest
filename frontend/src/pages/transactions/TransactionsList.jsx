@@ -22,6 +22,7 @@ import {
   CalendarDays,
   Receipt,
 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 const TransactionsList = () => {
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ const TransactionsList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [summary, setSummary] = useState(null);
+
+  const { user : currentUser , socketReady } = useAuth();
 
   const [filters, setFilters] = useState({
     search: "",
@@ -93,7 +96,7 @@ const TransactionsList = () => {
     fetchMeta();
   }, []);
 
-  const fetchTransactions = async (pageToFetch = 1) => {
+  const fetchTransactions = async (pageToFetch = 1, fromListener=false, listenerMessage) => {
     setLoading(true);
     const toastId = toast.loading("Fetching Transactions.....")
     try {
@@ -116,7 +119,12 @@ const TransactionsList = () => {
       setSummary(res.summary);
       setTotalPages(res.totalPages || 1);
       setPage(res.page || 1);
-      toast.success("Transactions fetched successfully", {id: toastId});
+      if(fromListener){
+        toast.success(listenerMessage, {id: toastId});
+      }else{
+        
+        toast.success("Transactions fetched successfully", {id: toastId});
+      }
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
       toast.error(err.response.data.message, { id: toastId,});
@@ -193,16 +201,40 @@ const TransactionsList = () => {
   };
 
   useEffect(() => {
-    const handleTransactionChange = () => {
+      console.log("Inside useeffect which has transaction listener and fetch tarnsaction");
+      const handleTransactionChange = (payload) => {
+      console.log("payload from handletransactionChange: ", payload)
+      console.log("CurrentUser", currentUser);
+      // if (payload.actorId === currentUser._id) {
+      //   return;
+      // }
       fetchTransactions(page);
     };
+  }, [page, filters]);
+
+
+  useEffect(() => {
+
+    const handleTransactionChange = (payload) => {
+      console.log("fetching transcation");
+      console.log("Received: ", payload);
+      console.log("Paylod message: ", payload.message);
+      toast.success(payload.message)
+
+
+      fetchTransactions(1, true, payload.message + "Hence Refetching Transactions...");
+    };
+
+    if(socketReady === false){
+      console.log("Socket not ready yet");
+    }
 
     setupTransactionListeners(handleTransactionChange);
 
     return () => {
       removeTransactionListeners(handleTransactionChange);
     };
-  }, [page, filters]);
+  }, [socketReady]);
 
   const handleSearchClick = () => {
     fetchTransactions(1);

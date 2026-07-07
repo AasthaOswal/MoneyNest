@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true);
+    const [socketReady, setSocketReady] = useState(false);
 
     // Runs ONCE when app loads — checks if cookie is still valid
     useEffect(() => {
@@ -58,6 +59,7 @@ export const AuthProvider = ({ children }) => {
 
                     // initialize authenticated socket
                     initSocket();
+                    setSocketReady(true)
 
                     setupNotificationListener((data) => {
                     console.log("inside notification listener")
@@ -127,7 +129,7 @@ export const AuthProvider = ({ children }) => {
 
 
     return (
-        <AuthContext.Provider value={{user,setUser,loading,setLoading, login, signup, logout}} >
+        <AuthContext.Provider value={{user,setUser,loading,setLoading, login, signup, logout, socketReady, setSocketReady}} >
             {children}
         </AuthContext.Provider>
     )

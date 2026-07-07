@@ -566,7 +566,7 @@ export const getSocketToken = (req, res) => {
   try {
     const socketToken = jwt.sign(
     {
-      userId: req.user.userId,
+      userId: req.user._id,
       familyId: req.user.familyId,
     },
     process.env.SOCKET_JWT_SECRET,

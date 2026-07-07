@@ -11,11 +11,20 @@ const EVENTS = [
 export const setupTransactionListeners = (callback) => {
   const socket = getSocket();
 
-  if (!socket) return;
+  // console.log("Socket:", socket);
+  // console.log("Connected:", socket?.connected);
 
-  EVENTS.forEach((event) => {
+  if(!socket){
+    console.log("No Socket object");
+    return;
+  }
+
+  EVENTS.forEach(event => {
+    console.log("Registering", event);
     socket.on(event, callback);
   });
+
+  console.log(socket.listeners("transaction:new"));
 };
 
 export const removeTransactionListeners = (callback) => {

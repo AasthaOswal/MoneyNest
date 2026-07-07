@@ -16,13 +16,13 @@ function CustomToaster() {
         reverseOrder={false} 
         toastOptions={{
           success: {
-            duration: 4000,
+            duration: 10000,
           },
           error: {
-            duration: 4000,
+            duration: 10000,
           },
           info:{
-            duration: 6000,
+            duration: 10000,
           },
           loading: {
             duration: Infinity,

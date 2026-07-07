@@ -23,15 +23,15 @@ export const createNotification = async ({
     const io = getIO();
 
 
-    // emit to only this user
-    io.to(`user:${userId}`).emit("notification", {
-      notification,
-    });
-
-    //emit to family
-    io.to(`family:${familyId}`).emit("notification", {
-      notification,
-    });
+    if (familyId) {
+      io.to(`family:${familyId}`).emit("notification", {
+        notification,
+      });
+    } else {
+      io.to(`user:${userId}`).emit("notification", {
+        notification,
+      });
+    }
 
 
     return notification;

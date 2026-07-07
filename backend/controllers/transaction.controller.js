@@ -223,21 +223,52 @@ export const createTransaction = async (req, res) => {
     await transaction.save();
     dbSaved = true;
 
+    const io = getIO();
+
+const room = `family:${req.user.familyId}`;
+
+console.log("================================");
+console.log("EMITTING transaction:new");
+console.log("Room:", room);
+console.log("Actor:", req.user._id.toString());
+
+const sockets = await io.in(room).fetchSockets();
+
+console.log("Sockets in room:", sockets.length);
+
+sockets.forEach((s) => {
+  console.log(
+    "Socket:",
+    s.id,
+    "User:",
+    s.user?.userId
+  );
+});
+
+// io.to(room).emit("transaction:new", {
+//   message: "New transaction added.",
+//   actorId: req.user._id,
+// });
+
+console.log("Emit completed");
+console.log("================================");
   
 
     //emit to family
     getIO().to(`family:${req.user.familyId}`).emit("transaction:new", {
-      message: "New transaction added."
+      message: `New transaction added by ${req.user.name}.`,
+      actorId: req.user._id
     });
 
 
-    getIO().to(`family:${req.user.familyId}`).emit("notification", {
-      type: "success",
-      notification : {
-        title: `Transaction created by a member of your family.`,
-        body: "Please check Trasnactions page to see the updated transactions list."
-      }
-    });
+    // getIO().to(`family:${req.user.familyId}`).emit("notification", {
+    //   type: "success",
+    //   notification : {
+    //     title: `Transaction created by a member of your family.`,
+    //     body: "Please check Trasnactions page to see the updated transactions list."
+    //   },
+    //   actorId: req.user._id
+    // });
 
     return res.status(201).json({
       success: true,
@@ -390,18 +421,52 @@ export const updateTransaction = async (req, res) => {
 
     dbSaved = true;
 
+    
+    const io = getIO();
+
+const room = `family:${req.user.familyId}`;
+
+console.log("================================");
+console.log("EMITTING transaction:new");
+console.log("Room:", room);
+console.log("Actor:", req.user._id.toString());
+
+const sockets = await io.in(room).fetchSockets();
+
+console.log("Sockets in room:", sockets.length);
+
+sockets.forEach((s) => {
+  console.log(
+    "Socket:",
+    s.id,
+    "User:",
+    s.user?.userId
+  );
+});
+
+// io.to(room).emit("transaction:new", {
+//   message: "New transaction added.",
+//   actorId: req.user._id,
+// });
+
+console.log("Emit completed");
+console.log("================================");
+
     //emit to family
     getIO().to(`family:${req.user.familyId}`).emit("transaction:update", {
-      message: "Transaction updated."
+      message: `Transaction titled ${updatedTransaction.title} was updated by ${req.user.name}.`,
+      actorId: req.user._id
     });
 
-    getIO().to(`family:${req.user.familyId}`).emit("notification", {
-      type: "success",
-      notification : {
-        title: `Transaction updated by a member of your family.`,
-        body: "Please check Trasnactions page to see the updated transactions list."
-      }
-    });
+    // getIO().to(`family:${req.user.familyId}`).emit("notification", {
+    //   type: "success",
+    //   notification : {
+    //     title: `Transaction updated by a member of your family.`,
+    //     body: "Please check Trasnactions page to see the updated transactions list."
+    //   },
+    //   actorId: req.user._id
+    // });
+
 
     // Delete old file after success
     // if (oldPublicId) {
@@ -682,6 +747,8 @@ export const deleteTransaction = async (req, res) => {
 
     const transaction = await Transaction.findById(transactionId);
 
+    const  transactionTitle = transaction.title;
+
     if (!transaction) {
       return res.status(404).json({
         success: false,
@@ -723,16 +790,17 @@ export const deleteTransaction = async (req, res) => {
 
     //emit to family
     getIO().to(`family:${req.user.familyId}`).emit("transaction:delete", {
-      message: "Transaction deleted."
+      message: `Transaction titled ${transactionTitle} deleted by ${req.user.name}.`,
+      actorId: req.user._id
     });
 
-    getIO().to(`family:${req.user.familyId}`).emit("notification", {
-      type: "success",
-      notification : {
-        title: `Transaction deleted by a member of your family.`,
-        body: "Please check Trasnactions page to see the updated transactions list."
-      }
-    });
+    // getIO().to(`family:${req.user.familyId}`).emit("notification", {
+    //   type: "success",
+    //   notification : {
+    //     title: `Transaction deleted by a member of your family.`,
+    //     body: "Please check Trasnactions page to see the updated transactions list."
+    //   }
+    // });
 
     return res.status(200).json({
       success: true,
