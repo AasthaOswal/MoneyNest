@@ -3,7 +3,7 @@ import Joi from "joi";
 const commonOptions = {
   stripUnknown: true,
   convert: true,
-  abortEarly: false
+  abortEarly: true
 };
 
 // reusable field

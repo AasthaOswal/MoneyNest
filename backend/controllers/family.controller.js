@@ -31,10 +31,10 @@ export const createFamily = async (req, res) => {
     const { value, error } = createFamilySchema.validate(req.body);
 
     if (error) {
-      return res.status(400).json({
+    return res.status(400).json({
         success: false,
-        message: error.details.map(err => err.message)
-      });
+        message: error.details[0].message
+    });
     }
 
     const { familyName } = value;
@@ -124,10 +124,10 @@ export const joinFamilyWithToken = async (req, res) => {
     console.log(error)
 
     if (error) {
-      return res.status(400).json({
+    return res.status(400).json({
         success: false,
-        message: error.details.map(err => err.message)
-      });
+        message: error.details[0].message
+    });
     }
 
     const { token } = value;
@@ -258,10 +258,10 @@ export const editFamily = async (req, res) => {
     const { value, error } = editFamilySchema.validate(req.body);
 
     if (error) {
-      return res.status(400).json({
+    return res.status(400).json({
         success: false,
-        message: error.details.map(err => err.message)
-      });
+        message: error.details[0].message
+    });
     }
 
     const { familyName } = value;
