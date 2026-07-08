@@ -161,6 +161,10 @@ const Signup = () => {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
+
+          <p className="mt-2 text-xs text-text-secondary">
+          Must contain 8–14 characters with at least 1 uppercase, 1 lowercase, 1 number, and 1 special character.
+          </p>
         </div>
 
         {/* Signup Button */}

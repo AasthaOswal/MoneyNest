@@ -1,5 +1,19 @@
 import Joi from "joi";
 
+const strongPassword = Joi.string()
+    .trim()
+    .min(8)
+    .max(14)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/)
+    .required()
+    .messages({
+        "string.empty": "Password is required",
+        "string.min": "Password must be at least 8 characters long",
+        "string.max": "Password cannot exceed 14 characters",
+        "string.pattern.base":
+            "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    });
+    
 export const signupValidation = Joi.object({
     name: Joi.string().trim().min(3).max(50).required().messages({
         "string.empty": "Name is required",
@@ -10,12 +24,9 @@ export const signupValidation = Joi.object({
         "string.empty": "Email is required",
         "string.email": "Please provide a valid email"
     }),
-    password: Joi.string().trim().min(6).required().messages({
-        "string.empty": "Password is required",
-        "string.min": "Password must be at least 6 characters long"
-    })
+    password: strongPassword
 }).options({
-    abortEarly : false,
+    abortEarly : true,
     stripUnknown : true,
     convert : true
 });
@@ -25,11 +36,9 @@ export const loginValidation = Joi.object({
         "string.empty": "Email is required",
         "string.email": "Please provide a valid email"
     }),
-    password: Joi.string().trim().required().messages({
-        "string.empty": "Password is required"
-    })
+    password: strongPassword
 }).options({
-    abortEarly : false,
+    abortEarly : true,
     stripUnknown : true,
     convert : true
 });
@@ -44,7 +53,7 @@ export const forgotPasswordValidation = Joi.object({
         "string.email": "Please provide a valid email"
     })
 }).options({
-    abortEarly: false,
+    abortEarly: true,
     stripUnknown: true,
     convert: true
 });
@@ -54,10 +63,7 @@ export const forgotPasswordValidation = Joi.object({
 // 🔐 RESET PASSWORD
 // =======================
 export const resetPasswordValidation = Joi.object({
-    password: Joi.string().trim().min(6).required().messages({
-        "string.empty": "Password is required",
-        "string.min": "Password must be at least 6 characters long"
-    }),
+    password: strongPassword,
 
     token: Joi.string().length(64).hex().required().messages({
         "string.length": "Invalid reset token",
@@ -66,7 +72,7 @@ export const resetPasswordValidation = Joi.object({
     })
     
 }).options({
-    abortEarly: false,
+    abortEarly: true,
     stripUnknown: true,
     convert: true
 });
