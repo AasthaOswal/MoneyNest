@@ -1,5 +1,5 @@
 import Category from "../models/category.model.js";
-import { createCategorySchema } from "../validators/category.validation.js";
+import { createCategorySchema, updateCategorySchema, getCategoriesSchema } from "../validators/category.validation.js";
 import mongoose from "mongoose";
 
 // =======================
@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 // =======================
 export const createCategory = async (req, res) => {
   try {
-    // ✅ Joi validation
+    // Joi validation
     const { value, error } = createCategorySchema.validate(req.body);
 
     if (error) {
@@ -54,7 +54,17 @@ export const createCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+
+    const { value, error } = updateCategorySchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message
+      });
+    }
+
+    const {name} = value;
 
     if (!name) {
       return res.status(400).json({
@@ -108,7 +118,18 @@ export const updateCategory = async (req, res) => {
 // =======================
 export const getCategories = async (req, res) => {
   try {
-    const { search, type, isActive, showDeleted } = req.query;
+
+    // Joi validation
+    const { value, error } = getCategoriesSchema.validate(req.query);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message
+      });
+    }
+
+    const { search, type, isActive, showDeleted, } = value;
 
     let query = {
       family: req.user.familyId,
@@ -128,11 +149,13 @@ export const getCategories = async (req, res) => {
     }
 
     // Active / Deleted Filter
-    if (showDeleted === "true") {
+    if (showDeleted === true) {
       query.isActive = false;
     } else if (isActive !== undefined) {
-      query.isActive = isActive === "true";
-    } 
+      query.isActive = isActive;
+    }
+
+    console.log(query)
 
     const categories = await Category.find(query)
       .sort({ createdAt: -1 });

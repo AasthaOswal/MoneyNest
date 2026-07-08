@@ -1,6 +1,10 @@
 import Joi from "joi";
 
-
+const commonOptions = {
+  stripUnknown: true,
+  convert: true,
+  abortEarly: true
+};
 
 /*
 this pattern : pattern(/^[a-zA-Z0-9\s\-&]+$/)
@@ -43,7 +47,7 @@ export const createCategorySchema = Joi.object({
         "Category type must be one of: income, expense, or investment",
       "any.required": "Category type is required"
     })
-});
+}).options(commonOptions);
 
 export const updateCategorySchema = Joi.object({
   name: Joi.string()
@@ -67,8 +71,47 @@ export const updateCategorySchema = Joi.object({
       "any.only":
         "Category type must be one of: income, expense, or investment"
     })
-})
+}).options(commonOptions)
   .min(1)
   .messages({
     "object.min": "At least one field must be provided for update"
   });
+
+
+export const getCategoriesSchema = Joi.object({
+  search: Joi.string()
+    .trim()
+    .pattern(/^[A-Za-z0-9\s\-&]+$/)
+    .min(1)
+    .max(50)
+    .allow("")
+    .messages({
+      "string.base": "Search must be a string",
+      "string.empty": "Search cannot be empty",
+      "string.min": "Search must be at least 1 character",
+      "string.max": "Search cannot exceed 50 characters",
+      "string.pattern.base":
+        "Search can only contain letters, numbers, spaces, hyphens (-), and &"
+    }),
+
+  type: Joi.string()
+    .allow("")
+    .valid("income", "expense", "investment", "")
+    .messages({
+      "string.base": "Category type must be a string",
+      "any.only":
+        "Category type must be one of: income, expense, or investment"
+    }),
+
+  isActive: Joi.boolean()
+    .allow("")
+    .messages({
+      "boolean.base": "isActive must be true or false"
+    }),
+
+  showDeleted: Joi.boolean()
+    .allow("")
+    .messages({
+      "boolean.base": "showDeleted must be true or false"
+    })
+}).options(commonOptions);

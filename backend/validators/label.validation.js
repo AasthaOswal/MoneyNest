@@ -1,5 +1,13 @@
 import Joi from "joi";
 
+
+const commonOptions = {
+  stripUnknown: true,
+  convert: true,
+  abortEarly: true
+};
+
+
 export const createLabelSchema = Joi.object({
   name: Joi.string()
     .trim()
@@ -17,10 +25,7 @@ export const createLabelSchema = Joi.object({
         "Label name can only contain lowercase letters, numbers, spaces, hyphens (-), and &",
       "any.required": "Label name is required"
     })
-}).options({
-  stripUnknown: true,
-  convert: true
-});
+}).options(commonOptions);
 
 export const updateLabelSchema = Joi.object({
   name: Joi.string()
@@ -42,10 +47,7 @@ export const updateLabelSchema = Joi.object({
   .messages({
     "object.min": "At least one field must be provided for update"
   })
-  .options({
-    stripUnknown: true,
-    convert: true
-  });
+  .options(commonOptions);
 
 export const getLabelsSchema = Joi.object({
   search: Joi.string()
@@ -65,7 +67,4 @@ export const getLabelsSchema = Joi.object({
       "string.base": "isActive must be either true or false"
     })
     .optional()
-}).options({
-  stripUnknown: true,
-  convert: true
-});
+}).options(commonOptions);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CategoryService from "../../services/category.service";
 import FilterSelect from "../../components/reusable/FilterSelect";
+import toast from "react-hot-toast"
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -26,6 +27,7 @@ const STATUS_OPTIONS = [
 ];
 
   const fetchCategories = async () => {
+    const toastId = toast.loading("Please wait  while we fetch your catgeories");
     try {
       const params = {
         search,
@@ -44,9 +46,11 @@ const STATUS_OPTIONS = [
 
       if (res.success) {
         setCategories(res.data);
+        toast.success("categories fetched  succcessfully.", {id:toastId});
       }
     } catch (err) {
-      console.log(err);
+      console.log(err.response);
+      toast.error(err?.response?.data?.message || "Some error occured.", {id: toastId});
     }
   };
 
