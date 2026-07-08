@@ -35,36 +35,41 @@ const LeaveFamily = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-4">
-      <div className="max-w-md w-full bg-white shadow-xl rounded-2xl p-6 border border-gray-200">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-(--shadow-card) p-6">
 
-        {/* Title */}
-        <h2 className="text-xl font-semibold text-red-600 mb-4">
+        <h2 className="mb-2 text-2xl font-bold text-error">
           Leave Family
         </h2>
 
-        {/* Warning Box */}
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6 text-sm">
-          <p className="font-medium mb-2">⚠️ Warning</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>You will lose access to all family transactions</li>
-            <li>Your contribution history will no longer be visible</li>
-            <li>You may need a new invite to rejoin</li>
+        <p className="mb-6 text-sm text-text-secondary">
+          Leaving your family will immediately remove your access to shared data
+          and features. Please review the consequences before continuing.
+        </p>
+
+        <div className="mb-6 rounded-xl border border-error bg-error-bg p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg">⚠️</span>
+            <h3 className="font-semibold text-error">Warning</h3>
+          </div>
+
+          <ul className="list-disc space-y-2 pl-5 text-sm text-text-secondary">
+            <li>You will lose access to all family transactions.</li>
+            <li>Your contribution history will no longer be visible.</li>
+            <li>You may require a new invite to join again.</li>
           </ul>
         </div>
 
-        {/* Button */}
         <button
           onClick={handleLeaveFamily}
           disabled={loading}
-          className={`w-full py-2 rounded-lg font-medium transition ${
+          className={`w-full rounded-xl border py-3 font-semibold transition-all duration-200 ${
             loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-red-600 hover:bg-red-700 text-white"
+              ? "cursor-not-allowed border-border bg-surface text-muted"
+              : "border-error bg-error text-bg hover:opacity-90 cursor-pointer"
           }`}
         >
           {loading ? "Leaving..." : "Leave Family"}
         </button>
-
       </div>
     </div>
   );
