@@ -24,8 +24,6 @@ import errorLogRoutes from "./routes/admin/errorLog.routes.js";
 import failedOperationRoutes from "./routes/admin/failedOperation.routes.js";
 
 
-
-import {startGoalTracker} from './services/cron/goalTracker.js'
 import { startMonthlyReportJob } from "./services/cron/monthlyReport.js";
 
 import { requestLogger } from "./middlewares/requestLogger.middleware.js";
