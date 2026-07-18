@@ -19,7 +19,7 @@ const maxLimit = {
 
 const keyGenIP = (req) => {
   let ip =
-    req.ip ||
+    ipKeyGenerator(req) ||
     req.headers["x-forwarded-for"] ||
     req.socket?.remoteAddress ||
     "unknown";

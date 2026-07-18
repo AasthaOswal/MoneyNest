@@ -1,4 +1,4 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, {ipKeyGenerator} from "express-rate-limit";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -22,7 +22,8 @@ const getClientKey = (req) => {
   }
 
   // ✅ fallback → IP
-  const ip = req.ip || req.socket?.remoteAddress || "unknown";
+
+  const ip = ipKeyGenerator(req) || req.socket?.remoteAddress || "unknown";
   return ip.startsWith("::ffff:") ? ip.slice(7) : ip;
 };
 
