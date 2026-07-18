@@ -148,11 +148,11 @@ const GoalsPage = () => {
 
             {/* Financial Type Enum Dropdown */}
             <FilterSelect
-              label="Transaction Context"
+              label="Transaction Type"
               value={filters.type}
               onChange={(val) => setFilters((prev) => ({ ...prev, type: val }))}
               options={[
-                { id: "", name: "All Matrix Types" },
+                { id: "", name: "All Types" },
                 { id: "income", name: "Income" },
                 { id: "expense", name: "Expense" },
                 { id: "investment", name: "Investment" },
@@ -163,7 +163,7 @@ const GoalsPage = () => {
 
             {/* Goal Strategy Paradigm */}
             <FilterSelect
-              label="Goal Constraint Type"
+              label="Goal Type"
               value={filters.goalType}
               onChange={(val) => setFilters((prev) => ({ ...prev, goalType: val }))}
               options={[
@@ -175,19 +175,19 @@ const GoalsPage = () => {
 
             {/* Privacy Scope Visibility Matrix */}
             <FilterSelect
-              label="Visibility Scope"
+              label="Visibility"
               value={filters.visibility}
               onChange={(val) => setFilters((prev) => ({ ...prev, visibility: val }))}
               options={[
                 { id: "", name: "Shared & Personal" },
                 { id: "family", name: "Family Wide" },
-                { id: "personal", name: "Personal Private" },
+                { id: "personal", name: "Personal" },
               ]}
             />
 
             {/* Operational Metrics Sort Target */}
             <FilterSelect
-              label="Sort Attribute"
+              label="Sort By"
               value={filters.sortBy}
               onChange={(val) => setFilters((prev) => ({ ...prev, sortBy: val }))}
               options={sortOptions}
@@ -195,7 +195,7 @@ const GoalsPage = () => {
 
             {/* Display Ordering Sequence */}
             <FilterSelect
-              label="Directional Sequence"
+              label="Order Sequence"
               value={filters.order}
               onChange={(val) => setFilters((prev) => ({ ...prev, order: val }))}
               options={[
@@ -206,14 +206,14 @@ const GoalsPage = () => {
 
             {/* Global Status Filter Constraints */}
             <FilterSelect
-              label="Lifecycle Status"
+              label="Status"
               value={filters.status}
               onChange={(val) => setFilters((prev) => ({ ...prev, status: val }))}
               options={[
-                { id: "", name: "All Lifecycles" },
-                { id: "active", name: "Active Trackers" },
-                { id: "completed", name: "Completed Matrix" },
-                { id: "failed", name: "Breached/Failed" },
+                { id: "", name: "All" },
+                { id: "active", name: "Active" },
+                { id: "completed", name: "Completed" },
+                { id: "failed", name: "Failed" },
               ]}
             />
           </div>
