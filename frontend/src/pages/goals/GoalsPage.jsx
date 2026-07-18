@@ -66,7 +66,7 @@ const GoalsPage = () => {
         throw new Error(response.message || "Failed to fetch goals.");
       }
     } catch (error) {
-      toast.error(error.message || "Failed to retrieve family goals", {
+      toast.error(error.response.data.message || "Failed to retrieve family goals", {
         id: toastId,
       });
     } finally {

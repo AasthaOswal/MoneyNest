@@ -5,21 +5,26 @@ import { getDateRange } from "../utils/goals/getDateRange.js";
 import { errorLogger } from "../utils/logger/errorLogger.js";
 import calculateGoalProgress from "../services/goals/calculateGoalProgress.js"
 import { formatGoalSummary } from "../services/goals/formatGoalSummary.js";
+import { createGoalValidation, getGoalsValidation, updateGoalValidation } from "../validators/goal.validation.js";
 
 
 // GET ALL GOALS FOR FAMILY
 export const getAllGoals = async (req, res) => {
     try {
-        const {
-            visibility,
-            status,
-            type,
-            goalType,
-            search,
-            sortBy = "createdAt",
-            order = "desc",
-        } = req.query;
 
+        const { error, value } = getGoalsValidation.validate(req.query);
+    
+        if (error) {
+            console.log(error)
+            return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+            });
+        }
+
+        const { visibility, status, type, goalType, search, sortBy = "createdAt", order = "desc", } = value;
+
+        
         const query = {
             family: req.user.familyId,
         };
@@ -183,16 +188,17 @@ export const getGoalById = async (req, res) => {
 // CREATE GOAL
 export const createGoal = async (req, res) => {
     try {
-        const {
-            title,
-            description,
-            amount,
-            startDate,
-            endDate,
-            type,
-            goalType,
-            visibility,
-        } = req.body;
+
+        const { error, value } = createGoalValidation.validate(req.body);
+    
+    
+        if (error) {
+            return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+            });
+        }
+        const { title, description, amount, startDate, endDate, type, goalType,  visibility, } = value;
 
         const goalStartDate = new Date(startDate);
         goalStartDate.setHours(0, 0, 0, 0);
@@ -282,7 +288,17 @@ export const updateGoal = async (req, res) => {
             });
         }
 
-        Object.assign(goal, req.body);
+        const { error, value } = updateGoalValidation.validate(req.body);
+    
+    
+        if (error) {
+            return res.status(400).json({
+            success: false,
+            message: error.details[0].message
+            });
+        }
+
+        Object.assign(goal, value);
 
         await goal.save();
 
