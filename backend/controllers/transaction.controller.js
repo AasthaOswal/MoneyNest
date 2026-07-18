@@ -167,20 +167,13 @@ export const createTransaction = async (req, res) => {
       req.body.labels = [req.body.labels];
     }
 
-    const { error, value } = createTransactionSchema.validate(req.body, {
-      abortEarly: false
-    });
+    const { error, value } = createTransactionSchema.validate(req.body);
+
 
     if (error) {
-      const validationErrors = error.details.map(err => ({
-        field: err.path[0],
-        message: err.message
-      }));
-
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
-        errors: validationErrors
+        message: error.details[0].message
       });
     }
 
@@ -340,20 +333,13 @@ export const updateTransaction = async (req, res) => {
       req.body.labels = [req.body.labels];
     }
 
-    const { error, value } = updateTransactionSchema.validate(req.body, {
-      abortEarly: false
-    });
+    const { error, value } = updateTransactionSchema.validate(req.body);
+
 
     if (error) {
-      const validationErrors = error.details.map(err => ({
-        field: err.path[0],
-        message: err.message
-      }));
-
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
-        errors: validationErrors
+        message: error.details[0].message
       });
     }
 
@@ -539,22 +525,16 @@ export const getTransactions = async (req, res) => {
     } = req.query;
 
     const { error, value } = getTransactionsValidation.validate(
-      { search, type, page, limit, minAmount, maxAmount, startDate, endDate, user, category, label },
-      { abortEarly: false }
+      { search, type, page, limit, minAmount, maxAmount, startDate, endDate, user, category, label }
     );
 
     if (error) {
-      const validationErrors = error.details.map(err => ({
-        field: err.path[0],
-        message: err.message
-      }));
-
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
-        errors: validationErrors
+        message: error.details[0].message
       });
     }
+
 
     const pageNum = value.page;
     const limitNum = value.limit;
