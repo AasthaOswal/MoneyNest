@@ -7,9 +7,6 @@ import { createNotification } from "../../utils/notification/createNotification.
 import { deleteFromCloudinary } from "../../utils/cloudinary/deleteFromCloudinary.js";
 
 
-import { getFamilyReportData } from "../report/analytics.service.js";
-import { generateReportPDF } from "../report/report.service.js";
-
 
 import {sendEmailBrevo} from "../../utils/email/sendEmailBrevo.js";
 
@@ -32,33 +29,7 @@ const operationHandlers = {
 
 
 
-    monthly_report_email: async (payload) => {
-    const { email, familyId, from, to } = payload;
 
-    const data = await getFamilyReportData({
-      familyId,
-      from: new Date(from),
-      to: new Date(to),
-    });
-
-    const pdfBuffer = await generateReportPDF(data);
-    const base64PDF = Buffer.from(pdfBuffer).toString("base64");
-
-    await sendEmailBrevo({
-      toEmail: email,
-      subject: "📊 Monthly Finance Report",
-      htmlContent: `
-        <h2>Your Monthly Report</h2>
-        <p>Attached is your report for last month.</p>
-      `,
-      attachments: [
-        {
-          name: "monthly-report.pdf",
-          content: base64PDF,
-        },
-      ],
-    });
-  },
 };
 
 const RETRY_CRON = "* * * * *"; // every minute

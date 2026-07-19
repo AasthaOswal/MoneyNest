@@ -43,7 +43,6 @@ const FailedOperationsPage = () => {
   const typeOptionns = [
     {id: "", name: "All Types"},
     {id: "cloudinary_delete", name: "Cloudinary Delete"},
-    {id: "monthly_report_email", name: "Monthly Report Email"},
     {id: "db_notification", name: "DB Notification"},
     {id: "ai_monthly_report_email", name: "AI Monthly Report Email"}
   ];
