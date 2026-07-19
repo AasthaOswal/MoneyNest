@@ -22,6 +22,7 @@ import notificationRoutes from './routes/notification.routes.js';
 import requestLogRoutes from "./routes/admin/requestLog.routes.js";
 import errorLogRoutes from "./routes/admin/errorLog.routes.js";
 import failedOperationRoutes from "./routes/admin/failedOperation.routes.js";
+import aiFeatureRoutes from "./routes/ai.routes.js"
 
 
 import { startMonthlyReportJob } from "./services/cron/monthlyReport.js";
@@ -98,6 +99,7 @@ app.use("/api/goals", goalRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/ai", aiFeatureRoutes);
 app.use("/api/admin/request-logs", requestLogRoutes);
 app.use("/api/admin/error-logs", errorLogRoutes);
 app.use("/api/admin/failed-operations", failedOperationRoutes);

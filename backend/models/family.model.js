@@ -26,6 +26,16 @@ const familySchema = new mongoose.Schema({
         default: "active",
     },
 
+    aiUsage:{
+        requestsMade: {
+            type:Number,
+            default:0
+        },
+        lastResetDate: {
+            type:Date
+        }
+    }
+
 
 }, { timestamps: true });
 

@@ -90,6 +90,11 @@ import FamilyDetails from './pages/admin/family/FamilyDetails.jsx';
 import RequestAccountDeletion from './pages/user/RequestAccountDeletion.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 
+import AIFeatures from './pages/ai/AIFeatures.jsx'
+import FinancialHealth from './pages/ai/FinancialHealth.jsx';
+import Recommendation from './pages/ai/Recommendation.jsx';
+import Benchmark from './pages/ai/Benchmark.jsx';
+
 function App() {
 
   // useEffect(() => {
@@ -181,6 +186,11 @@ function App() {
                   <Route path="/transactions/create" element={<CreateTransaction />} />
                   <Route path="/transactions/:id" element={<TransactionDetails />} />
                   <Route path="/transactions/edit/:id" element={<EditTransaction />} />
+
+                  <Route path="/ai" element={<AIFeatures/> } />
+                  <Route path="/ai/financial-health" element={<FinancialHealth/> } />
+                  <Route path="/ai/benchmark" element={<Benchmark/> } />
+                  <Route path="/ai/recommendation" element={<Recommendation/> } />
                   
                 </Route>
 
