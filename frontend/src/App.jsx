@@ -47,8 +47,6 @@ import { AuthProvider } from './context/AuthContextNew.jsx';
 import { ThemeProvider } from './context/ThemeContext';
 
 import { useEffect } from "react";
-import { onMessage } from "firebase/messaging";
-import { messaging } from "./services/firebase.service.js"; // adjust path if needed
 
 // Family pages
 import FamilyOnboarding from "./pages/family/FamilyOnboarding";
@@ -68,7 +66,6 @@ import IndividualDashboard from './pages/dashboard/IndividualDashboard.jsx';
 // Notifications pages
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import NotificationDetailsPage from './pages/notifications/NotificationDetailsPage';
-import PushNotificationSettings from './pages/notifications/PushNotificationSettings';
 
 import AuthCallback from './pages/auth/AuthCallback.jsx';
 import Profile from './pages/auth/Profile.jsx';
@@ -97,25 +94,6 @@ import Benchmark from './pages/ai/Benchmark.jsx';
 
 function App() {
 
-  // useEffect(() => {
-  //   // This listener stays active for the lifetime of the component
-  //   const unsubscribe = onMessage(messaging, (payload) => {
-  //     console.log("Foreground message received:", payload);
-
-  //     const { title, body } = payload.notification;
-
-  //     // Use the Service Worker to show the notification (High mobile compatibility)
-  //     navigator.serviceWorker.ready.then((registration) => {
-  //       registration.showNotification(title, {
-  //         body: body,
-  //         icon: "/favicon.svg",
-  //         badge: "/favicon.svg", // Optional: small icon for mobile status bars
-  //       });
-  //     });
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
   return (
     // <ThemeProvider>
       <BrowserRouter>
@@ -148,7 +126,6 @@ function App() {
 
                   <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/notifications/:id" element={<NotificationDetailsPage />} />
-                  <Route path="/settings/push-notifications" element={<PushNotificationSettings />} />
       
                   <Route path="/dashboard/family" element={<FamilyDashboard />} />
                   <Route path="/dashboard/individual" element={<IndividualDashboard />} />

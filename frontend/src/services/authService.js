@@ -1,29 +1,8 @@
 
 import api from "../axios/axios";
-import { getFCMToken } from "../utils/createFcmToken";
 import { disconnectSocket } from "../socket/socket";
 
-// export const handlePostLogin = async () => {
-//   try {
-//     const res = await api.get("/user/me");
-//     const user = res.data.user;
 
-//     const token = await getFCMToken();
-//     const device = navigator.userAgent;
-
-//     if (token) {
-//       await api.post("/user/fcm-token", {
-//         fcmToken: token,
-//         device,
-//       });
-//     }
-
-//     return user;
-//   } catch (error) {
-//     console.error("Post login failed:", error);
-//     throw error;
-//   }
-// };
 
 
 const goToAuthCallback = () => {
@@ -34,15 +13,7 @@ export const handlePostLogin = async () => {
   const res = await api.get("/user/me", { skipAuthRefresh: true });
   const user = res.data.user;
 
-  const token = await getFCMToken();
-  const device = navigator.userAgent;
 
-  if (token) {
-    await api.post("/user/fcm-token", {
-      fcmToken: token,
-      device,
-    });
-  }
 
   return user;
 };

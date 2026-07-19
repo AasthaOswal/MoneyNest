@@ -1,6 +1,5 @@
 
 import api from "../axios/axios";
-import { getFCMToken } from "../utils/createFcmToken";
 import { disconnectSocket } from "../socket/socket";
 
 

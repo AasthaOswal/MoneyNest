@@ -207,28 +207,6 @@ const UserDetails = () => {
             <InfoRow label="Token Generation Version" value={userData.tokenVersion?.toString()} />
           </SectionCard>
 
-          {/* Active Registered Device Push Notification Tokens */}
-          {/* <SectionCard title="Registered Notification Nodes" icon={Smartphone}>
-            {userData.fcmTokens?.length > 0 ? (
-              <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-                {userData.fcmTokens.map((fcm, idx) => (
-                  <div key={idx} className="bg-(--color-input-bg) border border-(--color-border) rounded p-3 text-xs text-text space-y-1">
-                    <div className="flex justify-between font-medium text-text-secondary">
-                      <span>Device: {fcm.device || "Unknown Platform"}</span>
-                      <span>{formatDate(fcm.createdAt)}</span>
-                    </div>
-                    <div className="font-mono text-xs break-all text-(--color-primary) bg-(--color-surface) p-1.5 rounded border border-(--color-divider)">
-                      {fcm.token}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-3 text-sm bg-(--color-input-bg) border border-(--color-border) rounded text-text-secondary italic">
-                No messaging network devices registered to this user record.
-              </div>
-            )}
-          </SectionCard> */}
 
           {/* Internal Database Records Tracking */}
           <SectionCard title="System Chronology Records" icon={Database}>

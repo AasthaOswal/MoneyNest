@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../axios/axios";
 import { useAuth } from "../../hooks/useAuth";
-import { getFCMToken } from "../../utils/createFcmToken";
 import { initSocket } from "../../socket/socket.js";
 import toast from "react-hot-toast";
 import { setupNotificationListener } from "../../socket/socketNotification.js";
@@ -64,16 +63,6 @@ const AuthCallback = () => {
 
         console.log(socketRes);
 
-
-        // const response = await axios.post(
-        //   `${API_URL}/auth/refresh-token`,
-        //   {},
-        //   { withCredentials: true }
-        // );
-        // console.log(response)
-
-        // localStorage.setItem("accessToken", response?.data?.accessToken);
-
         // initialize authenticated socket
         initSocket();
 
@@ -83,29 +72,6 @@ const AuthCallback = () => {
           toast.success(`${data.notification.title} - ${data.notification.body}`);
         });
 
-
-
-
-        // if (token) {
-        //   await api.post("/user/fcm-token", {
-        //     fcmToken: token,
-        //     device,
-        //   });
-        // }
-
-        // try {
-        //   const token = await getFCMToken();
-        //   const device = navigator.userAgent;
-
-        //   if (token) {
-        //     await api.post("/user/fcm-token", {
-        //       fcmToken: token,
-        //       device,
-        //     });
-        //   }
-        // } catch (err) {
-        //   console.error("FCM registration failed", err);
-        // }
 
         if (user.role === "admin") {
           navigate("/admin-dashboard", { replace: true });

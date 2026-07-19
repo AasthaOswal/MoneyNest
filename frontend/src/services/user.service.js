@@ -12,17 +12,6 @@ export const getMyProfile = async () => {
   }
 };
 
-/**
- * 🔔 Save FCM Token
- */
-export const saveFcmToken = async (tokenData) => {
-  try {
-    const response = await api.post("/user/fcm-token", tokenData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
 
 /**
  * 🗑️ Request Account Deletion

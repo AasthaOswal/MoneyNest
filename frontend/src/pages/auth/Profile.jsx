@@ -93,30 +93,6 @@ const ProfilePage = () => {
 
         <div className="p-5 flex flex-col gap-4">
 
-          {/* <button
-            className="
-              flex items-center gap-3
-              border border-border
-              bg-card
-              hover:bg-card-hover
-              rounded-xl
-              px-4 py-4
-              transition
-              hover:cursor-pointer
-            "
-
-            onClick={()=>navigate("/settings/push-notifications")}
-          >
-            <Bell className="text-primary" size={18} />
-            <div className="text-left">
-              <p className="text-text font-medium">
-                Notifications
-              </p>
-              <p className="text-muted text-sm">
-                Manage push notifications
-              </p>
-            </div>
-          </button> */}
 
             {/* Leave Family Button */}
             <button

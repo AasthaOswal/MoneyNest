@@ -2,7 +2,6 @@ import React from 'react';
 import { Menu as LucideMenu } from 'lucide-react';
 // import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
-// import NotificationButton from '../buttons/NotificationButton';
 import { useNavigate } from 'react-router-dom';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
@@ -136,23 +135,6 @@ const Header = ({ setIsOpen }) => {
               </button>
             </MenuItem>
 
-            {/* Notifications */}
-            {/* <MenuItem>
-              <button
-                onClick={() => navigate("/settings/push-notifications")}
-                className="
-                  flex items-center gap-3
-                  w-full px-4 py-3
-                  text-sm text-text
-                  hover:bg-surface-2
-                  transition-colors
-                  hover:cursor-pointer
-                "
-              >
-                <Bell className="w-4 h-4" />
-                Notification Settings
-              </button>
-            </MenuItem> */}
 
             {/* Logout */}
             <div className="border-t border-border">
