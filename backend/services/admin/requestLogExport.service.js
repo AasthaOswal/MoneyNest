@@ -99,23 +99,6 @@ export const exportRequestLogsAndEmail = async (payload={}) => {
     console.log("✅ Export + Email sent successfully");
   } catch (error) {
     console.error("❌ Export failed:", error.message);
-
-    await createFailedExportLog(error,yesterday,now); // 🔥 IMPORTANT
   }
 };
 
-export const createFailedExportLog = async (error,from,to) => {
-  await FailedOperation.create({
-    operationType: "request_log_export",
-    status: "failed",
-    payload: {
-      from,
-      to,
-    },
-    error: {
-      message: error.message,
-      stack: error.stack,
-    },
-    nextRetryAt: new Date(Date.now() + 60 * 60 * 1000),
-  });
-};

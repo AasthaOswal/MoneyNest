@@ -46,7 +46,6 @@ const FailedOperationsPage = () => {
     {id: "cloudinary_delete_multiple", name: "Cloudinary Delete Multiple"},
     {id: "monthly_report_email", name: "Monthly Report Email"},
     {id: "db_notification", name: "DB Notification"},
-    {id: "request_log_export", name: "Request Log Export"},
     {id: "ai_monthly_report_email", name: "AI Monthly Report Email"}
   ];
 

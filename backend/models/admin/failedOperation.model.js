@@ -8,7 +8,7 @@ const failedOperationSchema = new mongoose.Schema(
     },
     operationType: {
       type: String,
-      enum: ["cloudinary_delete","cloudinary_delete_multiple", "monthly_report_email", "db_notification", "request_log_export", "ai_monthly_report_email"],
+      enum: ["cloudinary_delete","cloudinary_delete_multiple", "monthly_report_email", "db_notification", "ai_monthly_report_email"],
       required: true,
     },
 
