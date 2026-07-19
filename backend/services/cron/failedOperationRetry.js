@@ -5,7 +5,6 @@ import { createNotification } from "../../utils/notification/createNotification.
 
 // ✅ ADD THESE
 import { deleteFromCloudinary } from "../../utils/cloudinary/deleteFromCloudinary.js";
-import { deleteMultipleFiles } from "../../utils/cloudinary/deleteMultipleFiles.js";
 
 
 import { getFamilyReportData } from "../report/analytics.service.js";
@@ -31,14 +30,7 @@ const operationHandlers = {
     await deleteFromCloudinary(publicId);
   },
 
-  cloudinary_delete_multiple: async (payload) => {
-    const { publicIds } = payload;
 
-    // ⚠️ your payload stores array of objects [{ publicId, reason }]
-    const ids = publicIds.map(item => item.publicId);
-
-    await deleteMultipleFiles(ids);
-  },
 
     monthly_report_email: async (payload) => {
     const { email, familyId, from, to } = payload;

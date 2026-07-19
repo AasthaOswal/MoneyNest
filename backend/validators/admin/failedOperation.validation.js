@@ -4,7 +4,6 @@ export const getFailedOperationsValidation = Joi.object({
   type: Joi.string().allow("").trim()
     .valid(
       "cloudinary_delete",
-      "cloudinary_delete_multiple",
       "monthly_report_email",
       "db_notification",
       "ai_monthly_report_email"

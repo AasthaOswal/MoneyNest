@@ -8,7 +8,6 @@ import { createTransactionSchema, updateTransactionSchema, getTransactionsValida
 
 import { validateAndUploadFiles } from "../utils/cloudinary/validateAndUploadFiles.js";
 import { deleteFromCloudinary } from "../utils/cloudinary/deleteFromCloudinary.js";
-import { deleteMultipleFiles } from "../utils/cloudinary/deleteMultipleFiles.js";
 
 import { generateTransactionsExcel } from "../services/transaction/generateExcel.js";
 import {sendEmailBrevo} from "../utils/email/sendEmailBrevo.js";
