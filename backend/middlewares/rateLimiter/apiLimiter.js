@@ -23,7 +23,7 @@ const getClientKey = (req) => {
 
   // ✅ fallback → IP
 
-  const ip = ipKeyGenerator(req) || req.socket?.remoteAddress || "unknown";
+  const ip = ipKeyGenerator(req.ip) || req.socket?.remoteAddress || "unknown";
   return ip.startsWith("::ffff:") ? ip.slice(7) : ip;
 };
 

@@ -19,7 +19,7 @@ const maxLimit = {
 
 const keyGenIP = (req) => {
   let ip =
-    ipKeyGenerator(req) ||
+    ipKeyGenerator(req.ip) ||
     req.headers["x-forwarded-for"] ||
     req.socket?.remoteAddress ||
     "unknown";
@@ -36,7 +36,7 @@ const keyGenIP = (req) => {
 
 // Email-based (for login, signup, forgot password)
 const keyGenEmail = (req) => {
-  const ip = ipKeyGenerator(req);
+  const ip = ipKeyGenerator(req.ip);
   const email = req.body?.email?.toLowerCase() || "no-email";
   return `${ip}-${email}`;
 };
