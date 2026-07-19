@@ -6,7 +6,6 @@ export const getFailedOperationsValidation = Joi.object({
       "cloudinary_delete",
       "cloudinary_delete_multiple",
       "monthly_report_email",
-      "push_notification",
       "db_notification",
       "request_log_export",
       "ai_monthly_report_email"

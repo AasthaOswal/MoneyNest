@@ -1,4 +1,3 @@
-import { sendPushNotification } from "../firebase/sendPushNotification.js";
 import { createNotification } from "../../utils/notification/createNotification.js";
 import { deleteFromCloudinary } from "../../utils/cloudinary/deleteFromCloudinary.js";
 import { deleteMultipleFiles } from "../../utils/cloudinary/deleteMultipleFiles.js";
@@ -13,10 +12,6 @@ export const operationHandlers = {
     await exportRequestLogsAndEmail(payload);
   },
 
-  push_notification: async (payload) => {
-    const { userId, title, body } = payload;
-    await sendPushNotification(userId, title, body);
-  },
 
   db_notification: async (payload) => {
     const { userId, title, body, type, data } = payload;

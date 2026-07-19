@@ -40,16 +40,6 @@ export const userSchema = new mongoose.Schema({
     }],
 
 
-    // Array of fcmTokens because:
-    // 1 user → multiple devices → multiple tokens
-    fcmTokens: [
-        {
-            token: { type: String },
-            device: { type: String },
-            createdAt: { type: Date, default: Date.now }
-        }
-    ],
-
 
 
     resetPasswordToken: {

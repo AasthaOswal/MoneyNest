@@ -1,4 +1,4 @@
-import { saveFcmToken, getMyProfile, requestAccountDeletion, approveUserDeletion, getAllUsers, getUserById } from "../controllers/user.controller.js";
+import { getMyProfile, requestAccountDeletion, approveUserDeletion, getAllUsers, getUserById } from "../controllers/user.controller.js";
 import { Router } from "express";
 import { authenticateToken, authorizeRoles } from "../middlewares/auth.middleware.js";
 import { requireNoFamily, requireFamily } from "../middlewares/family.middleware.js";
@@ -6,7 +6,6 @@ import { requireNoFamily, requireFamily } from "../middlewares/family.middleware
 
 const router = Router();
 
-router.post("/fcm-token", authenticateToken, authorizeRoles("familyAdmin", "member", "admin"), saveFcmToken);
 
 
 

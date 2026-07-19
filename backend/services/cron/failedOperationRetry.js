@@ -1,7 +1,6 @@
 import cron from "node-cron";
 import FailedOperation from "../../models/admin/failedOperation.model.js";
 
-import { sendPushNotification } from "../firebase/sendPushNotification.js";
 import { createNotification } from "../../utils/notification/createNotification.js";
 
 // ✅ ADD THESE
@@ -23,10 +22,7 @@ const operationHandlers = {
     await exportRequestLogsAndEmail(payload);
   },
 
-  push_notification: async (payload) => {
-    const { userId, title, body } = payload;
-    await sendPushNotification(userId, title, body);
-  },
+
 
   db_notification: async (payload) => {
     const { userId, title, body, type, data } = payload;
