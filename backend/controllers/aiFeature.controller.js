@@ -5,7 +5,7 @@ import { financialHealthData } from "../services/ai-features/mocks/financialHeal
 import { benchmarkData } from "../services/ai-features/mocks/benchmark.mock.js";
 import { recommendationData } from "../services/ai-features/mocks/recommendation.mock.js";
 
-const DAILY_LIMIT = 6;
+const DAILY_LIMIT = Number(process.env.AI_FEATURES_DAILY_LIMIT);
 
 // utils/checkAndResetAIUsage.js
 
@@ -101,33 +101,39 @@ export const aiFeature = async (req, res) => {
         // CALL LLM
         // ============================================
 
-        console.log(feature)
+        // console.log(feature)
 
-        let aiResponse;
+        // let aiResponse;
 
-        // const aiResponse = await generateAIFeature(reportData,feature);
+        // if(feature == "financialHealth"){
+        //     aiResponse = financialHealthData
+        // }else if(feature == "benchmark"){
+        //     aiResponse = benchmarkData
+        // }else if(feature == "recommendation"){
+        //     aiResponse = recommendationData
+        // }
 
-        if(feature == "financialHealth"){
-            aiResponse = financialHealthData
-        }else if(feature == "benchmark"){
-            aiResponse = benchmarkData
-        }else if(feature == "recommendation"){
-            aiResponse = recommendationData
-        }
+        const aiResponse = await generateAIFeature(reportData,feature);
+
+        
 
         // ============================================
         // INCREMENT ONLY AFTER SUCCESS
         // ============================================
 
-        // family.aiUsage.requestsMade += 1;
+        family.aiUsage.requestsMade += 1;
 
         await family.save();
 
         return res.status(200).json({
             success: true,
             data: aiResponse,
-            remainingRequests:
-                DAILY_LIMIT - family.aiUsage.requestsMade
+            remainingRequests:{
+                remaining: DAILY_LIMIT - family.aiUsage.requestsMade,
+                dailyLimit: DAILY_LIMIT,
+                requestsMade: family.aiUsage.requestsMade,
+            }
+            
         });
 
     } catch (error) {
@@ -136,6 +142,46 @@ export const aiFeature = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: error.message || "Failed to generate AI insights."
+        });
+    }
+};
+
+
+export const getRemainingAIRequests = async (req, res) => {
+    try {
+        const familyId = req.user.familyId;
+
+        const family = await Family.findById(familyId);
+
+        if (!family) {
+            return res.status(404).json({
+                success: false,
+                message: "Family not found."
+            });
+        }
+
+        await resetAIUsage(family);
+
+        const remainingRequests = Math.max(
+            0,
+            DAILY_LIMIT - family.aiUsage.requestsMade
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                dailyLimit: DAILY_LIMIT,
+                requestsMade: family.aiUsage.requestsMade,
+                remainingRequests,
+                lastResetDate: family.aiUsage.lastResetDate
+            }
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to fetch AI usage."
         });
     }
 };

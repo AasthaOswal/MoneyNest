@@ -6,6 +6,7 @@ const Recommendation = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [remainingRequests, setRemainingRequests] = useState(null);
 
   useEffect(() => {
     
@@ -17,12 +18,13 @@ const Recommendation = () => {
         const response = await AIService.getAIFeature("recommendation");
         if (response?.data) {
           setData(response.data);
+          setRemainingRequests(response.remainingRequests);
           toast.success("Financial insights updated", { id: toastId });
         } else {
           throw new Error("Invalid response payload structure");
         }
       } catch (err) {
-        const fallbackMsg = err.message || "Failed to load recommendations";
+        const fallbackMsg = err.response?.data?.message || "Failed to load recommendations";
         setError(fallbackMsg);
         toast.error(fallbackMsg, { id: toastId });
       } finally {
@@ -75,23 +77,64 @@ const Recommendation = () => {
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] font-sans antialiased selection:bg-[var(--color-primary-subtle)] selection:text-[var(--color-primary)]">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+        <header className="border-b border-[color:var(--color-border)] py-6 shadow-[dashed_var(--shadow-card)] flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[color:var(--color-text)] to-[color:var(--color-text-secondary)] bg-clip-text text-transparent">
+              Recommendations
+            </h1>
+            
+            <p className="text-[color:var(--color-text-secondary)] leading-relaxed text-sm md:text-base">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse autem dicta laborum reprehenderit fugit aliquam dolores dolor temporibus laboriosam id expedita voluptates, vero nostrum, numquam in magni animi voluptatem architecto!
+            </p>
+            
+          </div>
+
+          {!loading && remainingRequests && (
+              <div className="mt-5 rounded-xl border border-border bg-card p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-text-secondary">
+                      AI Requests Remaining Today
+                    </p>
+                    <p className="mt-1 text-3xl font-bold text-primary">
+                      {remainingRequests.remaining} / {remainingRequests.dailyLimit}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm text-text-secondary">
+                      Used Today
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-text">
+                      {remainingRequests.requestsMade}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-lg bg-surface-2 px-3 py-2 text-sm text-text-secondary">
+                  Your AI request limit resets automatically at <strong>12:00 AM</strong> each day.
+                </div>
+              </div>
+            )}
+          
+         
+        </header>
         
         {/* Header Block */}
-        <header className="mb-8 pb-6 border-b border-[var(--color-divider)]">
+        <section className="mb-8 mt-4 pb-6 border-b border-[var(--color-divider)]">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--color-text)]">
-              Financial Recommendations
-            </h1>
-            <span className="rounded-full bg-[var(--color-primary-subtle)] px-2.5 py-0.5 text-xs font-semibold text-[var(--color-primary)] border border-[var(--color-border)]">
-              AI Powered
-            </span>
+            <h2 className="text-xl font-bold tracking-wide text-[var(--color-text)]">
+              Summary
+            </h2>
+            
           </div>
           {data?.summary && (
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--color-text-secondary)]">
               {data.summary}
             </p>
           )}
-        </header>
+        </section>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Action Items List */}

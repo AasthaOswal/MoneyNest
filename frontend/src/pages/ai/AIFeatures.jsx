@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import AIService from "../../services/ai.service";
 import { Activity, Lightbulb, BarChart2Icon, } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const AIFeatures = () => {
   const navigate = useNavigate();
@@ -26,6 +27,24 @@ const AIFeatures = () => {
     },
   ];
 
+  const [remainingRequests, setRemainingRequests] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRemainingRequests = async () => {
+      try {
+        const res = await AIService.getRemainingAIRequests();
+        setRemainingRequests(res.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRemainingRequests();
+  }, []);
+
   return (
     <div className="min-h-screen bg-bg text-text p-8 flex flex-col items-center">
       <div className="max-w-4xl w-full">
@@ -34,9 +53,39 @@ const AIFeatures = () => {
           <h1 className="text-3xl font-bold tracking-tight text-text">
             AI Features
           </h1>
+
           <p className="text-text-secondary mt-2">
-            Select an AI-powered module to inspect and optimize your financial portfolio.
+            Select an AI-powered module to inspect and optimize your financial
+            portfolio.
           </p>
+
+          {!loading && remainingRequests && (
+            <div className="mt-5 rounded-xl border border-border bg-card p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text-secondary">
+                    AI Requests Remaining Today
+                  </p>
+                  <p className="mt-1 text-3xl font-bold text-primary">
+                    {remainingRequests.remainingRequests} / {remainingRequests.dailyLimit}
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  <p className="text-sm text-text-secondary">
+                    Used Today
+                  </p>
+                  <p className="mt-1 text-xl font-semibold text-text">
+                    {remainingRequests.requestsMade}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-lg bg-surface-2 px-3 py-2 text-sm text-text-secondary">
+                Your AI request limit resets automatically at <strong>12:00 AM</strong> each day.
+              </div>
+            </div>
+          )}
         </header>
 
         {/* Feature Grid */}

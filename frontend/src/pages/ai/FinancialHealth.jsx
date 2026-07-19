@@ -5,6 +5,7 @@ import AIService from "../../services/ai.service";
 const FinancialHealth = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [remainingRequests, setRemainingRequests] = useState(null);
 
   useEffect(() => {
     const fetchFinancialHealth = async () => {
@@ -14,12 +15,13 @@ const FinancialHealth = () => {
         const response = await AIService.getAIFeature("financialHealth");
         if (response.success && response.data) {
           setData(response.data);
+          setRemainingRequests(response.remainingRequests);
           toast.success("Insights generated successfully!", { id: toastId });
         } else {
           throw new Error("Failed to parse financial metrics.");
         }
       } catch (err) {
-        const errMsg = err.message || "Something went wrong";
+        const errMsg = err.response?.data?.message || "Something went wrong";
         toast.error(errMsg, { id: toastId });
       } finally {
         setLoading(false);
@@ -57,7 +59,7 @@ const FinancialHealth = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[color:var(--color-bg)] text-[color:var(--color-text)]">
         <p className="text-[color:var(--color-error)] bg-[color:var(--color-error-bg)] px-4 py-3 rounded-xl border border-[color:var(--color-error)]/30">
-          Could not load financial insights. Please refresh the page.
+          Error occured. 
         </p>
       </div>
     );
@@ -67,15 +69,61 @@ const FinancialHealth = () => {
     <div className="min-h-screen bg-[color:var(--color-bg)] text-[color:var(--color-text)] p-6 md:p-10 transition-colors duration-200">
       <div className="max-w-6xl mx-auto space-y-8">
         
-        {/* Header Summary Section */}
+        {/* Header Section */}
+
         <header className="bg-[color:var(--color-surface)] border border-[color:var(--color-border)] rounded-2xl p-6 shadow-[dashed_var(--shadow-card)] flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
           <div className="space-y-2 max-w-2xl">
             <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[color:var(--color-text)] to-[color:var(--color-text-secondary)] bg-clip-text text-transparent">
-              Financial Health Check
+              Financial Health
+            </h1>
+            
+            <p className="text-[color:var(--color-text-secondary)] leading-relaxed text-sm md:text-base">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse autem dicta laborum reprehenderit fugit aliquam dolores dolor temporibus laboriosam id expedita voluptates, vero nostrum, numquam in magni animi voluptatem architecto!
+            </p>
+            
+          </div>
+
+          {!loading && remainingRequests && (
+              <div className="mt-5 rounded-xl border border-border bg-card p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-text-secondary">
+                      AI Requests Remaining Today
+                    </p>
+                    <p className="mt-1 text-3xl font-bold text-primary">
+                      {remainingRequests.remaining} / {remainingRequests.dailyLimit}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm text-text-secondary">
+                      Used Today
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-text">
+                      {remainingRequests.requestsMade}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-lg bg-surface-2 px-3 py-2 text-sm text-text-secondary">
+                  Your AI request limit resets automatically at <strong>12:00 AM</strong> each day.
+                </div>
+              </div>
+            )}
+          
+         
+        </header>
+
+        {/* Summary Section */}
+        <section className="bg-[color:var(--color-surface)] border border-[color:var(--color-border)] rounded-2xl p-6 shadow-[dashed_var(--shadow-card)] flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[color:var(--color-text)] to-[color:var(--color-text-secondary)] bg-clip-text text-transparent">
+              Summary
             </h1>
             <p className="text-[color:var(--color-text-secondary)] leading-relaxed text-sm md:text-base">
               {data.summary}
             </p>
+            
           </div>
           
           {/* Main Ring Badge */}
@@ -88,7 +136,7 @@ const FinancialHealth = () => {
               <div className={`text-xl font-bold ${getScoreColorClass(data.overallScore)}`}>{data.grade}</div>
             </div>
           </div>
-        </header>
+        </section>
 
         {/* Quick Highlights: Strengths & Weaknesses */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">

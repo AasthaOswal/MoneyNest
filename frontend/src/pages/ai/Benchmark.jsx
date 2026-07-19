@@ -8,6 +8,7 @@ const Benchmark = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [remainingRequests, setRemainingRequests] = useState(null);
 
   useEffect(() => {
     const fetchBenchmark = async () => {
@@ -17,11 +18,12 @@ const Benchmark = () => {
       try {
         const response = await AIService.getAIFeature("benchmark");
         setData(response.data);
+        setRemainingRequests(response.remainingRequests);
         
         // Success toast update
         toast.success("Insights loaded successfully!", { id: toastId });
       } catch (err) {
-        const errMsg = err.message || "Something went wrong";
+        const errMsg = err.response?.data?.message || "Something went wrong";
         setError(errMsg);
         
         // Error toast update
@@ -58,20 +60,49 @@ const Benchmark = () => {
     <div className="min-h-screen bg-[var(--color-bg)] p-6 text-[var(--color-text)] antialiased">
       {/* Header Section */}
       <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[var(--color-text)]">
-            Benchmark Comparison
-          </h1>
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            AI-driven breakdown and benchmark indicators
-          </p>
-        </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1.5 text-xs font-medium text-[var(--color-muted)]">
-          Rating:{" "}
-          <span className="font-semibold text-[var(--color-warning)]">
-            {data?.overallRating}
-          </span>
-        </div>
+        <header className="bg-[color:var(--color-surface)] border border-[color:var(--color-border)] rounded-2xl p-6 shadow-[dashed_var(--shadow-card)] flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[color:var(--color-text)] to-[color:var(--color-text-secondary)] bg-clip-text text-transparent">
+              Financial Health
+            </h1>
+            
+            <p className="text-[color:var(--color-text-secondary)] leading-relaxed text-sm md:text-base">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse autem dicta laborum reprehenderit fugit aliquam dolores dolor temporibus laboriosam id expedita voluptates, vero nostrum, numquam in magni animi voluptatem architecto!
+            </p>
+            
+          </div>
+
+          {!loading && remainingRequests && (
+              <div className="mt-5 rounded-xl border border-border bg-card p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-text-secondary">
+                      AI Requests Remaining Today
+                    </p>
+                    <p className="mt-1 text-3xl font-bold text-primary">
+                      {remainingRequests.remaining} / {remainingRequests.dailyLimit}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm text-text-secondary">
+                      Used Today
+                    </p>
+                    <p className="mt-1 text-xl font-semibold text-text">
+                      {remainingRequests.requestsMade}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-lg bg-surface-2 px-3 py-2 text-sm text-text-secondary">
+                  Your AI request limit resets automatically at <strong>12:00 AM</strong> each day.
+                </div>
+              </div>
+            )}
+          
+         
+        </header>
+        
       </div>
 
       {/* Summary Box */}
@@ -83,6 +114,13 @@ const Benchmark = () => {
           <p className="text-base leading-relaxed text-[var(--color-text-secondary)]">
             {data.summary}
           </p>
+
+          <div className="inline-flex items-center gap-2  bg-[var(--color-surface)] mt-4  py-1.5 text-xs font-medium text-[var(--color-muted)]">
+          Rating:{" "}
+          <span className="font-semibold text-[var(--color-warning)]">
+            {data?.overallRating}
+          </span>
+        </div>
         </div>
       )}
 

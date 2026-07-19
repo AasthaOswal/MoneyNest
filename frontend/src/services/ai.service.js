@@ -13,8 +13,21 @@ const getAIFeature = async (feature) => {
   }
 };
 
+/**
+ * 📊 Get remaining AI requests
+ */
+const getRemainingAIRequests = async () => {
+  try {
+    const response = await api.get("/ai/remaining-requests");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const AIService = {
   getAIFeature,
+  getRemainingAIRequests
 };
 
 export default AIService;
