@@ -16,7 +16,8 @@ import {
   LockIcon,
   AlertTriangle,
   Logs,
-  XCircle
+  XCircle,
+  Brain
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -39,6 +40,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       ]
     : [
         { name: 'Family Dashboard', path: '/dashboard/family', icon: LayoutDashboard, requiresFamily: true },
+        { name: 'AI Features', path: '/ai', icon: Brain, requiresFamily: true },
         { name: 'My Dashboard', path: '/dashboard/individual', icon: User, requiresFamily: true },
         { name: 'Transactions', path: '/transactions', icon: ArrowRightLeft, requiresFamily: true },
         { name: 'Categories', path: '/categories', icon: List, requiresFamily: true },

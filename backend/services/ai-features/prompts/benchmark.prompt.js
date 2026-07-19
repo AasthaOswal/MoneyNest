@@ -17,8 +17,6 @@ Healthy: Between 15% and 20%
 4. Total Allocation Rate (Expenses + Investments)
 Healthy: Should never exceed 100%
 
-5. Emergency Fund
-Healthy: Savings equal to at least 3 to 6 months of expenses
 
 6. Income Dependency
 Healthy: No single member should contribute more than 70% of household income.

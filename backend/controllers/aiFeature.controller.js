@@ -1,7 +1,9 @@
 import Family from "../models/family.model.js";
 import { buildMonthlyReportData } from "../services/ai-monthly-family-report/dataCollection.service.js";
 import {generateAIFeature} from "../services/ai-features/orchestration/groq.service.js"
-
+import { financialHealthData } from "../services/ai-features/mocks/financialHealth.mock.js";
+import { benchmarkData } from "../services/ai-features/mocks/benchmark.mock.js";
+import { recommendationData } from "../services/ai-features/mocks/recommendation.mock.js";
 
 const DAILY_LIMIT = 6;
 
@@ -101,13 +103,23 @@ export const aiFeature = async (req, res) => {
 
         console.log(feature)
 
-        const aiResponse = await generateAIFeature(reportData,feature);
+        let aiResponse;
+
+        // const aiResponse = await generateAIFeature(reportData,feature);
+
+        if(feature == "financialHealth"){
+            aiResponse = financialHealthData
+        }else if(feature == "benchmark"){
+            aiResponse = benchmarkData
+        }else if(feature == "recommendation"){
+            aiResponse = recommendationData
+        }
 
         // ============================================
         // INCREMENT ONLY AFTER SUCCESS
         // ============================================
 
-        family.aiUsage.requestsMade += 1;
+        // family.aiUsage.requestsMade += 1;
 
         await family.save();
 
