@@ -38,17 +38,7 @@ export const createNotification = async ({
 
   } catch (error) {
     console.error("Error creating notification:", error.message);
-    await createFailedOperation({
-      operationType: "db_notification",
-      payload: {
-        userId,
-        title,
-        body,
-        type,
-        data
-      },
-      error,
-    });
-    return null; // don't break cron
+
+    throw error;
   }
 };
