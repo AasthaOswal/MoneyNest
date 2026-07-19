@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import AuthService from "../../services/authService";
+import AuthService from "../../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 

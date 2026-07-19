@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import AuthService from "../../services/authService"; 
+import AuthService from "../../services/auth.service"; 
 import { useAuth } from "../../hooks/useAuth.js";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import AuthService from "../../services/authService";
+import AuthService from "../../services/auth.service";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");

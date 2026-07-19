@@ -12,9 +12,30 @@ import {
   LogOut
 } from "lucide-react";
 
+import toast from 'react-hot-toast';
+
 const Header = ({ setIsOpen }) => {
   // const { theme, toggleTheme } = useTheme();
+
+  console.log("About to call useAuth - from Header.jsx");
   const { user, logout } = useAuth();
+
+  const handleLogout = async ()=>{
+    const toastId = toast.loading("Please wait while we log you out");
+    try{
+      const res = await logout();
+
+      console.log(res);
+      toast.success(res.data?.message || "Logged out successfullyy..", {id:toastId});
+
+
+    }catch(error){
+      console.log(error);
+      console.log(error.response);
+      toast.error(error.response?.data?.message || "Some error occured.", {id:toastId});
+
+    }
+  };
 
   const navigate = useNavigate();
   return (
@@ -140,7 +161,7 @@ const Header = ({ setIsOpen }) => {
             <div className="border-t border-border">
               <MenuItem>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="
                     flex items-center gap-3
                     w-full px-4 py-3

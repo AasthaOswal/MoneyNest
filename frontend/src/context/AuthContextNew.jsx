@@ -12,6 +12,8 @@ export const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => { 
 
+    console.log("AuthProvider rendered - from AuthContextNew");
+
     const navigate = useNavigate();
 
     const [user, setUser] = useState(null)
@@ -118,8 +120,14 @@ export const AuthProvider = ({ children }) => {
     };
 
       const logout = async () => {
-        await AuthService.logout();
-        setUser(null);
+        try{
+            const res = await AuthService.logout();
+            setUser(null);
+            return res;
+        }catch(error){
+            console.log(error);
+            throw error;
+        }
     };
 
 

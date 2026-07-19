@@ -4,6 +4,9 @@ import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 
 const ProtectedRoute = ({ allowedRoles }) => {
+
+  console.log("ProtectedRoute rendered");
+  
   const { user, loading } = useAuth();
   const location = useLocation();
 
