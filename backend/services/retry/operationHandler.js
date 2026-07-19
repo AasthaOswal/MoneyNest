@@ -4,14 +4,9 @@ import { deleteMultipleFiles } from "../../utils/cloudinary/deleteMultipleFiles.
 import { getFamilyReportData } from "../report/analytics.service.js";
 import { generateReportPDF } from "../report/report.service.js";
 import { sendEmailBrevo } from "../../utils/email/sendEmailBrevo.js";
-import { exportRequestLogsAndEmail } from "../admin/requestLogExport.service.js";
 import {generateMonthlyReportForFamily} from "../ai-monthly-family-report/monthlyReportMain.service.js";
 
 export const operationHandlers = {
-  request_log_export: async (payload) => {
-    await exportRequestLogsAndEmail(payload);
-  },
-
 
   db_notification: async (payload) => {
     const { userId, title, body, type, data } = payload;
