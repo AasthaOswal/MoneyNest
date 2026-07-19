@@ -21,14 +21,14 @@ import {generateMonthlyReportForFamily} from "../ai-monthly-family-report/monthl
 // const GOAL_TRACKER_CRON = "*/10 * * * *";
 
 // runs every 3 minutes - for deployed version testing
-const GOAL_TRACKER_CRON = "*/3 * * * *";
+// const GOAL_TRACKER_CRON = "*/3 * * * *";
 
 //runs every minute - localhost testing
 // const GOAL_TRACKER_CRON = "* * * * *";
 
 
 // 1st day of every month at 12:00 AM - 0 0 1 * *
-// const GOAL_TRACKER_CRON = "0 0 1 * *"; 
+const GOAL_TRACKER_CRON = "0 0 1 * *"; 
 
 const sleep = (ms) =>
     new Promise(resolve => setTimeout(resolve, ms));

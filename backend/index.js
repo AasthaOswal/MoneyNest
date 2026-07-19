@@ -108,11 +108,11 @@ if(process.env.START_AI_MONTHLY_REPORT_CRON === "true"){
 startAiMonthlyFinancialReportCron();
 }
 
-// startPersonalGoalTracker();
-// startFamilyGoalTracker();
+startPersonalGoalTracker();
+startFamilyGoalTracker();
 
 // run cron job
-// startFailedOperationsRetryNew();
+startFailedOperationsRetryNew();
 
 app.use(globalErrorHandler);
 

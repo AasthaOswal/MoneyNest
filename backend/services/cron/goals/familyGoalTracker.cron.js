@@ -11,14 +11,14 @@ import { createNotification } from "../../../utils/notification/createNotificati
 import { formatGoalSummary } from "../../goals/formatGoalSummary.js";
 
 // runs every 5 minutes - deployed testing
-const FAMILY_GOAL_TRACKER_CRON = "*/5 * * * *";
+// const FAMILY_GOAL_TRACKER_CRON = "*/5 * * * *";
 
 // runs every minute - localhost testing
 // const FAMILY_GOAL_TRACKER_CRON = "* * * * *";
 
 
 // Every Sunday at 9:00 AM
-// const FAMILY_GOAL_TRACKER_CRON = "0 9 * * 0";
+const FAMILY_GOAL_TRACKER_CRON = "0 9 * * 0";
 
 export const startFamilyGoalTracker = () => {
     cron.schedule(

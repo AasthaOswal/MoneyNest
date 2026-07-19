@@ -5,7 +5,11 @@ import { retrySingleOperation } from "../retry/retrySingleFailedOperation.servic
 // const RETRY_CRON = "* * * * *"; // every minute
 
 
-const RETRY_CRON = "*/30 * * * * *"; // every 30 sec
+// const RETRY_CRON = "*/30 * * * * *"; // every 30 sec
+
+
+// every saturday 9 am
+const RETRY_CRON = "0 0 9 * * 6";
 
 export const startFailedOperationsRetryNew = () => {
     console.log("🔁 Failed Operations Retry Service Started");
