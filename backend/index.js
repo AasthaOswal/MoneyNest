@@ -27,7 +27,6 @@ import aiFeatureRoutes from "./routes/ai.routes.js"
 
 import { requestLogger } from "./middlewares/requestLogger.middleware.js";
 import { authenticateToken } from "./middlewares/auth.middleware.js";
-import { startFailedOperationsRetry } from "./services/cron/failedOperationRetry.js";
 import {startFailedOperationsRetryNew} from "./services/cron/failedOperationNew.cron.js";
 import { startAiMonthlyFinancialReportCron } from "./services/cron/aiMonthlyFamilyReport.cron.js";
 
@@ -113,9 +112,6 @@ startAiMonthlyFinancialReportCron();
 // startFamilyGoalTracker();
 
 // run cron job
-// startGoalTracker();
-// startFailedOperationsRetry();
-
 // startFailedOperationsRetryNew();
 
 app.use(globalErrorHandler);
