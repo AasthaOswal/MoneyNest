@@ -6,7 +6,6 @@ import Label from "../models/label.model.js";
 
 import { createTransactionSchema, updateTransactionSchema, getTransactionsValidation } from "../validators/transaction.validation.js";
 
-import { validateAndUploadFiles } from "../utils/cloudinary/validateAndUploadFiles.js";
 import { deleteFromCloudinary } from "../utils/cloudinary/deleteFromCloudinary.js";
 
 import { generateTransactionsExcel } from "../services/transaction/generateExcel.js";
